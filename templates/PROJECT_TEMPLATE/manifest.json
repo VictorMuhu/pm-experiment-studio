@@ -1,0 +1,32 @@
+{
+  "$schema": "../../schemas/project-manifest.schema.json",
+
+  "name": "Project Name",
+  "slug": "project-name",
+
+  "date_created": "YYYY-MM-DD",
+  "date_updated": "YYYY-MM-DD",
+
+  "bucket": "pm-productivity",
+  "persona": "Specific description of the target user — role, context, and what they are trying to do. Not a job title alone.",
+  "problem_statement": "The specific problem this project addresses. Name the failure mode, for whom, and why the existing approach is insufficient.",
+
+  "complexity": "simple",
+  "artifact_type": "Describe what the finished thing actually is — structure and interaction, not a category label.",
+  "style_direction": "premium-saas",
+  "stack": [],
+
+  "status": "draft",
+  "publish_recommendation": "hold",
+
+  "description": "One sentence describing what this project does — no trailing period, under 160 characters",
+  "tags": [],
+
+  "idea_matrix_id": null,
+
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+
+  "notes": null
+}

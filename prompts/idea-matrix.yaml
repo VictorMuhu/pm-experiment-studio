@@ -1,0 +1,1247 @@
+# idea-matrix.yaml
+# 40 project seeds for PM-led product experiments.
+# Divided across 6 buckets. Each seed is scoped to be buildable as a standalone artifact.
+#
+# likely_complexity scale:
+#   low    — one focused UI, minimal state, no auth, shippable in a day or two
+#   medium — multiple views or states, some data persistence or processing, 3–5 days
+#   high   — real backend, data pipeline, or non-trivial algorithmic work, 1–2 weeks
+#
+# candidate_artifact_types: what the finished thing actually is
+# candidate_stacks: concrete technology options, not frameworks-in-general
+
+seeds:
+
+  # ─────────────────────────────────────────────
+  # BUCKET: PM PRODUCTIVITY
+  # ─────────────────────────────────────────────
+
+  - id: prd-gap-detector
+    concept_name: PRD Gap Detector
+    bucket: pm-productivity
+    target_persona: Product manager writing or reviewing a requirements document
+    pain_point: >
+      PRDs get reviewed late in the process, and the gaps that matter — missing edge cases,
+      undefined success metrics, unstated assumptions — only surface during eng kickoff
+      or, worse, after build starts.
+    one_sentence_thesis: >
+      Paste a PRD draft and get a structured list of the gaps a senior engineer or
+      designer would catch in review, before you send it.
+    likely_complexity: low
+    candidate_artifact_types:
+      - single-page web tool
+      - CLI tool with markdown output
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js app router, no database
+    differentiation_angle: >
+      Not a grammar checker or template filler — outputs are categorized by gap type
+      (missing metric, ambiguous actor, undefined error state, no rollback plan) with
+      specific line references so the PM knows exactly where to fix.
+    notes: >
+      The value is in the taxonomy of gap types, not the LLM call. Spend design time
+      on the output schema. Consider shipping the taxonomy itself as a separate artifact.
+
+  - id: retro-pattern-tracker
+    concept_name: Retro Pattern Tracker
+    bucket: pm-productivity
+    target_persona: Engineering manager or PM who runs recurring sprint retrospectives
+    pain_point: >
+      Retro themes recur across sprints — "unclear requirements," "blocked on design" —
+      but because notes live in different Miro boards or Notion pages, no one ever sees
+      the pattern. The same problems get discussed without ever getting fixed.
+    one_sentence_thesis: >
+      Log retro items over time in a lightweight format; surface recurring themes,
+      trend direction, and which action items were never followed up on.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - lightweight web app with local persistence
+      - CSV-in, patterns-out CLI tool
+    candidate_stacks:
+      - SvelteKit + localStorage (no backend)
+      - Python + pandas + rich (CLI)
+      - React + IndexedDB
+    differentiation_angle: >
+      Focuses on recurrence frequency and resolution rate, not just theme clustering.
+      A recurring theme with no resolved action items is surfaced differently than
+      a recurring theme that's trending down. The insight is in the trajectory.
+    notes: >
+      Tempting to make this an LLM clustering tool — resist. The categorization
+      can be manual (checkboxes, tags) with analysis done on structured data.
+      Speed of input matters more than classification accuracy.
+
+  - id: stakeholder-update-composer
+    concept_name: Stakeholder Update Composer
+    bucket: pm-productivity
+    target_persona: PM who sends weekly or milestone-based updates to exec stakeholders
+    pain_point: >
+      Writing stakeholder updates is time-consuming because the format and framing
+      depend heavily on audience: eng leads want status and blockers, execs want
+      risk and business impact, customers want outcomes. PMs rewrite the same facts
+      three times in different voices.
+    one_sentence_thesis: >
+      Given a bullet list of raw status points, generate audience-appropriate updates
+      in three formats simultaneously — exec summary, team update, and customer-facing
+      version — each with the right framing and detail level.
+    likely_complexity: low
+    candidate_artifact_types:
+      - single-page web tool with copy-to-clipboard output
+      - Notion integration (webhook-triggered)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js with no database
+    differentiation_angle: >
+      The UI enforces the input structure: status (on-track/at-risk/blocked),
+      why it matters, what's next. The quality of the output depends on the
+      quality of the structure — the tool teaches the mental model while using it.
+    notes: >
+      The interesting design challenge is what input fields to expose. Too many
+      and it's another form. Too few and the output lacks specificity.
+
+  - id: feature-flag-graveyard
+    concept_name: Feature Flag Graveyard
+    bucket: pm-productivity
+    target_persona: PM or tech lead on a team that has accumulated feature flags over 12+ months
+    pain_point: >
+      Feature flags accumulate. After a few quarters, nobody knows which flags are
+      permanent config, which are stale experiments, and which are actively protecting
+      production. Cleaning them up requires manual investigation that no one prioritizes.
+    one_sentence_thesis: >
+      Connect to a LaunchDarkly or Unleash export and generate a triage report:
+      which flags are expired, which are likely permanent, which owner hasn't touched
+      them in 90 days, and what's the cleanup sequence.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - CLI tool with HTML report output
+      - Single-page dashboard (read-only)
+    candidate_stacks:
+      - Node.js CLI, LaunchDarkly API, html-to-text for report
+      - Python + Jinja2 for HTML report
+    differentiation_angle: >
+      Outputs a prioritized cleanup queue, not just a list. Flags are scored by
+      staleness, blast radius (number of contexts they affect), and owner activity.
+      Gives the tech lead a defensible order of operations for a cleanup sprint.
+    notes: >
+      Could start even simpler — accept a CSV export from any flag system rather
+      than requiring API integration. The analysis logic is the interesting part.
+
+  - id: okr-health-scorer
+    concept_name: OKR Health Scorer
+    bucket: pm-productivity
+    target_persona: PM or program manager writing OKRs or reviewing a team's OKRs for quality
+    pain_point: >
+      Most OKRs are written to satisfy a process, not to actually guide decisions.
+      Key results are output-based ("launch X") instead of outcome-based, or so
+      vague they can never be truly failed. Reviewers give feedback inconsistently.
+    one_sentence_thesis: >
+      Score a set of OKRs against a rubric (outcome vs. output, measurability,
+      time-bound, leading vs. lagging) and return a structured critique with
+      specific rewrite suggestions for each failing key result.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page paste-and-score tool
+      - Shareable report (static HTML)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js, no database
+    differentiation_angle: >
+      The rubric is explicit and displayed alongside the output — users can see
+      exactly which criterion each KR fails. The tool teaches the framework by
+      using it, not by explaining it upfront.
+    notes: >
+      The rubric design is the core intellectual work here. Research the Christina
+      Wodtke and Felipe Castro OKR frameworks before building the scoring logic.
+
+  - id: roadmap-dependency-surface
+    concept_name: Roadmap Dependency Surfacer
+    bucket: pm-productivity
+    target_persona: PM managing a multi-team roadmap with cross-functional dependencies
+    pain_point: >
+      Cross-team dependencies are underspecified in roadmaps. A team commits to shipping
+      X, not knowing that team B needs to ship Y first — and the conflict only becomes
+      visible in sprint planning, weeks after the roadmap was set.
+    one_sentence_thesis: >
+      Import a roadmap (CSV or Linear export) with team and quarter tags, and surface
+      implicit dependencies: items where one team's output is likely another team's input,
+      ordered by risk of conflict.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Web tool with dependency graph visualization
+      - CLI tool with structured output
+    candidate_stacks:
+      - React + D3 or Dagre for graph rendering
+      - Python + NetworkX + matplotlib
+    differentiation_angle: >
+      Most dependency tools require explicit dependency tagging. This one infers likely
+      dependencies from item names, descriptions, and team assignments — flagging
+      probable conflicts for human review rather than managing declared ones.
+    notes: >
+      The inference quality will be imperfect — frame it as a "surface for review"
+      tool, not a definitive dependency map. Precision matters less than recall here;
+      a false positive is cheap, a missed dependency is expensive.
+
+  - id: interview-debrief-structurer
+    concept_name: Interview Debrief Structurer
+    bucket: pm-productivity
+    target_persona: PM or UX researcher conducting user interviews who needs to debrief quickly
+    pain_point: >
+      Interview notes are messy in real-time. The synthesis — pulling out distinct pain
+      points, quotes worth keeping, hypotheses confirmed or denied — happens hours later
+      from memory or chaotic notes, and important details get lost or conflated.
+    one_sentence_thesis: >
+      Paste raw interview notes and get a structured debrief: confirmed hypotheses,
+      new hypotheses surfaced, notable verbatim quotes, and open questions — separated
+      by the interviewee's stated vs. implied needs.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page web tool
+      - Obsidian plugin (markdown in, markdown out)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Python CLI with markdown output
+      - Obsidian community plugin (TypeScript)
+    differentiation_angle: >
+      Explicitly separates stated needs ("I wish it did X") from implied needs (behavior
+      or frustration that suggests an unspoken problem). This distinction is where most
+      interview synthesis falls short.
+    notes: >
+      The output should be immediately paste-able into a research repository.
+      Design the output format first, before the UI.
+
+
+  # ─────────────────────────────────────────────
+  # BUCKET: GTM WORKFLOW
+  # ─────────────────────────────────────────────
+
+  - id: launch-readiness-auditor
+    concept_name: Launch Readiness Auditor
+    bucket: gtm-workflow
+    target_persona: PM or PMM coordinating a product launch across eng, marketing, sales, and support
+    pain_point: >
+      Launch checklists exist but they're generic templates that get copied and incompletely
+      filled. The gaps that cause launch failures — support not trained, sales deck outdated,
+      docs not published — are predictable but still missed repeatedly.
+    one_sentence_thesis: >
+      Given a feature description and launch scope, generate a launch readiness checklist
+      scoped to the feature's specific risk surface — internal tool launches look different
+      from public API launches, which look different from consumer feature launches.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page web tool
+      - Exportable checklist (Markdown, Notion import)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static export
+    differentiation_angle: >
+      The checklist is scope-aware: inputs include launch type (internal/beta/GA), affected
+      surfaces (API, UI, billing, support), and audience (existing users/new users/enterprise).
+      The output differs meaningfully based on these inputs, not just feature name.
+    notes: >
+      Could extend to a go/no-go scoring tool — checklist items flagged as blocking vs.
+      recommended. That's a v2 scope decision worth logging in the decision log.
+
+  - id: persona-message-mapper
+    concept_name: Persona-to-Message Mapper
+    bucket: gtm-workflow
+    target_persona: PMM or PM building positioning for a product with multiple buyer segments
+    pain_point: >
+      The same feature gets framed differently for a developer, an IT admin, and a CFO —
+      but most teams write one message and use it everywhere, or write three versions
+      inconsistently without a clear differentiation logic.
+    one_sentence_thesis: >
+      Given a feature description and a set of target personas, generate segment-specific
+      value prop statements, proof points, and objection pre-emptions for each — organized
+      around what each persona is trying to avoid, not just what they want.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page web tool with tabbed persona output
+      - Downloadable positioning brief (PDF or Markdown)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js, no database
+    differentiation_angle: >
+      Frames each value prop around the persona's primary fear (losing control, looking
+      slow, overspending, getting paged) rather than generic benefits. Fear-based framing
+      consistently outperforms benefit-based in B2B positioning.
+    notes: >
+      The persona input could be freeform text or a set of structured fields. Structured
+      fields (role, company size, primary KPI, main risk) produce better output but create
+      more friction. Worth A/B testing in real use.
+
+  - id: competitive-delta-snapshot
+    concept_name: Competitive Delta Snapshot
+    bucket: gtm-workflow
+    target_persona: PM or PMM who needs to brief sales on competitive positioning quickly
+    pain_point: >
+      Competitive battlecards go stale within weeks and get ignored. When a competitor
+      ships something new, there's no lightweight process for updating the relevant
+      sections and communicating what changed to sales without republishing a full doc.
+    one_sentence_thesis: >
+      Given a competitor changelog or release notes, generate a structured delta brief:
+      what changed, how it affects your positioning, which deal stages it matters in,
+      and what the updated handling is for the relevant objection.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Web tool with diff-style output
+      - Slack-sendable brief generator
+    candidate_stacks:
+      - Next.js with Claude API
+      - Python CLI with Slack webhook output
+    differentiation_angle: >
+      Outputs are framed for sales use — "In a late-stage deal where the prospect mentions
+      [competitor], here's what changed and here's the updated response." Not analyst-speak,
+      deal-context speak.
+    notes: >
+      The input could be a URL to a competitor changelog page, with the tool scraping and
+      summarizing. Adds complexity but improves the workflow significantly.
+
+  - id: beta-cohort-pattern-finder
+    concept_name: Beta Cohort Pattern Finder
+    bucket: gtm-workflow
+    target_persona: PM analyzing early access or beta program usage before GA launch
+    pain_point: >
+      Beta feedback arrives as a mix of support tickets, survey responses, and usage data.
+      The patterns that matter — which persona segments are struggling, which workflows
+      are working, where the "aha moment" is actually landing — are buried in the noise
+      and rarely synthesized before launch.
+    one_sentence_thesis: >
+      Upload beta feedback and usage summary data; get back a segmented pattern report
+      showing which cohort types are succeeding, which are struggling, and what the
+      most common failure mode is per segment.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Data upload and analysis web tool
+      - Python notebook with structured output
+    candidate_stacks:
+      - Next.js with file upload, Claude API for synthesis
+      - Python + pandas + Claude API for analysis
+      - Observable notebook
+    differentiation_angle: >
+      Segments output by "personas succeeding" vs. "personas struggling" rather than
+      feature-level usage stats. The PM question before launch isn't "which feature
+      was used most" — it's "who is actually ready to get value from this."
+    notes: >
+      This works best as a semi-structured workflow: define your persona segments first,
+      then the analysis maps feedback to those segments. Don't try to auto-discover
+      segments from raw data — that's a research project, not a launch tool.
+
+  - id: win-loss-pattern-extractor
+    concept_name: Win/Loss Pattern Extractor
+    bucket: gtm-workflow
+    target_persona: PM or sales leader reviewing deal outcomes to inform roadmap or positioning
+    pain_point: >
+      Win/loss interview notes and Salesforce notes contain patterns — objections, missing
+      features, competitor mentions — but they're unstructured and nobody has time to
+      read 50 deal summaries. The insights stay locked in the data.
+    one_sentence_thesis: >
+      Upload a batch of win/loss notes or CRM deal summaries and get back a structured
+      analysis: top 5 loss reasons by frequency, top 3 win drivers, competitor mentions
+      mapped to deal outcome, and which deal stage each issue most often appears.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Data upload web tool with exportable report
+      - Python CLI with JSON/CSV output
+    candidate_stacks:
+      - Next.js with file upload + Claude API
+      - Python + Claude API + rich for terminal output
+    differentiation_angle: >
+      Outputs are explicitly tied to deal stages (prospecting / demo / eval / procurement)
+      so product and sales can route each insight to the right team. A late-stage
+      pricing objection is a different problem than an early-stage ICP misfit.
+    notes: >
+      Privacy consideration: deal notes often contain customer names. The tool should
+      work on anonymized data, and the README should note this clearly.
+
+  - id: pricing-sensitivity-explorer
+    concept_name: Pricing Sensitivity Explorer
+    bucket: gtm-workflow
+    target_persona: PM or growth lead doing early pricing research without a data science team
+    pain_point: >
+      Van Westendorp and Gabor-Granger pricing surveys exist but most PMs don't know how
+      to set one up, collect responses, and interpret the outputs without a researcher.
+      Pricing decisions end up made on gut feel or competitive benchmarking alone.
+    one_sentence_thesis: >
+      A lightweight survey builder for Van Westendorp price sensitivity measurement —
+      generates the four canonical questions scoped to your product, collects responses,
+      and renders the four price curves with the acceptable price range highlighted.
+    likely_complexity: high
+    candidate_artifact_types:
+      - Two-part web app: survey link + results dashboard
+    candidate_stacks:
+      - Next.js + SQLite or Turso for response storage
+      - Next.js + Supabase (free tier)
+    differentiation_angle: >
+      Most pricing survey tools are enterprise or researcher-facing. This one is built for
+      a PM who has a Typeform account and a Slack channel of beta users. Setup in 10 minutes,
+      shareable link, automatic curve rendering when responses exceed n=30.
+    notes: >
+      The methodology is public domain and well-documented. The value is in making it
+      self-service, not in the math. Keep the results view clean — one chart, four lines,
+      one highlighted range. Resist adding more.
+
+  - id: onboarding-email-sequencer
+    concept_name: Onboarding Email Sequence Auditor
+    bucket: gtm-workflow
+    target_persona: PM or lifecycle marketer reviewing or building a product onboarding email sequence
+    pain_point: >
+      Onboarding email sequences get built once and never revisited. Steps get out of sync
+      with the product, triggers fire at the wrong moments, and the sequence doesn't account
+      for different user paths (activated vs. not activated, team vs. individual).
+    one_sentence_thesis: >
+      Paste your current onboarding sequence (email subjects + bodies + send timing) and
+      get a structured audit: steps that contradict the current product, triggers that don't
+      match activation patterns, missing branch points for key user states.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page paste-and-audit tool
+      - Annotated sequence output (Markdown)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      The audit output flags three distinct problem types: factual errors (feature described
+      no longer exists), sequencing errors (email fires before user can complete the action),
+      and segmentation gaps (no branch for the most common user state). Each type has a
+      different owner and fix.
+    notes: >
+      Tempting to make this a builder, not an auditor. Resist — auditing an existing sequence
+      is the higher-value starting point. Most teams have a sequence; few have audited it.
+
+
+  # ─────────────────────────────────────────────
+  # BUCKET: ANALYTICS / DEBUGGING
+  # ─────────────────────────────────────────────
+
+  - id: funnel-drop-hypothesis-engine
+    concept_name: Funnel Drop Hypothesis Engine
+    bucket: analytics-debugging
+    target_persona: PM or growth analyst investigating an unexplained drop in conversion at a funnel step
+    pain_point: >
+      When a funnel step drops unexpectedly, the PM opens a dashboard and stares at numbers.
+      The process of generating hypotheses (is it a segment? a device? a recent change? a
+      seasonal pattern?) is informal and often skips entire categories of causes.
+    one_sentence_thesis: >
+      Given a funnel step, the drop magnitude, a date range, and recent product changes,
+      generate a prioritized list of testable hypotheses organized by hypothesis category
+      with the data cut needed to confirm or deny each one.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page structured input tool
+      - Shareable hypothesis brief (Markdown/HTML)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js, no database
+    differentiation_angle: >
+      The output is a hypothesis checklist with explicit "how to test" instructions —
+      not just "check if it's a mobile issue" but "segment by device type, compare
+      steps 2→3 conversion rate for iOS vs. Android for the 7 days before and after
+      the drop date." Actionable specificity is the point.
+    notes: >
+      The hypothesis taxonomy is the intellectual core: technical (bug, infra), product
+      change (feature, copy, flow), external (traffic source shift, seasonality),
+      instrumentation (event not firing, double-counting). Build this taxonomy explicitly.
+
+  - id: metric-definition-auditor
+    concept_name: Metric Definition Auditor
+    bucket: analytics-debugging
+    target_persona: PM or data analyst establishing or reviewing a metric definition for a KPI
+    pain_point: >
+      Metrics get defined informally — "active users means logged in in the last 30 days" —
+      without specifying edge cases: Do deleted accounts count? What about service accounts?
+      Is it a rolling window or calendar month? These gaps cause discrepancies across dashboards
+      and erode trust in the data.
+    one_sentence_thesis: >
+      Submit a metric name and informal definition; get back a structured definition
+      with every ambiguity flagged, a canonical SQL-like pseudocode definition, and a
+      list of the edge cases that need explicit handling before the metric can be trusted.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page tool with structured definition output
+      - Exportable metric spec (YAML or Markdown)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      Outputs a formal metric spec document in a consistent format — name, grain,
+      numerator definition, denominator definition, filters, exclusions, recalculation
+      policy. Teams can use the output directly as a metric registry entry.
+    notes: >
+      A library of example metric definitions (DAU, revenue, churn rate, activation rate)
+      pre-loaded as templates would make this immediately useful out of the box.
+
+  - id: ab-test-result-interpreter
+    concept_name: A/B Test Result Interpreter
+    bucket: analytics-debugging
+    target_persona: PM reading an A/B test result without a statistician available
+    pain_point: >
+      A/B test dashboards show p-values and confidence intervals but most PMs lack the
+      statistical fluency to interpret them correctly — especially for tests with multiple
+      variants, low base rates, or short run times. Decisions get made on misleading numbers.
+    one_sentence_thesis: >
+      Enter your test parameters and results; get a plain-English interpretation that
+      flags common errors (underpowered test, peeking, multiple comparisons problem)
+      and gives a recommended decision with explicit reasoning.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Web calculator with structured output
+      - Embeddable widget for internal wiki
+    candidate_stacks:
+      - Plain HTML/JS (no backend — all math client-side)
+      - React with recharts for distribution visualization
+    differentiation_angle: >
+      Goes beyond "statistically significant yes/no" to flag whether the test was
+      adequately powered before it ran, whether the effect size is practically meaningful
+      (minimum detectable effect vs. actual observed effect), and whether the result is
+      likely a false positive given the base rate of winning experiments in this context.
+    notes: >
+      The statistics here are well-established — implement Chi-squared for conversion rates,
+      t-test for continuous metrics, and the sequential testing correction for tests checked
+      before the planned end date. Don't invent methodology.
+
+  - id: event-tracking-coverage-mapper
+    concept_name: Event Tracking Coverage Mapper
+    bucket: analytics-debugging
+    target_persona: PM or analytics engineer auditing instrumentation coverage before a data review
+    pain_point: >
+      Product analytics instrumentation drifts: events that were added for a feature that
+      was redesigned, flows with no events at all, event names that are inconsistently
+      formatted. The gaps only surface when someone asks a question the data can't answer.
+    one_sentence_thesis: >
+      Given a product flow description (or sitemap) and a list of currently instrumented
+      events, generate a coverage map showing which steps have events, which are dark,
+      and which events appear to be orphaned (fired by flows that no longer exist).
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Flow diagram with coverage annotations
+      - Coverage report (table format)
+    candidate_stacks:
+      - React + Mermaid.js or D3 for flow rendering
+      - Python CLI with ASCII flow output
+    differentiation_angle: >
+      Surfaces "dark spots" — flow steps with no events — separately from "orphaned events"
+      — events with no corresponding current flow step. Both are problems, but they have
+      different owners and different fix costs.
+    notes: >
+      The hardest part is the input format for the product flow. A structured YAML flow
+      definition is more useful than freeform text for this use case.
+
+  - id: dashboard-staleness-detector
+    concept_name: Dashboard Staleness Detector
+    bucket: analytics-debugging
+    target_persona: Data analyst or PM managing a collection of internal dashboards
+    pain_point: >
+      Internal dashboards accumulate. Dashboards built for a quarterly initiative keep
+      living in the "dashboards" folder long after the initiative ends. Nobody knows
+      which ones are actively used, which are owned, or which underlying tables have
+      changed enough to make the dashboard misleading.
+    one_sentence_thesis: >
+      Connect to a Metabase or Looker API and generate a staleness report: dashboards
+      with no views in 60+ days, dashboards whose underlying tables have schema changes
+      since last edit, and dashboards with no assigned owner.
+    likely_complexity: high
+    candidate_artifact_types:
+      - CLI tool with HTML report
+      - Scheduled Slack summary (cron + webhook)
+    candidate_stacks:
+      - Python + Metabase API or Looker SDK
+      - Node.js + scheduled job
+    differentiation_angle: >
+      Frames output as an actionable triage list: "archive," "reassign owner," or
+      "validate after schema change" — three distinct categories with different next steps.
+      Not just a stale flag on each dashboard.
+    notes: >
+      Start with Metabase — it has a well-documented public API and is common in
+      startup data stacks. Looker adds complexity due to LookML parsing.
+
+  - id: sql-explainer-for-pms
+    concept_name: SQL Explainer for PMs
+    bucket: analytics-debugging
+    target_persona: PM who receives SQL queries from analysts and needs to understand what they measure
+    pain_point: >
+      Analysts send PMs SQL queries that produce the numbers in dashboards. PMs can't
+      evaluate whether the query actually measures what they asked for, so they either
+      blindly trust it or ask the analyst to explain it — which is a slow, repeated loop.
+    one_sentence_thesis: >
+      Paste a SQL query and get a plain-English explanation of exactly what it measures,
+      what each join does, which filters are applied, and what edge cases in the data
+      the query might silently mis-handle.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page tool with annotated query output
+      - VS Code extension (query → inline comments)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - VS Code extension (TypeScript)
+    differentiation_angle: >
+      Not just a general explanation — output is structured around PM-relevant questions:
+      "What does this count?", "What is excluded?", "What happens if [table] has nulls?",
+      "Does this double-count if a user has multiple rows?" The PM's blind spots, not a
+      developer's.
+    notes: >
+      The VS Code extension version is a stronger artifact for a developer-adjacent PM
+      persona. The web tool is better for non-technical PMs. Build one, note the other
+      as a future variant in the decision log.
+
+  - id: anomaly-hypothesis-generator
+    concept_name: Anomaly Hypothesis Generator
+    bucket: analytics-debugging
+    target_persona: PM or on-call analyst investigating an unexpected spike or drop in a key metric
+    pain_point: >
+      When a metric spikes or drops, the instinct is to check the same few things (did
+      we deploy? is there a data pipeline issue?) and ignore systematic alternative causes.
+      The mental checklist is informal and incomplete.
+    one_sentence_thesis: >
+      Given a metric name, anomaly direction (spike/drop), magnitude, and date/time,
+      generate a structured investigation checklist covering technical, product, external,
+      and instrumentation hypotheses — ordered by prior probability and ease of investigation.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page tool with shareable investigation brief
+      - Slack slash command (/investigate [metric] [direction])
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Slack app (Node.js + Bolt SDK)
+    differentiation_angle: >
+      The ordering matters more than the list. Most hypothesis generators produce
+      an unordered braindump. This one ranks by "most likely given what you told me"
+      and "fastest to check," so the analyst works the list efficiently.
+    notes: >
+      The Slack slash command version is the more useful artifact — it meets the analyst
+      where they are when an anomaly is discovered. Consider that as the primary form factor.
+
+
+  # ─────────────────────────────────────────────
+  # BUCKET: CUSTOMER EXPERIENCE
+  # ─────────────────────────────────────────────
+
+  - id: support-ticket-theme-clusterer
+    concept_name: Support Ticket Theme Clusterer
+    bucket: customer-experience
+    target_persona: PM or support lead reviewing a high volume of incoming tickets to identify product issues
+    pain_point: >
+      Support tickets contain signal about product failures, but the volume makes
+      manual review impractical. Teams rely on tags that were applied inconsistently,
+      or run keyword searches that miss issues described in different words.
+    one_sentence_thesis: >
+      Upload a CSV export of support tickets and get back a theme cluster report:
+      top issue categories by frequency, representative example tickets per cluster,
+      and a "product signal vs. user error vs. documentation gap" classification for each.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Data upload web tool with cluster output
+      - Python notebook with interactive output
+    candidate_stacks:
+      - Next.js with file upload + Claude API
+      - Python + Claude API (batch processing) + pandas
+    differentiation_angle: >
+      The three-way classification (product bug / user error / docs gap) routes each theme
+      to the right team without manual triage. Most clustering tools just group — this one
+      prescribes the owner.
+    notes: >
+      Batch processing matters here — a real ticket export will have hundreds of rows.
+      Design for async processing with a progress indicator, not a single synchronous call.
+
+  - id: onboarding-friction-mapper
+    concept_name: Onboarding Friction Mapper
+    bucket: customer-experience
+    target_persona: PM or UX designer auditing a new user onboarding flow for friction points
+    pain_point: >
+      Onboarding flows accumulate friction over product iterations — steps added for edge
+      cases that became the main case, explanatory copy written for an old UI, required
+      fields that are no longer required. Auditing the full flow requires walking it
+      manually with fresh eyes, which is rare.
+    one_sentence_thesis: >
+      Walk through an onboarding flow by describing each step, and get a friction assessment:
+      cognitive load score per step, likely drop reasons, steps that can be deferred,
+      and a recommended "minimum viable path" for the most common user type.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Step-by-step structured input tool
+      - Annotated flow output (Markdown or HTML)
+    candidate_stacks:
+      - Next.js multi-step form with Claude API
+      - Plain HTML/JS
+    differentiation_angle: >
+      Applies four distinct friction lenses per step: cognitive (too much to understand),
+      effort (too much to do), trust (asks for something the user isn't ready to give),
+      and timing (right action, wrong moment in the journey). Each has a different fix.
+    notes: >
+      The structured input is more valuable than freeform description. Design input fields
+      that prompt the user to describe what's visible, what's required, and what decision
+      the user must make at each step.
+
+  - id: nps-verbatim-categorizer
+    concept_name: NPS Verbatim Categorizer
+    bucket: customer-experience
+    target_persona: PM or CX analyst processing NPS survey responses to inform product priorities
+    pain_point: >
+      NPS verbatim responses are the most useful part of an NPS survey and the least
+      systematically reviewed. Teams read a random sample, write a summary paragraph,
+      and move on. The distribution of what promoters love vs. what detractors cite
+      is rarely quantified.
+    one_sentence_thesis: >
+      Upload NPS response data (score + verbatim) and get a structured breakdown:
+      top themes by score band (detractor / passive / promoter), features mentioned
+      in positive vs. negative context, and a list of the verbatims most worth sharing
+      directly with the product team.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Data upload web tool with filterable output
+      - Shareable PDF/HTML report
+    candidate_stacks:
+      - Next.js with CSV upload + Claude API
+      - Python + Claude API + reportlab for PDF
+    differentiation_angle: >
+      Segments output by score band before clustering themes — so the team can see
+      "what detractors cite most" separately from "what promoters cite most."
+      Most NPS tools aggregate across the full range and obscure this distinction.
+    notes: >
+      The "verbatims worth sharing with the team" output is a high-value curated artifact —
+      it selects for clarity and specificity, not just frequency. One well-chosen verbatim
+      in a product review changes a conversation more than a chart does.
+
+  - id: churn-signal-pattern-matcher
+    concept_name: Churn Signal Pattern Matcher
+    bucket: customer-experience
+    target_persona: PM or CS lead trying to identify early indicators of customer churn before renewal
+    pain_point: >
+      By the time a customer churns, the team can point to 10 signals they missed: support
+      escalation in month 4, drop in active users in month 5, unanswered QBR in month 6.
+      The signals exist but no one is watching for the pattern before it's too late.
+    one_sentence_thesis: >
+      Given a set of churned customer histories (support tickets, usage data, CRM notes),
+      surface the sequence of signals that most consistently preceded churn, and produce
+      a detection checklist that CS can apply to current accounts.
+    likely_complexity: high
+    candidate_artifact_types:
+      - Data analysis web tool with pattern output
+      - Python notebook with shareable HTML output
+    candidate_stacks:
+      - Python + pandas + Claude API for pattern synthesis
+      - Observable notebook
+    differentiation_angle: >
+      Output is a temporal pattern — "signal A at month N, followed by signal B within
+      30 days" — not just a list of risk factors. The sequence and timing of signals
+      is what makes a detection checklist actionable.
+    notes: >
+      Requires real or realistic synthetic data to build and test. Consider generating
+      a synthetic dataset as part of the project artifact — it makes the tool demonstrable
+      without requiring real customer data.
+
+  - id: feature-request-deduplicator
+    concept_name: Feature Request Deduplicator
+    bucket: customer-experience
+    target_persona: PM managing a large backlog of user feature requests across multiple channels
+    pain_point: >
+      Feature requests arrive through support tickets, sales calls, user interviews, NPS
+      responses, and community posts. The same underlying need gets expressed in dozens
+      of different ways and tracked as separate items. PMs can't see the true frequency
+      of any given need.
+    one_sentence_thesis: >
+      Upload a list of feature requests from any source and get a deduplicated cluster
+      output: groups of requests expressing the same underlying need, with the best
+      representative phrasing for each group and a total frequency count.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Data upload tool with cluster output
+      - Exportable backlog (CSV with cluster IDs)
+    candidate_stacks:
+      - Next.js with file upload + Claude API
+      - Python + Claude API (batch embeddings + clustering)
+    differentiation_angle: >
+      Distinguishes between same-need (different words, same request) and related-need
+      (different requests that might be solved by the same solution). The latter is
+      labeled as "possibly related" rather than merged — an important nuance for
+      backlog management.
+    notes: >
+      For larger inputs (500+ requests), embedding-based clustering (via OpenAI or
+      Claude embeddings) will outperform LLM-based grouping. Worth noting this threshold
+      in the project documentation.
+
+  - id: customer-journey-gap-annotator
+    concept_name: Customer Journey Gap Annotator
+    bucket: customer-experience
+    target_persona: PM or CX designer building or reviewing a customer journey map
+    pain_point: >
+      Journey maps get created, reviewed once, and filed. They're snapshots, not living
+      documents. When the product changes, the journey map doesn't update. And even when
+      fresh, they rarely systematically document emotional gaps (moments of uncertainty
+      or frustration the product doesn't address) vs. functional gaps (steps where
+      the product is absent).
+    one_sentence_thesis: >
+      Describe a customer journey in structured stages and get an annotated output
+      distinguishing functional gaps (no product touchpoint), emotional gaps (product
+      present but not addressing the user's state), and handoff gaps (seam between
+      two teams or channels that nobody owns).
+    likely_complexity: low
+    candidate_artifact_types:
+      - Multi-step input tool with annotated journey output
+      - Printable/shareable journey document
+    candidate_stacks:
+      - Next.js with multi-step form
+      - Plain HTML/JS
+    differentiation_angle: >
+      The three-way gap taxonomy (functional / emotional / handoff) produces actionable
+      routing: functional gaps go to product, emotional gaps go to content/UX, handoff
+      gaps go to ops or program management. A generic "opportunity" label doesn't do this.
+    notes: >
+      Consider allowing the user to export the annotated journey as a Mermaid diagram —
+      it's immediately usable in documentation tools and looks more credible than a
+      text output.
+
+  - id: user-quote-library
+    concept_name: User Quote Library
+    bucket: customer-experience
+    target_persona: PM or researcher who accumulates user quotes across interviews, surveys, and calls
+    pain_point: >
+      User quotes are the most persuasive artifact in product work — a single clear verbatim
+      can change a leadership decision. But quotes live in scattered places: Notion pages,
+      interview notes, Gong recordings. When you need one, you can't find it.
+    one_sentence_thesis: >
+      A minimal searchable library for saving, tagging, and retrieving user verbatim quotes —
+      with fields for source type, persona, sentiment, and the product area they reference.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Lightweight web app with local or cloud persistence
+      - Browser extension (highlight-to-save)
+    candidate_stacks:
+      - Next.js + SQLite or Turso (serverless SQLite)
+      - SvelteKit + localStorage (zero backend)
+      - Browser extension (TypeScript + IndexedDB)
+    differentiation_angle: >
+      Built for retrieval, not just storage. The search experience is the product —
+      find quotes by product area, persona type, sentiment, or free text. Designed so
+      a PM can pull the right quote in under 30 seconds before a stakeholder meeting.
+    notes: >
+      The browser extension version is a much stronger artifact — the friction of switching
+      to a separate app to save a quote is why existing solutions fail. But extensions
+      have more setup complexity. Worth logging this trade-off in the decision log.
+
+
+  # ─────────────────────────────────────────────
+  # BUCKET: INTERNAL TOOLING
+  # ─────────────────────────────────────────────
+
+  - id: meeting-output-formatter
+    concept_name: Meeting Output Formatter
+    bucket: internal-tooling
+    target_persona: PM or EM who takes meeting notes and needs to turn them into structured outputs
+    pain_point: >
+      Meeting notes are written in stream-of-consciousness during a call and rarely
+      formatted into the outputs that matter: decisions made, action items with owners,
+      open questions, and context for people who weren't in the room. This transformation
+      takes 15–30 minutes and often doesn't happen.
+    one_sentence_thesis: >
+      Paste raw meeting notes and get back a structured output with decisions (with rationale),
+      action items (with owner and due date extracted from context), open questions, and a
+      one-paragraph summary suitable for async sharing.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page tool with formatted output
+      - Slack-ready message formatter
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Raycast extension (TypeScript)
+    differentiation_angle: >
+      Distinguishes decisions (things that were settled) from action items (things that need
+      to be done) from open questions (things unresolved that need a future answer).
+      Most tools conflate all three. These go to different people and tracking systems.
+    notes: >
+      The Raycast extension version is a strong form factor — PMs who use Raycast can
+      trigger this without opening a browser. Consider both and pick based on your
+      own workflow.
+
+  - id: incident-postmortem-scaffolder
+    concept_name: Incident Post-Mortem Scaffolder
+    bucket: internal-tooling
+    target_persona: EM or PM leading a post-mortem after a production incident
+    pain_point: >
+      Post-mortems are written under time pressure after an incident, often by the person
+      most exhausted from responding to it. The resulting documents are inconsistent in
+      quality, frequently miss contributing factors, and rarely produce action items with
+      real owners and dates.
+    one_sentence_thesis: >
+      Provide a timeline of incident events and the initial impact description; get back
+      a structured post-mortem draft with contributing factor categories, a five-whys
+      chain, and action item slots with owner fields — ready to fill in, not ready to publish.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page tool with structured output
+      - Google Docs or Notion template generator
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      Generates a draft, not a finished document — explicitly labeled as such. Outputs
+      include placeholder prompts ("contributing factor: was there a missing test? [describe]")
+      rather than filled conclusions, which prevents the post-mortem from being authored
+      by an LLM instead of the team that lived through the incident.
+    notes: >
+      The five-whys chain is the hardest output to get right — it needs to probe for
+      systemic causes, not stop at proximate ones. Test this specifically with real
+      incident scenarios.
+
+  - id: rfc-status-tracker
+    concept_name: RFC Status Tracker
+    bucket: internal-tooling
+    target_persona: Staff engineer or technical PM managing a design review and RFC process
+    pain_point: >
+      RFCs get written, commented on, and then never formally closed. The status lives
+      in someone's head or in a doc comment thread. Teams end up re-litigating decisions
+      that were made in an RFC nobody can find, or building on an RFC whose status
+      was never updated after the decision changed.
+    one_sentence_thesis: >
+      A minimal RFC registry — a list of RFCs with status (draft / in-review / accepted /
+      superseded / rejected), owner, decision date, and link — with a weekly digest of
+      RFCs that have been in review longer than a configured threshold.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Lightweight web app with persistence
+      - Static YAML registry with generated HTML view
+    candidate_stacks:
+      - Next.js + SQLite or Turso
+      - Static site from YAML source (11ty or similar)
+    differentiation_angle: >
+      The static YAML registry approach is the more interesting artifact — the source
+      of truth is a YAML file in the team's git repo, and the HTML view is generated.
+      Decisions are version-controlled. The RFC status is as auditable as the code.
+    notes: >
+      The weekly digest is a key feature — passive visibility, not requiring anyone
+      to check a dashboard. Deliver it via Slack webhook or email.
+
+  - id: knowledge-base-freshness-checker
+    concept_name: Knowledge Base Freshness Checker
+    bucket: internal-tooling
+    target_persona: PM, team lead, or IT ops person maintaining an internal wiki or knowledge base
+    pain_point: >
+      Internal wikis rot. Pages written for a previous architecture, a deprecated tool,
+      or an old process stay visible and get followed by new employees. The cost of
+      stale documentation is invisible until someone does the wrong thing because they
+      read an outdated page.
+    one_sentence_thesis: >
+      Connect to a Confluence or Notion API, and generate a freshness report: pages
+      not viewed or edited in 180+ days, pages whose content references deprecated tools
+      or discontinued products, and pages with no assigned owner.
+    likely_complexity: high
+    candidate_artifact_types:
+      - CLI tool with HTML report output
+      - Scheduled Slack digest
+    candidate_stacks:
+      - Python + Confluence REST API or Notion API
+      - Node.js with scheduled cron
+    differentiation_angle: >
+      The content analysis pass — flagging pages that mention deprecated tools by name —
+      is what separates this from a simple last-edited-date report. That requires an
+      LLM pass over page content, which is the interesting technical piece.
+    notes: >
+      Scope to Notion first — the API is better documented and more common in product
+      teams. Confluence adds complexity and requires a separate auth model.
+
+  - id: hiring-rubric-calibrator
+    concept_name: Hiring Rubric Calibrator
+    bucket: internal-tooling
+    target_persona: EM or PM who conducts interviews and participates in hiring debriefs
+    pain_point: >
+      Interview rubrics exist but interviewers apply them inconsistently — the same
+      answer gets a "strong yes" from one interviewer and a "lean no" from another
+      because the rubric criteria aren't illustrated with concrete examples of what
+      each score level looks like.
+    one_sentence_thesis: >
+      Given a role, a set of rubric criteria, and sample interview responses, generate
+      calibration examples for each score level (1–4) for each criterion — concrete,
+      role-specific examples that a new interviewer can use to anchor their scoring.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Calibration guide generator (PDF or Markdown)
+      - Internal training web tool
+    candidate_stacks:
+      - Next.js with Claude API
+      - Python CLI with markdown/PDF output
+    differentiation_angle: >
+      Most rubric generators produce abstract criteria. This one produces example
+      interview responses for each score level — so an interviewer who just gave a
+      2/4 can check it against the reference and confirm or recalibrate before the debrief.
+    notes: >
+      The generated calibration examples will need human review before use — frame
+      the tool as generating a draft that the hiring manager refines, not a ready-to-use
+      artifact. The time savings is still substantial.
+
+  - id: cross-team-dependency-register
+    concept_name: Cross-Team Dependency Register
+    bucket: internal-tooling
+    target_persona: PM, EM, or program manager tracking dependencies across multiple teams in a quarterly plan
+    pain_point: >
+      Dependencies get called out in planning meetings and tracked in someone's notes.
+      When a team slips, the downstream teams often find out too late — there's no
+      lightweight system for making dependencies visible and flagging when a dependency
+      is at risk.
+    one_sentence_thesis: >
+      A minimal dependency registry — teams log what they need from which team by when —
+      with a status view showing at-risk dependencies (where the providing team's work
+      is behind or unplanned) and a weekly automated summary.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Lightweight web app
+      - YAML file with generated HTML view
+    candidate_stacks:
+      - Next.js + SQLite or Turso
+      - Static YAML source with 11ty or Astro for HTML view
+    differentiation_angle: >
+      Designed for the "I need X from team Y by week N" use case specifically — not a
+      general project management tool. The constraint produces a cleaner model: each
+      dependency has exactly one requesting team, one providing team, one artifact, and
+      one date.
+    notes: >
+      The automated weekly summary is the most important feature — passive visibility
+      is what makes lightweight coordination tools actually used. Without it, it's just
+      another dashboard nobody checks.
+
+
+  # ─────────────────────────────────────────────
+  # BUCKET: DECISION SUPPORT
+  # ─────────────────────────────────────────────
+
+  - id: make-vs-buy-evaluator
+    concept_name: Make vs. Buy Evaluator
+    bucket: decision-support
+    target_persona: PM or technical lead evaluating whether to build a capability internally or buy a vendor solution
+    pain_point: >
+      Make vs. buy decisions are made inconsistently — sometimes driven by engineering
+      preference ("we can build that"), sometimes by sales pressure from a vendor. The
+      structured factors (total cost, strategic differentiation, integration complexity,
+      long-term lock-in) rarely get documented before the decision is made.
+    one_sentence_thesis: >
+      Walk through a structured set of inputs (capability description, build cost estimate,
+      vendor options, strategic importance, integration complexity) and get a scored
+      evaluation matrix with a recommended decision and the three most important factors
+      driving it.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Multi-step evaluation wizard with scored output
+      - Exportable decision brief (PDF/Markdown)
+    candidate_stacks:
+      - Next.js multi-step form with scoring logic (no backend needed)
+      - Plain HTML/JS
+    differentiation_angle: >
+      Weights the strategic differentiation factor explicitly — a capability that is
+      core to the company's competitive advantage scores differently than commodity
+      infrastructure, even if the build cost is similar. Most cost-only frameworks
+      miss this.
+    notes: >
+      The scoring weights themselves are a design decision worth logging. Consider
+      allowing the user to adjust weights for their context rather than using a fixed
+      rubric — this makes the tool more honest about the subjectivity involved.
+
+  - id: priority-score-calculator
+    concept_name: Priority Score Calculator
+    bucket: decision-support
+    target_persona: PM who needs to rank a set of initiatives or features for a planning cycle
+    pain_point: >
+      RICE, ICE, and similar scoring frameworks exist but PMs apply them inconsistently —
+      especially the "Confidence" and "Effort" inputs, which are estimated without
+      calibration. The result is a ranked list that looks quantitative but encodes
+      the PM's original intuition.
+    one_sentence_thesis: >
+      A scoring tool that implements RICE, ICE, and weighted custom criteria — but prompts
+      for the calibration inputs that determine whether the scores are meaningful:
+      confidence basis, effort estimation method, and impact assumption source.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page scoring calculator with ranked output
+      - Shareable spreadsheet alternative (static HTML table)
+    candidate_stacks:
+      - Plain HTML/JS (no backend)
+      - React with local state
+    differentiation_angle: >
+      The calibration prompts are the differentiator — before entering a confidence score,
+      the user is asked what the confidence is based on. Before entering impact, the user
+      is asked what evidence supports it. This produces a brief justification trail alongside
+      the scores.
+    notes: >
+      The justification trail is the most useful output for stakeholder conversations —
+      "here's why item X scored higher than item Y" with evidence, not just numbers.
+      Design the output around this use case.
+
+  - id: assumption-log
+    concept_name: Assumption Log
+    bucket: decision-support
+    target_persona: PM managing an initiative with significant uncertainty in the early stages
+    pain_point: >
+      Product decisions rest on assumptions that are never written down. When an initiative
+      fails, it's often because a foundational assumption turned out to be wrong — but
+      because it was never logged, the team can't reconstruct what they believed and why,
+      or learn from the pattern of which assumption types most often fail.
+    one_sentence_thesis: >
+      A structured log for recording, tracking, and testing product assumptions —
+      with fields for assumption type, confidence level, how it will be tested, and
+      what happens to the initiative if it fails.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Lightweight web app with persistence
+      - Notion template with pre-built views
+    candidate_stacks:
+      - SvelteKit + localStorage or IndexedDB
+      - Next.js + SQLite
+    differentiation_angle: >
+      Includes an explicit "if this assumption is wrong" field — forcing the PM to
+      articulate the consequence of each assumption failing before it does. This surfaces
+      which assumptions are actually load-bearing vs. which are background beliefs.
+    notes: >
+      Four assumption types worth encoding: desirability (users want this), feasibility
+      (we can build this), viability (this is a business), and usability (users can figure
+      it out). These map to different test methods and different team owners.
+
+  - id: reversibility-classifier
+    concept_name: Reversibility Classifier
+    bucket: decision-support
+    target_persona: PM or EM making a technical or product decision and wanting to calibrate decision weight
+    pain_point: >
+      Not all decisions deserve the same deliberation. A reversible architecture choice
+      should be made quickly; an irreversible pricing model change should involve
+      extensive review. Teams apply uniform deliberation to all decisions and end up
+      over-investing in easy decisions and under-investing in hard ones.
+    one_sentence_thesis: >
+      Describe a decision you're facing and get a structured reversibility assessment:
+      cost to reverse, blast radius if wrong, time to detect if wrong, and a recommended
+      decision process (decide now / timebox to N days / require sign-off from X).
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page decision triage tool
+      - Notion template (decision brief)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      Outputs a process recommendation, not just a classification. "This is a type 2
+      decision" is less useful than "make this in the next standup, document the rationale
+      in a Slack message, and revisit in sprint review." The recommendation fits the
+      decision weight to the team's real workflow.
+    notes: >
+      Jeff Bezos's type 1 / type 2 framework is the reference here but the output should
+      go further — three dimensions (reversal cost, blast radius, detection speed) produce
+      a more nuanced recommendation than a binary classification.
+
+  - id: trade-off-memo-generator
+    concept_name: Trade-Off Memo Generator
+    bucket: decision-support
+    target_persona: PM who needs to present a decision recommendation to leadership or a cross-functional group
+    pain_point: >
+      Decision memos are written in varying formats and quality levels. The best ones
+      clearly state the options, the criteria used to evaluate them, the recommendation
+      and why, and what was explicitly deprioritized. Most don't do all four, and
+      the gaps create alignment failures in review meetings.
+    one_sentence_thesis: >
+      Provide a decision context, the options considered, and your recommendation;
+      get back a structured trade-off memo in a consistent format — options with
+      pros/cons against explicit criteria, recommendation with primary rationale,
+      and a "what this choice gives up" section that forces acknowledgment of the
+      cost of the chosen path.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Structured input tool with memo output
+      - Copyable memo (Markdown or plain text)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      The "what this choice gives up" section is the differentiator — it makes the
+      deprioritized options' value explicit, which is necessary for stakeholders who
+      advocated for them. Acknowledgment of what was given up produces faster alignment
+      than ignoring it.
+    notes: >
+      The output format should be intentionally short — a trade-off memo that exceeds
+      one page has failed at its job. Consider enforcing a word limit in the output
+      instructions.
+
+  - id: risk-surface-analyzer
+    concept_name: Risk Surface Analyzer
+    bucket: decision-support
+    target_persona: PM preparing to ship a significant feature or make a major product change
+    pain_point: >
+      Pre-ship risk reviews are superficial — teams check the same categories they've
+      always checked (performance, security, rollback plan) and miss the risks specific
+      to the feature's context: data migration risk, support volume spike risk, pricing
+      confusion risk, third-party dependency risk.
+    one_sentence_thesis: >
+      Describe a feature you're about to ship and get a risk surface report: a categorized
+      list of risk vectors specific to the feature's type, affected systems, and user base —
+      each with a recommended mitigation and a go/no-go relevance flag.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Single-page risk assessment tool
+      - Pre-ship checklist generator
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      Risk categories are derived from feature context, not applied from a generic template.
+      A billing change generates different risks than a new API endpoint. The inputs
+      (feature type, affected surfaces, user segments impacted, third-party dependencies)
+      drive which risk categories are surfaced.
+    notes: >
+      A library of real post-mortems and launch failures (public ones from tech companies)
+      would strengthen the risk taxonomy. Reading 20 of these before designing the
+      category list will produce a materially better tool.
+
+  - id: scope-cut-advisor
+    concept_name: Scope Cut Advisor
+    bucket: decision-support
+    target_persona: PM or EM under time pressure who needs to cut scope to hit a deadline
+    pain_point: >
+      Scope cuts under pressure are made reactively — the engineer says "this part is
+      taking twice as long" and the PM cuts whatever seems easiest to cut in the moment,
+      without systematically evaluating which cuts preserve the most value or which
+      cuts create the most downstream rework.
+    one_sentence_thesis: >
+      List the features or components in scope for a milestone, and get back a prioritized
+      cut list: items ranked by (estimated effort remaining) × (value to core use case
+      inverse) — with a "safe to cut" / "cuts create rework" / "do not cut" classification
+      for each.
+    likely_complexity: low
+    candidate_artifact_types:
+      - Lightweight prioritization tool
+      - Exportable cut list (Markdown/CSV)
+    candidate_stacks:
+      - Plain HTML/JS with Claude API
+      - Next.js static
+    differentiation_angle: >
+      The "cuts create rework" classification is the key output — it flags items where
+      cutting now will require re-doing work later (e.g., cutting the error state for
+      a form means writing the form again when the error state is added in v2). This
+      is the cost most scope cut frameworks don't capture.
+    notes: >
+      Requires the user to estimate effort remaining and rate value to core use case
+      for each item. The quality of the output depends on honest inputs. The tool
+      should prompt for the method used to estimate, not just accept the number.
+
+  - id: decision-journal
+    concept_name: Decision Journal
+    bucket: decision-support
+    target_persona: PM who wants to improve decision quality over time by tracking predictions and outcomes
+    pain_point: >
+      PMs make dozens of decisions per week and rarely review them. Without a feedback loop,
+      the same reasoning errors (overconfidence, anchoring, availability bias) repeat
+      indefinitely. Decision quality improves when predictions are recorded before outcomes
+      are known and reviewed after.
+    one_sentence_thesis: >
+      A minimal journal for logging decisions with the reasoning at the time, a predicted
+      outcome, a confidence level, and a review date — with a periodic review view that
+      surfaces logged decisions whose review dates have passed so you can score your
+      past predictions.
+    likely_complexity: medium
+    candidate_artifact_types:
+      - Lightweight web app with local persistence
+      - Plain markdown files in a git repo (CLI tool)
+    candidate_stacks:
+      - SvelteKit + IndexedDB (no backend)
+      - Python CLI writing structured Markdown files
+    differentiation_angle: >
+      The review loop is the product, not the logging. Most journal apps optimize for
+      entry. This one optimizes for the moment six weeks later when the outcome is
+      visible — surfacing the original reasoning and confidence level alongside what
+      actually happened.
+    notes: >
+      Deliberate practice framework (Kahneman, Annie Duke) is the reference model.
+      The confidence calibration view — a histogram of "confidence at time of decision"
+      vs. "outcome accuracy" — is the most valuable long-term output and worth building
+      even if it requires 30+ entries to become meaningful.

@@ -1,0 +1,820 @@
+# style-matrix.yaml
+# 12 visual identities for generated projects.
+# Each style is concrete enough to drive implementation decisions:
+# colors, fonts, spacing, component choices, and motion.
+
+styles:
+
+  - id: editorial-elegance
+    name: Editorial Elegance
+    summary: >
+      Looks like a well-designed digital magazine or long-form publication.
+      Content is the hero. Chrome is minimal. Every visual decision defers to the text.
+    color_direction:
+      background: "#FAFAF8"
+      surface: "#FFFFFF"
+      text_primary: "#1A1A1A"
+      text_secondary: "#6B6B6B"
+      accent: "#C8102E"
+      border: "#E8E4DF"
+      mode: light-only
+      notes: >
+        Off-white backgrounds, not pure white. One saturated accent — red, forest green,
+        or ink blue — used sparingly (pull quotes, active states, key labels only).
+    typography_direction:
+      heading_font: "Serif — Georgia, Playfair Display, or similar old-style serif"
+      body_font: "Humanist sans — Inter, Source Sans, or similar"
+      heading_weight: "400 (regular) or 300 (light) — never bold for editorial headings"
+      body_size: "17–18px / 1.7 line-height"
+      scale: "Fluid type scale with large ratio jumps — h1 should feel editorial-large"
+      uppercase_labels: false
+      notes: >
+        Avoid geometric sans for headings. The contrast between a serif headline and
+        humanist body text is the typographic signature of this style.
+    layout_personality:
+      structure: "Single column with generous max-width (680–760px for reading content)"
+      grid: "Asymmetric — sidebar offsets, pull-quote bleeds, wide image breaks"
+      alignment: "Left-aligned text; centered only for standalone quotes or chapter breaks"
+      whitespace: "Sections separated by 80–120px vertical space"
+      notes: >
+        Page layout should feel like it was set by a typographer, not assembled from components.
+    component_personality:
+      buttons: "Text links or thin-border ghost buttons — no filled pill buttons"
+      inputs: "Underline-only fields, no visible box"
+      cards: "No drop shadows. Border-top accent line or left rule instead."
+      tables: "Horizontal rules only — no vertical lines, no striped rows"
+      tags: "Inline text with dot separator, not pill badges"
+      nav: "Sparse horizontal nav, small caps labels at 12px"
+    spacing_density: low
+    motion_level: minimal
+    motion_notes: "Fade-ins on scroll only. No bounces, no scale transforms. Transitions max 200ms ease."
+    ideal_project_types:
+      - long-form reading tools
+      - content curation interfaces
+      - research or annotation tools
+      - newsletter or writing aids
+      - documentation with narrative structure
+    anti_patterns:
+      - gradient backgrounds
+      - rounded pill buttons
+      - card grids with drop shadows
+      - sidebar navigation with icons
+      - colored section backgrounds
+      - loading skeletons
+    screenshot_vibe: >
+      Clean off-white page, large serif headline, generous line spacing, one accent color
+      in a pull quote or active link. Looks like it belongs in a Substack or The Atlantic
+      product lab.
+
+
+  - id: dense-analyst-console
+    name: Dense Analyst Console
+    summary: >
+      Built for scanning, not reading. Maximizes information per viewport pixel.
+      Feels like a Bloomberg terminal that went to design school — still dense,
+      but with intentional hierarchy.
+    color_direction:
+      background: "#0D1117"
+      surface: "#161B22"
+      surface_raised: "#21262D"
+      text_primary: "#E6EDF3"
+      text_secondary: "#8B949E"
+      accent: "#58A6FF"
+      positive: "#3FB950"
+      negative: "#F85149"
+      warning: "#D29922"
+      border: "#30363D"
+      mode: dark-only
+      notes: >
+        GitHub dark palette is a good reference. Use color semantically — green for up/positive,
+        red for alerts/negative, blue for interactive. Avoid decorative color.
+    typography_direction:
+      heading_font: "Monospace or tabular sans — JetBrains Mono, IBM Plex Mono"
+      body_font: "Inter or IBM Plex Sans at 13px"
+      body_size: "12–13px / 1.5 line-height"
+      scale: "Compressed — minimal size difference between heading levels"
+      uppercase_labels: true
+      notes: >
+        Column headers in uppercase 11px with 0.08em letter-spacing.
+        Numbers must use tabular figures. Never use a proportional font for data columns.
+    layout_personality:
+      structure: "Multi-pane — horizontal splits with resizable regions"
+      grid: "CSS Grid with named areas. Sidebar + main + detail panel is standard."
+      alignment: "Dense, grid-locked. Nothing floats."
+      whitespace: "4–8px internal padding on cells. 16px between panels."
+      notes: >
+        Every pixel should carry information. Empty space is acceptable only at the edges
+        of the viewport, not between data elements.
+    component_personality:
+      buttons: "Small (28px height), ghost or outline style, icon + label"
+      inputs: "Compact search bars with monospace font, left-aligned"
+      cards: "Borderless panels with subtle background difference from page"
+      tables: "Dense data tables — sticky headers, zebra rows at 10% opacity, fixed column widths"
+      tags: "Small filled chips, 20px height, semantic colors"
+      nav: "Left sidebar with icon + label collapsed view, or tab bar across top of panes"
+    spacing_density: high
+    motion_level: none
+    motion_notes: "No transitions on data cells. Tab switches are instant. Tooltips appear at 0ms delay."
+    ideal_project_types:
+      - financial or metrics dashboards
+      - log analysis tools
+      - monitoring interfaces
+      - competitive intelligence tools
+      - data comparison utilities
+    anti_patterns:
+      - hero sections or splash screens
+      - illustration or icon-heavy empty states
+      - card carousels
+      - full-page modals
+      - decorative gradients
+      - animation on chart load
+    screenshot_vibe: >
+      Dark background, multiple data panes visible simultaneously, monospace labels,
+      green/red numeric indicators, column headers in small caps. High information density —
+      you can tell there's real data here just from the thumbnail.
+
+
+  - id: premium-saas
+    name: Premium SaaS
+    summary: >
+      The Figma / Linear / Notion design language. Clean, confident, slightly cool-toned.
+      Signals serious software without being intimidating. Familiar enough that power users
+      feel at home immediately.
+    color_direction:
+      background: "#FFFFFF"
+      surface: "#F9FAFB"
+      surface_raised: "#FFFFFF"
+      text_primary: "#111827"
+      text_secondary: "#6B7280"
+      accent: "#4F46E5"
+      accent_light: "#EEF2FF"
+      border: "#E5E7EB"
+      mode: light-primary
+      notes: >
+        Indigo-to-violet accent range. Gray scale uses cool undertones (slate, not warm gray).
+        Dark mode is a full inversion with same accent — #818CF8 on dark.
+    typography_direction:
+      heading_font: "Inter, -apple-system, or similar geometric sans"
+      body_font: "Same as heading — single font family"
+      heading_weight: "600–700 for headings, 500 for subheadings"
+      body_size: "14–15px / 1.6 line-height"
+      scale: "Moderate — clear hierarchy but not dramatic jumps"
+      uppercase_labels: false
+      notes: >
+        Font weight and color do more work than size. Labels are 13px/500,
+        body is 14px/400, subheadings are 15px/600 — a three-level weight scale.
+    layout_personality:
+      structure: "Left sidebar nav + main content area + optional right context panel"
+      grid: "12-column with 24px gutters inside panels"
+      alignment: "Consistent 24px horizontal padding on panels and modals"
+      whitespace: "Breathing room within sections (32–48px), tighter between list items (8–12px)"
+      notes: >
+        Feels like designed software, not a website. The layout is stable and predictable —
+        users learn it once and navigate without thinking.
+    component_personality:
+      buttons: "Filled primary (accent), ghost secondary — 8px border-radius, 36px height"
+      inputs: "Bordered with subtle shadow on focus — clean, standard, no surprises"
+      cards: "White with 1px border and sm shadow (0 1px 3px rgba(0,0,0,0.1))"
+      tables: "Standard with header sort indicators, row hover state, checkbox selection"
+      tags: "Pill badges, 6px border-radius, semantic or neutral colors"
+      nav: "Left sidebar with section grouping, active state background fill"
+    spacing_density: medium
+    motion_level: subtle
+    motion_notes: >
+      Sidebar open/close at 200ms ease-in-out. Modal enter with 150ms scale from 0.97 to 1.
+      No page-level animations. Skeleton loaders instead of spinners.
+    ideal_project_types:
+      - productivity tools
+      - internal dashboards
+      - workflow automation interfaces
+      - B2B feature prototypes
+      - settings / admin panels
+    anti_patterns:
+      - full-bleed hero images
+      - serif fonts
+      - heavy drop shadows
+      - splash or landing page layout inside the app
+      - icon-only navigation without tooltips
+    screenshot_vibe: >
+      White interface, left sidebar with nav items, main pane with a table or card list,
+      indigo accent on active states. Looks like it could ship as a real product tomorrow.
+      No rough edges visible.
+
+
+  - id: brutalist-utility
+    name: Brutalist Utility
+    summary: >
+      Function-first. No decorative elements — every pixel serves the task.
+      Influenced by early web, Craigslist's accidental clarity, and raw HTML forms.
+      Not ugly by accident; ugly by conviction.
+    color_direction:
+      background: "#FFFFFF"
+      surface: "#FFFFFF"
+      text_primary: "#000000"
+      text_secondary: "#555555"
+      accent: "#0000EE"
+      accent_visited: "#551A8B"
+      border: "#000000"
+      mode: light-only
+      notes: >
+        Pure white and pure black. Hyperlink blue (#0000EE) for all interactive elements.
+        No grays except for disabled states. Color is never decorative.
+    typography_direction:
+      heading_font: "System font stack — Arial, Helvetica, sans-serif"
+      body_font: "Same system stack"
+      heading_weight: "Bold (700)"
+      body_size: "16px / 1.5 line-height"
+      scale: "HTML default scale — h1 at 2em, h2 at 1.5em"
+      uppercase_labels: false
+      notes: >
+        Do not import web fonts. System fonts only. The rawness is the point.
+        Font choices should feel like someone just opened a text editor and started.
+    layout_personality:
+      structure: "Single-column or simple two-column with no decoration"
+      grid: "None — natural document flow"
+      alignment: "Left-aligned, full width"
+      whitespace: "16px default margins — not generous, not cramped"
+      notes: >
+        No gutters, no card containers, no panel wrappers. Sections are separated by
+        horizontal rules (<hr>) or heading hierarchy.
+    component_personality:
+      buttons: "Browser-default button style or text on black background — square corners"
+      inputs: "Native HTML inputs — no custom styling. Borders visible."
+      cards: "No cards — use sections with headings and horizontal rules"
+      tables: "Full border-collapse with visible cell borders — spreadsheet-like"
+      tags: "Square brackets around text: [tag-name]"
+      nav: "Unordered list of links at the top of the page"
+    spacing_density: medium
+    motion_level: none
+    motion_notes: "No transitions, no animations. State changes are instant."
+    ideal_project_types:
+      - command-line companion web UIs
+      - data entry tools
+      - utility scripts with a thin web front-end
+      - tools where the user is the designer
+      - no-frills internal ops tools
+    anti_patterns:
+      - rounded corners
+      - drop shadows
+      - gradient buttons
+      - imported fonts
+      - empty state illustrations
+      - onboarding modals
+      - smooth scroll
+    screenshot_vibe: >
+      White page, black text, blue links, visible form borders. Looks intentionally raw.
+      No visual styling beyond what a browser renders by default — but the information
+      hierarchy is clean and usable.
+
+
+  - id: playful-consumer
+    name: Playful Consumer
+    summary: >
+      High energy, approachable, designed to delight. Influenced by Duolingo, Headspace,
+      and consumer mobile apps that make mundane tasks feel rewarding. Saturated colors,
+      rounded everything, expressive motion.
+    color_direction:
+      background: "#FFFBF5"
+      surface: "#FFFFFF"
+      text_primary: "#1F1F1F"
+      text_secondary: "#666666"
+      accent: "#FF5733"
+      accent_2: "#6C63FF"
+      accent_3: "#00C49F"
+      positive: "#00C49F"
+      border: "#FFE4CC"
+      mode: light-primary
+      notes: >
+        Warm off-white base. Three accent colors — use them for distinct feature areas,
+        not interchangeably. Avoid muted tones; every surface should feel alive.
+    typography_direction:
+      heading_font: "Rounded sans — Nunito, Poppins, or DM Sans"
+      body_font: "Same family at regular weight"
+      heading_weight: "800 for hero text, 700 for section headings"
+      body_size: "16px / 1.65 line-height"
+      scale: "Large ratio — hero text at 48–64px is normal"
+      uppercase_labels: false
+      notes: >
+        Friendly, not corporate. Font should feel approachable — avoid anything with sharp
+        geometric terminals. Short line lengths (55 chars max) for readability.
+    layout_personality:
+      structure: "Centered content with max-width 480px on mobile, 720px on desktop"
+      grid: "Single column with full-bleed colored section breaks"
+      alignment: "Centered in hero zones, left-aligned in content zones"
+      whitespace: "Generous — 64–96px between sections. Breathing room creates delight."
+      notes: >
+        Mobile-first always. Desktop is an afterthought — the core experience lives on a phone.
+    component_personality:
+      buttons: "Large pill buttons (48px height), filled, with icon — accent color"
+      inputs: "Large rounded inputs (48px height), warm-toned border"
+      cards: "High border-radius (16–24px), subtle warm shadow, optional emoji or icon"
+      tables: "Avoid tables — use card lists or step-based flows instead"
+      tags: "Filled pill badges with emoji prefix"
+      nav: "Bottom navigation bar on mobile — 4–5 icon tabs"
+    spacing_density: low
+    motion_level: expressive
+    motion_notes: >
+      Spring animations on card entry (scale 0.9 → 1 with spring). Celebration micro-animations
+      on task completion. Page transitions with shared element morphing.
+      Nothing over 400ms. Respect prefers-reduced-motion.
+    ideal_project_types:
+      - habit trackers
+      - gamified learning tools
+      - consumer onboarding flows
+      - social or community features
+      - simple mobile-first utilities
+    anti_patterns:
+      - dense data tables
+      - left sidebar navigation
+      - monospace fonts
+      - dark backgrounds (unless night mode)
+      - small click targets below 44px
+      - error states that feel punishing
+    screenshot_vibe: >
+      Warm background, large rounded card with colorful accent, big friendly button,
+      maybe a progress ring or streak counter. Feels like an app you'd actually use
+      during your lunch break.
+
+
+  - id: terminal-minimal
+    name: Terminal Minimal
+    summary: >
+      For tools where the interface should disappear. Monochrome, monospace, keyboard-first.
+      Influenced by vi, tmux, and command-line tools that developers actually prefer.
+      No chrome — just output.
+    color_direction:
+      background: "#0A0A0A"
+      surface: "#111111"
+      text_primary: "#D4D4D4"
+      text_secondary: "#6A6A6A"
+      accent: "#A8CC8C"
+      accent_2: "#79C0FF"
+      error: "#F47067"
+      warning: "#E3B341"
+      border: "#2A2A2A"
+      mode: dark-only
+      notes: >
+        Near-black background. Muted green accent is the canonical "terminal green" but
+        softer than #00FF00 — use #A8CC8C or similar. Syntax-highlight palette: strings in
+        green, keywords in blue, errors in red. No accent color used decoratively.
+    typography_direction:
+      heading_font: "Monospace — JetBrains Mono, Fira Code, or Cascadia Code"
+      body_font: "Same monospace font throughout"
+      heading_weight: "Regular (400) — no bold for headings in this style"
+      body_size: "14px / 1.6 line-height"
+      scale: "Flat — distinction comes from indentation and prefix characters, not size"
+      uppercase_labels: false
+      notes: >
+        Use prefix characters to signal type: "> " for prompts, "# " for section headers,
+        "$ " for commands, "! " for warnings. Avoid heading tags where ASCII prefixes work.
+    layout_personality:
+      structure: "Full-width single column or split pane (left: nav/tree, right: content)"
+      grid: "Character grid — everything aligns to monospace character units"
+      alignment: "Left — always"
+      whitespace: "Tight vertical rhythm. Line breaks as separators, not margin."
+      notes: >
+        The viewport is a terminal window. Scrolling is the navigation model.
+        Fixed-width layouts are acceptable and often preferred.
+    component_personality:
+      buttons: "Text commands wrapped in brackets: [Run] [Cancel] — or keyboard shortcuts displayed"
+      inputs: "Blinking cursor, typed prompt style — "> input here_""
+      cards: "Box-drawing characters for panels (─ │ ┌ ┐ └ ┘) or just indentation"
+      tables: "ASCII table borders or pipe-separated columns"
+      tags: "[tag] format in accent color"
+      nav: "Numbered menu or keyboard shortcut list at screen top"
+    spacing_density: high
+    motion_level: minimal
+    motion_notes: >
+      Typing cursor blink only. Text can appear character-by-character at 30ms/char for
+      CLI output simulation. No other animation.
+    ideal_project_types:
+      - developer tools
+      - CLI companion UIs
+      - code review or diff tools
+      - API explorers
+      - system status monitors
+    anti_patterns:
+      - rounded corners
+      - drop shadows
+      - illustrations or photography
+      - sans-serif fonts
+      - bottom navigation
+      - skeleton loading screens
+    screenshot_vibe: >
+      Dark terminal window, monospace green-on-black text, ASCII-art borders around panels,
+      blinking cursor. Looks like htop had a product designer for a day.
+
+
+  - id: mobile-ambient
+    name: Mobile Ambient
+    summary: >
+      Designed for glanceable, passive information. Low cognitive load, large targets,
+      information visible without interaction. Influenced by iOS widgets, weather apps,
+      and lock-screen utilities.
+    color_direction:
+      background: "Dynamic — warm #1C1C1E (iOS system dark) or #F2F2F7 (iOS system light)"
+      surface: "#2C2C2E or #FFFFFF"
+      text_primary: "#FFFFFF or #000000"
+      text_secondary: "rgba(255,255,255,0.6) or rgba(0,0,0,0.5)"
+      accent: "Context-driven — weather blue (#5AC8FA), health red (#FF375F), etc."
+      border: "rgba(255,255,255,0.12) or rgba(0,0,0,0.08)"
+      mode: adaptive
+      notes: >
+        Adapt to system dark/light mode automatically. Background is never stark white
+        or pure black — use iOS/Android system color values. Accent color should
+        reflect the domain, not a brand color.
+    typography_direction:
+      heading_font: "SF Pro Display, -apple-system, or Roboto — system native"
+      body_font: "SF Pro Text or Roboto Regular"
+      heading_weight: "700 for ambient numbers/stats, 400 for labels"
+      body_size: "13–15px for labels, 32–64px for the primary displayed value"
+      scale: >
+        Two-tier: large display number (the hero value) and small supporting label.
+        Nothing in between.
+      uppercase_labels: true
+      notes: >
+        Labels are 11–12px uppercase with 0.06em tracking.
+        The main value dominates — everything else supports it.
+    layout_personality:
+      structure: "Widget grid — square or rectangular cells, max 2-column"
+      grid: "Fixed size tiles: 160×160px, 160×80px, 340×160px (double wide)"
+      alignment: "Content anchored to corners or centered within tile"
+      whitespace: "8px between tiles, 16px internal tile padding"
+      notes: >
+        Design each tile as self-contained. Assume it may be seen without context —
+        label everything, abbreviate nothing.
+    component_personality:
+      buttons: "Full-width, 52px height, high-contrast — one action per screen"
+      inputs: "Minimal — prefer selection over text entry; use pickers and toggles"
+      cards: "Tile format — corner-radius 16px, subtle glass effect (backdrop-filter: blur)"
+      tables: "Not applicable — restructure as tiles or progressive disclosure lists"
+      tags: "Colored dot + label inside tile"
+      nav: "Tab bar at bottom — 3–5 items max"
+    spacing_density: low
+    motion_level: subtle
+    motion_notes: >
+      Value updates with a 150ms number roll animation. Tile entry with 200ms spring scale.
+      Background color shifts with ambient data changes (e.g., temperature → hue shift).
+    ideal_project_types:
+      - personal dashboards
+      - habit or health trackers
+      - status monitors designed for a phone
+      - location or context-aware utilities
+      - glanceable data summaries
+    anti_patterns:
+      - text-dense layouts
+      - horizontal scrolling tables
+      - desktop-style navigation
+      - anything requiring fine motor precision
+      - more than one primary action per screen
+    screenshot_vibe: >
+      Dark rounded tiles on a system background, one large number or icon per tile,
+      uppercase labels in small text. Looks like a thoughtfully designed iPhone widget
+      with real data in it.
+
+
+  - id: executive-monochrome
+    name: Executive Monochrome
+    summary: >
+      High contrast, restrained, designed to communicate authority and clarity.
+      Think McKinsey slide decks converted to a live interface. Black, white, and one
+      accent color used only for critical emphasis. Zero decoration.
+    color_direction:
+      background: "#FFFFFF"
+      surface: "#F5F5F5"
+      text_primary: "#000000"
+      text_secondary: "#505050"
+      accent: "#000000"
+      accent_highlight: "#FFD700"
+      border: "#D0D0D0"
+      mode: light-only
+      notes: >
+        True black and white. The single accent is used only for the one number or
+        data point that matters most on each view — never decoratively.
+        Gold (#FFD700) or blue (#0047BB) are acceptable accent options.
+    typography_direction:
+      heading_font: "Sharp display serif or condensed sans — Freight Display, Bebas Neue, or Barlow Condensed"
+      body_font: "Clean grotesque — Helvetica Neue, Aktiv Grotesk, or Arial"
+      heading_weight: "900 or condensed — the heading should feel like a newspaper banner"
+      body_size: "15px / 1.55 line-height"
+      scale: "Wide ratio — primary metric displayed at 72–120px"
+      uppercase_labels: true
+      notes: >
+        Section labels in uppercase 10px, 0.12em tracking.
+        The headline number or takeaway is the focal point of each page.
+    layout_personality:
+      structure: "Report-style — one key message per view, supporting data below"
+      grid: "Wide margins (15–20% each side), content in central 60–70% column"
+      alignment: "Left-aligned within margins, or full-bleed for hero metrics"
+      whitespace: "Aggressive — each section has one thing to say, then ends"
+      notes: >
+        If a page has more than one primary message, split it into two pages.
+        Whitespace is a signal of confidence, not emptiness.
+    component_personality:
+      buttons: "Black fill on white, or white on black — square corners, no radius"
+      inputs: "Bottom-border only, black, 1px — form follows McKinsey PowerPoint"
+      cards: "Heavy top border (3–4px black), no corner radius, no shadow"
+      tables: "Horizontal rules only, bold header, no gridlines"
+      tags: "All-caps label with em-dash separator, no visual container"
+      nav: "Sparse — maximum 4 items, small caps, underline on active"
+    spacing_density: low
+    motion_level: none
+    motion_notes: "No animations. State changes are instant. Motion would undermine the authoritative tone."
+    ideal_project_types:
+      - executive dashboards
+      - KPI reporting tools
+      - board-level summary interfaces
+      - annual report visualizations
+      - strategy or OKR tracking
+    anti_patterns:
+      - rounded buttons or cards
+      - colorful illustrations
+      - playful micro-interactions
+      - multi-color charts
+      - sidebar navigation
+      - more than 3 font weights
+    screenshot_vibe: >
+      White page, massive black number, clean horizontal rule, small caps label above it.
+      Feels like it belongs in a boardroom. You'd print this slide.
+
+
+  - id: retro-future
+    name: Retro Future
+    summary: >
+      Sci-fi aesthetic from the 1970s–80s filtered through modern execution. CRTs, neon
+      on dark, scanlines, vector graphics. Nostalgic but not kitsch — the interface
+      should look like it came from a film prop department with a real budget.
+    color_direction:
+      background: "#0A0010"
+      surface: "#12001E"
+      text_primary: "#E0FF00"
+      text_secondary: "#9A7FBF"
+      accent: "#FF00CC"
+      accent_2: "#00FFCC"
+      border: "rgba(224,255,0,0.2)"
+      mode: dark-only
+      notes: >
+        Deep purple-black base. Neon yellow-green as primary text. Hot pink and cyan as
+        accents. Colors should feel like they're glowing — use text-shadow: 0 0 8px [color]
+        on key elements. Avoid pure saturated primaries (no #FF0000 red).
+    typography_direction:
+      heading_font: "Monospace or wide-tracking caps — Share Tech Mono, VT323, or Courier New"
+      body_font: "Same monospace family"
+      heading_weight: "Regular — weight comes from glow, not stroke"
+      body_size: "14px / 1.6 line-height"
+      scale: "Moderate — distinguish headings via glow intensity and tracking, not size alone"
+      uppercase_labels: true
+      notes: >
+        Letter-spacing 0.15–0.25em on headings. Scanline overlay texture (CSS repeating
+        linear-gradient at 2px intervals, 3% opacity) on dark backgrounds is optional
+        but effective.
+    layout_personality:
+      structure: "Centered panel layout — main display framed like a CRT monitor"
+      grid: "Symmetric, panel-based — feels like a 1980s computer UI"
+      alignment: "Center-aligned for display panels, left-aligned for data streams"
+      whitespace: "Moderate — panels need breathing room to feel like separate screens"
+      notes: >
+        Decorative frame elements (corner brackets, border animations) are acceptable
+        and encouraged — but must be CSS, not images.
+    component_personality:
+      buttons: "Outlined in accent color, square corners, glow on hover"
+      inputs: "Dark background, bright border, monospace text with cursor-blink"
+      cards: "Corner-bracket decoration (using ::before/::after pseudo-elements), no fill"
+      tables: "Glowing header row, dim alternating rows"
+      tags: "< TAG > format with accent color, monospace"
+      nav: "Horizontal bar with vertical separator lines, glow on active item"
+    spacing_density: medium
+    motion_level: subtle
+    motion_notes: >
+      Text flicker on load (2–3 frame opacity shift simulating CRT startup).
+      Scan-line sweep on page transition (150ms linear). Number updates via rapid
+      character cycling (slot-machine effect, 200ms). No spring animations.
+    ideal_project_types:
+      - creative or generative tools
+      - game interfaces or companion apps
+      - music visualization tools
+      - sci-fi themed experiments
+      - portfolio showcase projects
+    anti_patterns:
+      - rounded buttons
+      - light backgrounds
+      - sans-serif body text
+      - drop shadows (use glow instead)
+      - realistic photography
+      - iOS-style components
+    screenshot_vibe: >
+      Deep dark background, neon yellow-green monospace text, glowing panel borders
+      with corner brackets, pink and cyan accent elements. Unmistakably retro-sci-fi
+      but rendered crisply — not pixel art.
+
+
+  - id: tactile-dashboard
+    name: Tactile Dashboard
+    summary: >
+      Designed to feel physical — knobs, gauges, sliders that look like they do something.
+      Influenced by car dashboards, audio mixers, and hardware control panels.
+      Rich but not chaotic.
+    color_direction:
+      background: "#1A1A2E"
+      surface: "#16213E"
+      surface_raised: "#0F3460"
+      text_primary: "#E0E0E0"
+      text_secondary: "#A0A0B0"
+      accent: "#E94560"
+      accent_2: "#F5A623"
+      positive: "#4CAF50"
+      border: "#2A3A5A"
+      mode: dark-only
+      notes: >
+        Deep navy base. Warm orange and red accents for active/alert states.
+        Surfaces should show depth — use subtle inset shadows to make panels look recessed.
+        Knob/gauge elements need strong contrast against the panel surface.
+    typography_direction:
+      heading_font: "Condensed sans — Barlow Condensed, Oswald, or Roboto Condensed"
+      body_font: "Roboto Mono or DIN — utilitarian, neutral"
+      heading_weight: "700 condensed — labels should read like instrument labels"
+      body_size: "13px for data, 11px for sub-labels"
+      scale: "Compressed — display values at 28–36px, section labels at 11px uppercase"
+      uppercase_labels: true
+      notes: >
+        All unit labels (%, RPM, dB, ms) in small uppercase to the right or below the value.
+        Numbers should feel stamped on, not typed.
+    layout_personality:
+      structure: "Dashboard grid of modular control/display panels"
+      grid: "8px base unit — all panels snap to 8px grid multiples"
+      alignment: "Grid-locked — no free-floating elements"
+      whitespace: "8px between panels. Internal panel padding: 16px."
+      notes: >
+        Think of each panel as an instrument housing. It has a bezel (border), a face (surface),
+        and controls/displays mounted on it.
+    component_personality:
+      buttons: "Circular toggle buttons with LED indicator dot (on/off state)"
+      inputs: "Slider controls with tick marks, or rotary dial metaphor"
+      cards: "Instrument panel aesthetic — inset shadow, darker inner surface"
+      tables: "Not primary — use gauge clusters or bar indicators instead"
+      tags: "LED badge: colored dot + monospace label"
+      nav: "Top tab bar styled as panel selector — active tab looks physically pressed"
+    spacing_density: high
+    motion_level: subtle
+    motion_notes: >
+      Gauge needle animations at 300ms ease-out when value changes.
+      LED state changes with 80ms fade. Slider drag is real-time with no easing.
+      No page-level transitions.
+    ideal_project_types:
+      - IoT or hardware monitoring UIs
+      - audio or music tools
+      - vehicle or equipment dashboards
+      - real-time data monitoring
+      - system performance monitors
+    anti_patterns:
+      - flat card grids
+      - serif fonts
+      - light backgrounds
+      - large empty white space
+      - data tables without visual encoding
+      - floating action buttons
+    screenshot_vibe: >
+      Dark navy panel grid, circular gauges with needle indicators, slider controls
+      with tick marks, LED dots in green/red/orange. Looks like a mixing board
+      or a car's center console — functional hardware aesthetics.
+
+
+  - id: high-contrast-command
+    name: High-Contrast Command Center
+    summary: >
+      Accessibility-native — WCAG AAA contrast ratios as a design feature, not a
+      compliance checkbox. Built for operators who work in it for hours: security ops,
+      dispatch, air traffic. Visual hierarchy through contrast alone, no color-coding
+      for critical state.
+    color_direction:
+      background: "#000000"
+      surface: "#0D0D0D"
+      surface_raised: "#1A1A1A"
+      text_primary: "#FFFFFF"
+      text_secondary: "#B0B0B0"
+      accent: "#FFFF00"
+      alert: "#FF4444"
+      positive: "#00FF88"
+      border: "#333333"
+      mode: dark-only
+      notes: >
+        True black background. White text always. Yellow for attention/active — never use
+        yellow as decorative. Red for alerts only — no red decorative use.
+        Every color combination must pass WCAG AAA (7:1 minimum contrast ratio).
+    typography_direction:
+      heading_font: "IBM Plex Mono or Courier New — legible under stress"
+      body_font: "IBM Plex Sans or Verdana — designed for screen readability"
+      heading_weight: "Bold (700) — no ambiguity about what's a heading"
+      body_size: "15–16px minimum / 1.6 line-height"
+      scale: "Clear — h1 at 24px, h2 at 18px, body at 15px, label at 13px"
+      uppercase_labels: false
+      notes: >
+        Do not use font size below 13px anywhere. Line height never below 1.5.
+        Focus indicators must be visible at 3px width minimum.
+    layout_personality:
+      structure: "Multi-zone fixed layout — zones never overlap or scroll past fixed headers"
+      grid: "Fixed regions: status bar, main view, detail panel, alert tray"
+      alignment: "Left-aligned data, right-aligned numeric values in data columns"
+      whitespace: "Functional — enough to prevent mis-reads, not generous"
+      notes: >
+        Layout should survive being read on a wall monitor at 10 feet.
+        Zone boundaries are always clear — heavy borders or background contrast.
+    component_personality:
+      buttons: "White on black, 2px white border, square corners — no hover color, only border thickens"
+      inputs: "White border, white text on black, yellow focus ring (3px)"
+      cards: "Heavy white border (2px) — no background fill variation"
+      tables: "White cell borders, high-contrast header (white bg, black text)"
+      tags: "Square border, uppercase, no fill — [CRITICAL] [WARN] [OK]"
+      nav: "Persistent top bar, active item has white background + black text inversion"
+    spacing_density: medium
+    motion_level: none
+    motion_notes: >
+      No animations. State changes are instant. Motion in a high-stakes monitoring
+      environment creates distraction and false urgency.
+    ideal_project_types:
+      - security operations tools
+      - emergency dispatch or monitoring
+      - accessibility-first utilities
+      - tools designed for extended screen use
+      - operator consoles
+    anti_patterns:
+      - color-only state indicators (must have text label)
+      - any element below 13px font size
+      - hover-only affordances
+      - animation of any kind
+      - light mode
+      - semi-transparent overlays
+    screenshot_vibe: >
+      Black background, white text, yellow active state, heavy white borders on all regions.
+      Looks like a professional dispatch console or a security operations center screen.
+      High contrast is immediately obvious — you can read it squinting.
+
+
+  - id: warm-productivity
+    name: Warm Productivity Workspace
+    summary: >
+      Designed for long focused sessions. Beige-adjacent, paper-textured foundations,
+      warm neutrals. Feels like a well-organized desk rather than a software product.
+      Influenced by Notion, Bear, and physical notebooks.
+    color_direction:
+      background: "#FAF7F2"
+      surface: "#FFFFFF"
+      surface_alt: "#F3EFE8"
+      text_primary: "#2D2A26"
+      text_secondary: "#857B6F"
+      accent: "#B85C2A"
+      accent_light: "#FDF0E8"
+      border: "#E5DDD4"
+      mode: light-primary
+      notes: >
+        Warm off-white base — the page should feel like cream paper.
+        Accent is a muted terracotta or burnt orange — warm but not loud.
+        Dark mode uses #1C1915 background with #E8E0D4 text — same warm tone shifted dark.
+    typography_direction:
+      heading_font: "Humanist serif — Lora, Merriweather, or Source Serif for long content"
+      body_font: "Inter or Lato at normal weight for UI chrome; serif for content areas"
+      heading_weight: "600 for headings, 400 for body"
+      body_size: "16px / 1.75 line-height — generous for readability during long sessions"
+      scale: "Moderate — comfortable, not dramatic"
+      uppercase_labels: false
+      notes: >
+        The reading experience is primary. Body text line height should feel like writing
+        in a good notebook — not cramped. Sub-labels and metadata use 13px in text_secondary.
+    layout_personality:
+      structure: "Sidebar (collapsed by default) + wide content area with comfortable max-width (720px)"
+      grid: "8px base unit, generous horizontal padding (32px on content area)"
+      alignment: "Left-aligned, comfortable reading column"
+      whitespace: "Between sections: 48px. Between items in a list: 12–16px."
+      notes: >
+        The interface should get out of the way. Sidebar auto-hides. Toolbars fade when
+        not hovering. The content area is always the visual anchor.
+    component_personality:
+      buttons: "Warm-toned, low-contrast on default state — accent only for primary actions"
+      inputs: "Warm border (#E5DDD4), no shadow, placeholder in text_secondary"
+      cards: "Subtle warm shadow (0 2px 8px rgba(180,140,100,0.12)), soft border-radius 8px"
+      tables: "No gridlines — horizontal rule below header only; ample row padding (14px)"
+      tags: "Small pill with warm neutral fill — #F3EFE8 background, muted text"
+      nav: "Collapsible left sidebar, tree-navigation style, hover highlights in accent_light"
+    spacing_density: low
+    motion_level: minimal
+    motion_notes: >
+      Sidebar open/close at 250ms ease. Tooltip fade at 150ms. No entry animations.
+      Scroll behavior is instant — no smooth-scroll library. Nothing should feel slick
+      or app-like; it should feel calm.
+    ideal_project_types:
+      - note-taking or writing tools
+      - reading trackers or book apps
+      - personal knowledge bases
+      - journaling or reflection tools
+      - focus or deep-work utilities
+    anti_patterns:
+      - bright saturated colors
+      - dark backgrounds (default)
+      - dense data tables
+      - heavy motion or spring physics
+      - gamification elements
+      - floating action buttons
+    screenshot_vibe: >
+      Cream-white background, warm gray sidebar, serif heading in the content area,
+      generous line spacing, a terracotta tag or link. Feels like opening a well-kept
+      physical planner. Calm, organized, unhurried.

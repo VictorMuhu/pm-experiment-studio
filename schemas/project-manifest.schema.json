@@ -1,0 +1,267 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "project-manifest.schema.json",
+  "title": "Project Manifest",
+  "description": "Validates manifest.json for a generated project in /projects or /scratch. Used by scripts/validate.js and enforced in the Replit agent generation workflow.",
+  "type": "object",
+  "additionalProperties": false,
+
+  "required": [
+    "name",
+    "slug",
+    "date_created",
+    "bucket",
+    "persona",
+    "problem_statement",
+    "complexity",
+    "artifact_type",
+    "style_direction",
+    "stack",
+    "status",
+    "publish_recommendation",
+    "tags"
+  ],
+
+  "properties": {
+
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 80,
+      "description": "Display name of the project. Title case. Used in index listings and PR titles."
+    },
+
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "minLength": 3,
+      "maxLength": 60,
+      "description": "Filesystem-safe identifier. Lowercase, hyphen-separated, no leading/trailing hyphens. Must match the folder name without the date prefix (e.g., folder '2026-03-14-funnel-drop-tool' → slug 'funnel-drop-tool').",
+      "examples": ["funnel-drop-hypothesis-engine", "nps-verbatim-categorizer", "okr-health-scorer"]
+    },
+
+    "date_created": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 date the project folder was first created. YYYY-MM-DD. Set once and not updated.",
+      "examples": ["2026-03-14"]
+    },
+
+    "date_updated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "ISO 8601 date of the last meaningful change to source, docs, or metadata. YYYY-MM-DD.",
+      "examples": ["2026-03-20"]
+    },
+
+    "bucket": {
+      "type": "string",
+      "enum": [
+        "pm-productivity",
+        "gtm-workflow",
+        "analytics-debugging",
+        "customer-experience",
+        "internal-tooling",
+        "decision-support",
+        "other"
+      ],
+      "description": "Which idea-matrix bucket this project belongs to. Use 'other' for concepts that originate outside the idea matrix."
+    },
+
+    "persona": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 200,
+      "description": "Specific description of the target user. Must name a role, context, and what they are trying to do — not a job title alone. E.g., 'PM at a B2B SaaS company reading an A/B test result without a statistician available' not 'product manager'.",
+      "examples": [
+        "PM or growth analyst investigating an unexplained drop in a funnel step",
+        "Staff engineer or technical PM managing a design review and RFC process",
+        "PM coordinating a product launch across eng, marketing, sales, and support"
+      ]
+    },
+
+    "problem_statement": {
+      "type": "string",
+      "minLength": 40,
+      "description": "The specific problem this project addresses. Must name a failure mode, not a domain. Should answer: what goes wrong, for whom, and why the existing approach is insufficient.",
+      "examples": [
+        "A/B test dashboards show p-values but most PMs lack the statistical fluency to catch underpowered tests or multiple-comparisons problems before making a ship decision.",
+        "Win/loss interview notes contain patterns — objections, missing features, competitor mentions — but they are unstructured and nobody has time to read 50 deal summaries manually."
+      ]
+    },
+
+    "complexity": {
+      "type": "string",
+      "enum": ["simple", "intermediate", "complex"],
+      "description": "Estimated implementation complexity. simple = one focused UI, no auth, shippable in a day. intermediate = multiple views or states, some persistence or processing, 3–5 days. complex = real backend, data pipeline, or non-trivial algorithmic work, 1–2 weeks."
+    },
+
+    "artifact_type": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 120,
+      "description": "A plain-language description of what the finished artifact is. Not a category label — a description of the actual thing. Be specific about structure and interaction.",
+      "examples": [
+        "Single-page paste-and-score tool with structured output sections and copy-to-clipboard",
+        "Two-pane web app: left pane accepts structured input, right pane renders annotated output with per-section callouts",
+        "CLI tool that reads a directory of CSV exports and writes a ranked HTML report",
+        "Multi-step wizard that generates a scoped checklist based on launch type and affected surfaces"
+      ]
+    },
+
+    "style_direction": {
+      "type": "string",
+      "enum": [
+        "editorial-elegance",
+        "dense-analyst-console",
+        "premium-saas",
+        "brutalist-utility",
+        "playful-consumer",
+        "terminal-minimal",
+        "mobile-ambient",
+        "executive-monochrome",
+        "retro-future",
+        "tactile-dashboard",
+        "high-contrast-command",
+        "warm-productivity"
+      ],
+      "description": "The visual identity applied to this project, selected from styles/style-matrix.yaml. Every project must use exactly one style. The implementation must follow the style spec — colors, typography, spacing, component personality, and motion level."
+    },
+
+    "stack": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Specific technologies used. Name the actual libraries and runtimes, not categories. Use the real package or tool name.",
+      "examples": [
+        ["HTML", "CSS", "JavaScript", "Claude API"],
+        ["Next.js", "Tailwind CSS", "Turso", "Claude API"],
+        ["Python", "pandas", "rich", "Claude API"],
+        ["SvelteKit", "IndexedDB"]
+      ]
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["published", "draft", "rejected"],
+      "description": "Lifecycle status of the project. published = cleared quality gate, lives in /projects. draft = in progress, lives in /scratch. rejected = failed quality gate with documented reason, stays in /scratch."
+    },
+
+    "publish_recommendation": {
+      "type": "string",
+      "enum": ["publish", "hold", "scratch"],
+      "description": "Quality gate output. publish = all hard fails clear, ready for /projects. hold = soft flags remain but no hard fails; needs specific fixes before publish. scratch = one or more hard fails; route to /scratch with reason documented in decision-log.md."
+    },
+
+    "tags": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+        "minLength": 2,
+        "maxLength": 30
+      },
+      "description": "Lowercase hyphenated tags for filtering and index search. At least one tag should reflect the primary persona action (e.g., 'prioritization', 'funnel-analysis', 'stakeholder-communication'). No generic tags: 'tool', 'utility', 'app', 'web' are not allowed.",
+      "examples": [
+        ["okr", "goal-setting", "planning"],
+        ["a-b-testing", "statistics", "growth"],
+        ["support-tickets", "clustering", "customer-experience"]
+      ]
+    },
+
+    "description": {
+      "type": "string",
+      "minLength": 15,
+      "maxLength": 160,
+      "description": "One sentence describing what the project does. No trailing period. Written for a reader who has not yet clicked into the project — it must stand alone in an index listing.",
+      "examples": [
+        "Scores a set of OKRs against a structured rubric and returns specific rewrite suggestions for each failing key result",
+        "Generates a prioritized hypothesis list for PMs investigating unexplained funnel drops, organized by category with explicit investigation steps"
+      ]
+    },
+
+    "has_demo": {
+      "type": "boolean",
+      "description": "Whether a live demo URL is available and working."
+    },
+
+    "demo_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL to a live, publicly accessible demo. Must be null if has_demo is false. Must be a valid URI if has_demo is true."
+    },
+
+    "screenshot": {
+      "type": ["string", "null"],
+      "pattern": "^screenshots/[a-z0-9_\\-\\.]+\\.(png|jpg|webp)$",
+      "description": "Relative path to the primary screenshot file within the project folder. Must be under screenshots/. Must be null only if the project has no UI and no visual output. Pattern: screenshots/[filename].[png|jpg|webp].",
+      "examples": ["screenshots/screenshot.png", "screenshots/screenshot-results.png"]
+    },
+
+    "idea_matrix_id": {
+      "type": ["string", "null"],
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "The id field from prompts/idea-matrix.yaml that this project was built from. Null if the concept originated outside the idea matrix.",
+      "examples": ["funnel-drop-hypothesis-engine", "ab-test-result-interpreter", null]
+    },
+
+    "notes": {
+      "type": ["string", "null"],
+      "maxLength": 500,
+      "description": "Internal freeform notes visible to contributors but not rendered in public index views. Use for known limitations, follow-up ideas, or context about the publish_recommendation."
+    }
+  },
+
+  "allOf": [
+    {
+      "description": "If has_demo is true, demo_url must be a non-null string.",
+      "if": {
+        "properties": { "has_demo": { "const": true } }
+      },
+      "then": {
+        "properties": {
+          "demo_url": { "type": "string" }
+        },
+        "required": ["demo_url"]
+      }
+    },
+    {
+      "description": "If publish_recommendation is 'publish', status must be 'published' or 'draft'. A rejected project cannot be recommended for publish.",
+      "if": {
+        "properties": { "publish_recommendation": { "const": "publish" } }
+      },
+      "then": {
+        "properties": {
+          "status": { "enum": ["published", "draft"] }
+        }
+      }
+    },
+    {
+      "description": "If status is 'published', publish_recommendation must be 'publish'. A project cannot be published if it was held or scratched.",
+      "if": {
+        "properties": { "status": { "const": "published" } }
+      },
+      "then": {
+        "properties": {
+          "publish_recommendation": { "const": "publish" }
+        }
+      }
+    },
+    {
+      "description": "If status is 'rejected', publish_recommendation must be 'scratch'.",
+      "if": {
+        "properties": { "status": { "const": "rejected" } }
+      },
+      "then": {
+        "properties": {
+          "publish_recommendation": { "const": "scratch" }
+        }
+      }
+    }
+  ]
+}

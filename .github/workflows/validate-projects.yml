@@ -1,0 +1,147 @@
+name: Validate Projects
+
+# Runs on every PR and on manual dispatch.
+# Purpose: enforce structural completeness, manifest correctness, and
+# README index freshness before any project reaches main.
+#
+# NOT a generation workflow. Does not write or commit anything.
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      # Run when project content changes
+      - "projects/**"
+      # Run when the schema that governs manifests changes
+      - "schemas/**"
+      # Run when the validation scripts themselves change
+      - "scripts/validate_repo.py"
+      - "scripts/generate_index.py"
+      # Run when the template changes (catches regressions in expected structure)
+      - "templates/**"
+
+  workflow_dispatch:
+    inputs:
+      strict:
+        description: "Treat warnings as errors (same as --strict flag)"
+        type: boolean
+        default: true
+        required: false
+
+# Validation only — no write access needed.
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate project manifests and structure
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── Checkout ─────────────────────────────────────────────────────────
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── Python setup ─────────────────────────────────────────────────────
+      # validate_repo.py and generate_index.py use only the standard library.
+      # No pip install required. setup-python is here for version pinning and
+      # to make the runtime explicit — not to install packages.
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # ── Validation ───────────────────────────────────────────────────────
+
+      - name: Run project validation
+        id: validate
+        run: |
+          # Determine strict flag: always strict on PR, respects input on dispatch
+          STRICT_FLAG="--strict"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && \
+             [ "${{ inputs.strict }}" = "false" ]; then
+            STRICT_FLAG=""
+          fi
+
+          echo "Running: python scripts/validate_repo.py $STRICT_FLAG --no-color"
+          echo ""
+
+          # Run and tee to a file so we can include output in the step summary
+          # Use process substitution to preserve the exit code through tee
+          python scripts/validate_repo.py $STRICT_FLAG --no-color 2>&1 \
+            | tee /tmp/validation_output.txt
+          exit ${PIPESTATUS[0]}
+
+      # ── Write step summary ───────────────────────────────────────────────
+      # Runs whether the validation passed or failed so the output is always
+      # visible in the GitHub Actions UI without opening the raw log.
+
+      - name: Write validation summary
+        if: always()
+        run: |
+          echo "## Project Validation" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${{ steps.validate.outcome }}" = "success" ]; then
+            echo "> Validation passed." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "> **Validation failed.** Fix errors before merging." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat /tmp/validation_output.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # ── Index freshness check ─────────────────────────────────────────────
+      # Regenerate the README.md project index and fail if the committed
+      # version does not match. This catches PRs where a project was added
+      # or updated but the index wasn't regenerated before pushing.
+      #
+      # Only runs if validation passed — no point checking index freshness
+      # if the manifests themselves are broken.
+
+      - name: Check project index is current
+        if: steps.validate.outcome == 'success'
+        run: |
+          python scripts/generate_index.py --no-color
+
+          if ! git diff --exit-code README.md > /tmp/index_diff.txt 2>&1; then
+            echo ""
+            echo "--------------------------------------------------------------"
+            echo "  FAILED: README.md project index is out of date"
+            echo "--------------------------------------------------------------"
+            echo ""
+            echo "  The index was regenerated during CI and differs from what"
+            echo "  was committed. This means a project was added or updated"
+            echo "  without regenerating the index."
+            echo ""
+            echo "  Fix by running this command locally and committing the result:"
+            echo ""
+            echo "    python scripts/generate_index.py"
+            echo "    git add README.md"
+            echo "    git commit -m 'Regenerate project index'"
+            echo ""
+            echo "  Diff:"
+            cat /tmp/index_diff.txt
+            exit 1
+          fi
+
+          echo "README.md index is current."
+
+      # ── Index summary ─────────────────────────────────────────────────────
+
+      - name: Write index summary
+        if: steps.validate.outcome == 'success'
+        run: |
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## Project Index" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          # Extract the content between the index markers and append to the
+          # step summary so the current project table is visible in the UI.
+          awk '/PROJECT_INDEX_START/{found=1; next} /PROJECT_INDEX_END/{found=0} found{print}' \
+            README.md >> "$GITHUB_STEP_SUMMARY"
