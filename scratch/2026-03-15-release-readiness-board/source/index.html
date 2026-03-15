@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Release Readiness Board</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --surface2: #1a1a1a;
+    --border: #2a2a2a;
+    --text: #e8e8e8;
+    --muted: #666;
+    --accent: #f0f0f0;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --orange: #f97316;
+    --mono: 'Courier New', Courier, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+    padding: 0 20px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--text);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 900;
+    color: var(--bg);
+    letter-spacing: -1px;
+  }
+  header h1 {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: var(--mono);
+  }
+  .release-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+  .header-right { display: flex; gap: 8px; align-items: center; }
+  .search-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 10px;
+    font-size: 12px;
+    font-family: var(--mono);
+    width: 200px;
+    outline: none;
+  }
+  .search-box:focus { border-color: var(--text); }
+  .search-box::placeholder { color: var(--muted); }
+  .btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    font-size: 11px;
+    font-family: var(--mono);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn.active { background: var(--text); color: var(--bg); }
+
+  /* ── KPI STRIP ── */
+  .kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 2px solid var(--border);
+  }
+  .kpi {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .kpi:last-child { border-right: none; }
+  .kpi-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.blue { color: var(--blue); }
+
+  /* ── CHARTS ROW ── */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    border-bottom: 2px solid var(--border);
+  }
+  .chart-panel {
+    padding: 16px 20px;
+    border-right: 1px solid var(--border);
+  }
+  .chart-panel:last-child { border-right: none; }
+  .chart-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .chart-wrap { position: relative; height: 100px; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    flex-wrap: wrap;
+  }
+  .filter-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-right: 4px;
+  }
+  .filter-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 4px 10px;
+    font-size: 11px;
+    font-family: var(--mono);
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+  .filter-chip:hover { border-color: var(--text); color: var(--text); }
+  .filter-chip.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--mono);
+  }
+  thead tr {
+    background: var(--surface);
+    border-bottom: 2px solid var(--border);
+  }
+  th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  th:hover { color: var(--text); }
+  th .sort-icon { margin-left: 4px; opacity: 0.4; }
+  th.sorted .sort-icon { opacity: 1; color: var(--text); }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.1s;
+  }
+  tbody tr:hover { background: var(--surface2); }
+  tbody tr.selected { background: #1e1e1e; border-left: 2px solid var(--text); }
+  td {
+    padding: 11px 14px;
+    font-size: 12px;
+    white-space: nowrap;
+    vertical-align: middle;
+  }
+  .feature-name { font-weight: 700; color: var(--accent); font-size: 13px; }
+  .owner-cell { color: var(--muted); font-size: 11px; }
+
+  /* Confidence bar */
+  .conf-wrap { display: flex; align-items: center; gap: 8px; }
+  .conf-bar { width: 60px; height: 4px; background: var(--border); }
+  .conf-fill { height: 100%; }
+  .conf-num { font-size: 12px; font-weight: 700; }
+
+  /* Risk badge */
+  .badge {
+    display: inline-block;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .badge.low { color: var(--green); border-color: var(--green); }
+  .badge.med { color: var(--yellow); border-color: var(--yellow); }
+  .badge.high { color: var(--red); border-color: var(--red); }
+
+  /* Status pill */
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid;
+  }
+  .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+  .status-pill.ready { color: var(--green); border-color: var(--green); }
+  .status-pill.ready::before { background: var(--green); }
+  .status-pill.at-risk { color: var(--yellow); border-color: var(--yellow); }
+  .status-pill.at-risk::before { background: var(--yellow); }
+  .status-pill.blocked { color: var(--red); border-color: var(--red); }
+  .status-pill.blocked::before { background: var(--red); }
+  .status-pill.in-progress { color: var(--blue); border-color: var(--blue); }
+  .status-pill.in-progress::before { background: var(--blue); }
+
+  /* Checklist progress */
+  .checklist-wrap { display: flex; align-items: center; gap: 8px; }
+  .checklist-bar { width: 50px; height: 3px; background: var(--border); }
+  .checklist-fill { height: 100%; background: var(--blue); }
+  .checklist-num { font-size: 11px; color: var(--muted); }
+
+  /* ── DRAWER ── */
+  .drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 200;
+  }
+  .drawer-overlay.open { display: block; }
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 480px;
+    background: var(--surface);
+    border-left: 2px solid var(--border);
+    z-index: 201;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.2s ease;
+    overflow: hidden;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-header {
+    padding: 18px 20px 14px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .drawer-title { font-size: 16px; font-weight: 900; font-family: var(--mono); line-height: 1.2; }
+  .drawer-meta { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .close-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .close-btn:hover { background: var(--surface2); }
+  .drawer-body { overflow-y: auto; flex: 1; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+
+  .drawer-section-title {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* Confidence gauge */
+  .conf-gauge-row { display: flex; align-items: center; gap: 12px; }
+  .conf-gauge-num { font-family: var(--mono); font-size: 36px; font-weight: 900; }
+  .conf-gauge-bar { flex: 1; height: 8px; background: var(--border); }
+  .conf-gauge-fill { height: 100%; }
+
+  /* Stats grid */
+  .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); }
+  .stat-box { background: var(--surface2); padding: 12px; }
+  .stat-box-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .stat-box-val { font-family: var(--mono); font-size: 20px; font-weight: 900; }
+
+  /* Blocker list */
+  .blocker-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+  }
+  .blocker-item.resolved { opacity: 0.4; }
+  .blocker-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 2px; }
+  .blocker-dot.open { background: var(--red); }
+  .blocker-dot.done { background: var(--green); }
+  .blocker-text { font-size: 12px; flex: 1; line-height: 1.5; }
+  .blocker-owner { font-size: 10px; color: var(--muted); font-family: var(--mono); }
+  .resolve-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 10px;
+    font-family: var(--mono);
+    padding: 2px 6px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .resolve-btn:hover { border-color: var(--green); color: var(--green); }
+
+  /* Add blocker */
+  .add-row { display: flex; gap: 6px; margin-top: 8px; }
+  .add-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 10px;
+    font-size: 12px;
+    font-family: var(--sans);
+    outline: none;
+  }
+  .add-input:focus { border-color: var(--text); }
+  .add-input::placeholder { color: var(--muted); }
+  .add-btn {
+    background: var(--text);
+    border: 1px solid var(--text);
+    color: var(--bg);
+    padding: 7px 12px;
+    font-size: 11px;
+    font-family: var(--mono);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .add-btn:hover { background: #ccc; }
+
+  /* Checklist items */
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    margin-bottom: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .check-item:hover { border-color: var(--text); }
+  .check-box-ui {
+    width: 14px; height: 14px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-family: var(--mono);
+  }
+  .check-box-ui.checked { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .check-item-label { font-size: 12px; flex: 1; }
+  .check-item.checked .check-item-label { color: var(--muted); text-decoration: line-through; }
+
+  /* Notes */
+  .notes-area {
+    width: 100%;
+    min-height: 80px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px;
+    font-size: 12px;
+    font-family: var(--sans);
+    resize: vertical;
+    outline: none;
+    line-height: 1.5;
+  }
+  .notes-area:focus { border-color: var(--text); }
+  .notes-area::placeholder { color: var(--muted); }
+  .save-notes-btn {
+    margin-top: 6px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 12px;
+    font-size: 10px;
+    font-family: var(--mono);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .save-notes-btn:hover { border-color: var(--text); color: var(--text); }
+
+  /* Empty state */
+  .empty-row td {
+    text-align: center;
+    padding: 40px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+    .charts-row { grid-template-columns: 1fr; }
+    .drawer { width: 100vw; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-left">
+    <div class="logo-mark">RR</div>
+    <h1>Release Readiness Board</h1>
+    <div class="release-badge">v2.4.1 · Q1 2026</div>
+  </div>
+  <div class="header-right">
+    <input class="search-box" id="search" type="text" placeholder="Search features..." oninput="render()">
+    <button class="btn" onclick="exportCSV()">↓ Export</button>
+    <button class="btn active" id="myFeatureBtn" onclick="toggleMyFeatures()">My Features</button>
+  </div>
+</header>
+
+<!-- KPI STRIP -->
+<div class="kpi-strip" id="kpiStrip"></div>
+
+<!-- CHARTS -->
+<div class="charts-row">
+  <div class="chart-panel">
+    <div class="chart-title">Risk Breakdown</div>
+    <div class="chart-wrap"><canvas id="riskChart"></canvas></div>
+  </div>
+  <div class="chart-panel">
+    <div class="chart-title">Confidence Trend (Weekly Avg)</div>
+    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <span class="filter-label">Status:</span>
+  <button class="filter-chip on" data-filter="status" data-val="all" onclick="setFilter('status','all',this)">All</button>
+  <button class="filter-chip" data-filter="status" data-val="ready" onclick="setFilter('status','ready',this)">Ready</button>
+  <button class="filter-chip" data-filter="status" data-val="at-risk" onclick="setFilter('status','at-risk',this)">At Risk</button>
+  <button class="filter-chip" data-filter="status" data-val="blocked" onclick="setFilter('status','blocked',this)">Blocked</button>
+  <button class="filter-chip" data-filter="status" data-val="in-progress" onclick="setFilter('status','in-progress',this)">In Progress</button>
+  <div class="sep"></div>
+  <span class="filter-label">Risk:</span>
+  <button class="filter-chip on" data-filter="risk" data-val="all" onclick="setFilter('risk','all',this)">All</button>
+  <button class="filter-chip" data-filter="risk" data-val="high" onclick="setFilter('risk','high',this)">High</button>
+  <button class="filter-chip" data-filter="risk" data-val="med" onclick="setFilter('risk','med',this)">Medium</button>
+  <button class="filter-chip" data-filter="risk" data-val="low" onclick="setFilter('risk','low',this)">Low</button>
+  <div class="sep"></div>
+  <span id="rowCount" style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto;"></span>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th onclick="sortBy('name')">Feature <span class="sort-icon" id="sort-name">↕</span></th>
+        <th onclick="sortBy('owner')">Owner <span class="sort-icon" id="sort-owner">↕</span></th>
+        <th onclick="sortBy('confidence')">Confidence <span class="sort-icon" id="sort-confidence">↕</span></th>
+        <th onclick="sortBy('risk')">Risk <span class="sort-icon" id="sort-risk">↕</span></th>
+        <th onclick="sortBy('blockers')">Blockers <span class="sort-icon" id="sort-blockers">↕</span></th>
+        <th onclick="sortBy('checklist')">Checklist <span class="sort-icon" id="sort-checklist">↕</span></th>
+        <th onclick="sortBy('status')">Status <span class="sort-icon" id="sort-status">↕</span></th>
+        <th>Target Date</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+</div>
+
+<!-- DRAWER OVERLAY -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <div>
+      <div class="drawer-title" id="drawerTitle">—</div>
+      <div class="drawer-meta" id="drawerMeta">—</div>
+    </div>
+    <button class="close-btn" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────
+const CURRENT_USER = 'A. Nguyen';
+
+const DEFAULTS = [
+  {
+    id: 1, name: 'SSO Improvements', owner: 'A. Nguyen', confidence: 82,
+    risk: 'med', status: 'at-risk', targetDate: '2026-03-28',
+    blockers: [
+      { id: 1, text: 'SAML config not validated in staging', owner: 'A. Nguyen', resolved: false },
+      { id: 2, text: 'Security review pending sign-off', owner: 'T. Liu', resolved: false }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:true },
+      { id:3,label:'Security review complete',done:false },{ id:4,label:'Staging validation',done:false },
+      { id:5,label:'Load test executed',done:true },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:true },
+      { id:9,label:'Changelog updated',done:true },{ id:10,label:'PM sign-off',done:false },
+      { id:11,label:'Eng lead approval',done:false },{ id:12,label:'Docs updated',done:false }
+    ],
+    notes: 'SAML metadata XML needs refresh from IdP vendor. ETA: end of sprint.',
+  },
+  {
+    id: 2, name: 'Billing Revamp', owner: 'J. Patel', confidence: 61,
+    risk: 'high', status: 'blocked', targetDate: '2026-04-04',
+    blockers: [
+      { id: 1, text: 'Stripe webhook handler failing under load', owner: 'J. Patel', resolved: false },
+      { id: 2, text: 'Tax compliance edge cases unresolved', owner: 'K. Brown', resolved: false },
+      { id: 3, text: 'Design QA sign-off not received', owner: 'R. Martinez', resolved: false }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:false },
+      { id:3,label:'Security review complete',done:true },{ id:4,label:'Staging validation',done:false },
+      { id:5,label:'Load test executed',done:false },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:false },
+      { id:9,label:'Changelog updated',done:false },{ id:10,label:'PM sign-off',done:false },
+      { id:11,label:'Eng lead approval',done:false },{ id:12,label:'Docs updated',done:false },
+      { id:13,label:'Stripe reconciliation verified',done:false },{ id:14,label:'Finance team review',done:false }
+    ],
+    notes: 'Billing work is at high risk. Need unblocking from Stripe on webhook rate limits.',
+  },
+  {
+    id: 3, name: 'Search v2', owner: 'M. Chen', confidence: 90,
+    risk: 'low', status: 'ready', targetDate: '2026-03-21',
+    blockers: [],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:true },
+      { id:3,label:'Security review complete',done:true },{ id:4,label:'Staging validation',done:true },
+      { id:5,label:'Load test executed',done:true },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:true },
+      { id:9,label:'Changelog updated',done:true },{ id:10,label:'PM sign-off',done:true },
+      { id:11,label:'Eng lead approval',done:true },{ id:12,label:'Docs updated',done:true },
+      { id:13,label:'Performance benchmarks met',done:true }
+    ],
+    notes: 'Fully ready. Indexed 2.3M records. P95 latency < 120ms.',
+  },
+  {
+    id: 4, name: 'Mobile Push Notifications', owner: 'S. Kim', confidence: 74,
+    risk: 'med', status: 'in-progress', targetDate: '2026-04-11',
+    blockers: [
+      { id: 1, text: 'APNs cert expiry not handled in prod', owner: 'S. Kim', resolved: true }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:true },
+      { id:3,label:'Security review complete',done:false },{ id:4,label:'Staging validation',done:true },
+      { id:5,label:'Load test executed',done:false },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:false },
+      { id:9,label:'Changelog updated',done:false },{ id:10,label:'PM sign-off',done:false }
+    ],
+    notes: 'Android delivery confirmed. iOS APNs cert rotation resolved.',
+  },
+  {
+    id: 5, name: 'Analytics Dashboard v3', owner: 'T. Liu', confidence: 55,
+    risk: 'high', status: 'blocked', targetDate: '2026-04-18',
+    blockers: [
+      { id: 1, text: 'BigQuery quota exceeded — backfill job stuck', owner: 'T. Liu', resolved: false },
+      { id: 2, text: 'Data retention policy not applied to new tables', owner: 'D. Osei', resolved: false }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:false },
+      { id:3,label:'Data privacy review',done:false },{ id:4,label:'Staging validation',done:false },
+      { id:5,label:'Load test executed',done:false },{ id:6,label:'Rollback plan documented',done:false },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:false },
+      { id:9,label:'Changelog updated',done:false },{ id:10,label:'PM sign-off',done:false }
+    ],
+    notes: 'Blocked on GCP quota increase request (ticket open). ETA unknown.',
+  },
+  {
+    id: 6, name: 'Onboarding Flow Redesign', owner: 'R. Martinez', confidence: 87,
+    risk: 'low', status: 'ready', targetDate: '2026-03-24',
+    blockers: [],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:true },
+      { id:3,label:'Accessibility audit',done:true },{ id:4,label:'Staging validation',done:true },
+      { id:5,label:'A/B test configured',done:true },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:true },
+      { id:9,label:'Changelog updated',done:true },{ id:10,label:'PM sign-off',done:true },
+      { id:11,label:'Eng lead approval',done:true }
+    ],
+    notes: 'Onboarding completion rate improved 18% in staging A/B. Ready to ship.',
+  },
+  {
+    id: 7, name: 'API Rate Limiting v2', owner: 'D. Osei', confidence: 79,
+    risk: 'med', status: 'at-risk', targetDate: '2026-04-04',
+    blockers: [
+      { id: 1, text: 'Redis cluster migration not complete', owner: 'D. Osei', resolved: false }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:true },
+      { id:3,label:'Security review complete',done:true },{ id:4,label:'Staging validation',done:false },
+      { id:5,label:'Load test executed',done:true },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Monitoring alerts set',done:false },
+      { id:9,label:'Changelog updated',done:false },{ id:10,label:'PM sign-off',done:false }
+    ],
+    notes: 'Redis migration blocked by infra team capacity. Rescheduling for next week.',
+  },
+  {
+    id: 8, name: 'Multi-Currency Support', owner: 'K. Brown', confidence: 68,
+    risk: 'high', status: 'in-progress', targetDate: '2026-04-25',
+    blockers: [
+      { id: 1, text: 'FX rate service SLA not confirmed', owner: 'K. Brown', resolved: false }
+    ],
+    checklist: [
+      { id:1,label:'Unit tests passing',done:true },{ id:2,label:'Integration tests passing',done:false },
+      { id:3,label:'Security review complete',done:true },{ id:4,label:'Staging validation',done:false },
+      { id:5,label:'FX rate edge cases tested',done:false },{ id:6,label:'Rollback plan documented',done:true },
+      { id:7,label:'Feature flag configured',done:true },{ id:8,label:'Finance team sign-off',done:false },
+      { id:9,label:'Changelog updated',done:false },{ id:10,label:'PM sign-off',done:false }
+    ],
+    notes: 'Core conversion logic complete. Waiting on vendor SLA for live FX feed.',
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let features = JSON.parse(localStorage.getItem('rrb_features') || 'null') || DEFAULTS;
+let sortCol = 'confidence', sortDir = -1;
+let filters = { status: 'all', risk: 'all' };
+let selectedId = null;
+let showMine = false;
+let trendData = [65, 68, 70, 72, 74, 76, 78];
+
+function save() { localStorage.setItem('rrb_features', JSON.stringify(features)); }
+
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function confColor(c) {
+  if (c >= 80) return getComputedStyle(document.documentElement).getPropertyValue('--green').trim();
+  if (c >= 65) return getComputedStyle(document.documentElement).getPropertyValue('--yellow').trim();
+  return getComputedStyle(document.documentElement).getPropertyValue('--red').trim();
+}
+function riskOrder(r) { return r === 'high' ? 2 : r === 'med' ? 1 : 0; }
+function checklistPct(f) {
+  if (!f.checklist.length) return 0;
+  return Math.round(f.checklist.filter(c=>c.done).length / f.checklist.length * 100);
+}
+function openBlockers(f) { return f.blockers.filter(b=>!b.resolved).length; }
+
+// ── FILTER + SORT ─────────────────────────────────────────────────────────
+function getFiltered() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  return features.filter(f => {
+    if (q && !f.name.toLowerCase().includes(q) && !f.owner.toLowerCase().includes(q)) return false;
+    if (filters.status !== 'all' && f.status !== filters.status) return false;
+    if (filters.risk !== 'all' && f.risk !== filters.risk) return false;
+    if (showMine && f.owner !== CURRENT_USER) return false;
+    return true;
+  }).sort((a,b) => {
+    let av, bv;
+    if (sortCol === 'name') { av = a.name; bv = b.name; }
+    else if (sortCol === 'owner') { av = a.owner; bv = b.owner; }
+    else if (sortCol === 'confidence') { av = a.confidence; bv = b.confidence; }
+    else if (sortCol === 'risk') { av = riskOrder(a.risk); bv = riskOrder(b.risk); }
+    else if (sortCol === 'blockers') { av = openBlockers(a); bv = openBlockers(b); }
+    else if (sortCol === 'checklist') { av = checklistPct(a); bv = checklistPct(b); }
+    else if (sortCol === 'status') { av = a.status; bv = b.status; }
+    if (av < bv) return sortDir;
+    if (av > bv) return -sortDir;
+    return 0;
+  });
+}
+
+function setFilter(type, val, el) {
+  filters[type] = val;
+  document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  render();
+}
+
+function sortBy(col) {
+  if (sortCol === col) sortDir *= -1; else { sortCol = col; sortDir = -1; }
+  document.querySelectorAll('.sort-icon').forEach(el => el.style.opacity = '0.4');
+  document.getElementById(`sort-${col}`).style.opacity = '1';
+  render();
+}
+
+function toggleMyFeatures() {
+  showMine = !showMine;
+  document.getElementById('myFeatureBtn').classList.toggle('active', showMine);
+  render();
+}
+
+// ── KPI ───────────────────────────────────────────────────────────────────
+function renderKPIs() {
+  const avgConf = Math.round(features.reduce((s,f)=>s+f.confidence,0)/features.length);
+  const highRisk = features.filter(f=>f.risk==='high').length;
+  const blocked = features.filter(f=>f.status==='blocked').length;
+  const ready = features.filter(f=>f.status==='ready').length;
+  document.getElementById('kpiStrip').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Avg Confidence</div>
+      <div class="kpi-value ${avgConf>=80?'green':avgConf>=65?'yellow':'red'}">${avgConf}</div>
+      <div class="kpi-sub">out of 100</div></div>
+    <div class="kpi"><div class="kpi-label">High Risk</div>
+      <div class="kpi-value red">${highRisk}</div>
+      <div class="kpi-sub">features</div></div>
+    <div class="kpi"><div class="kpi-label">Blocked</div>
+      <div class="kpi-value yellow">${blocked}</div>
+      <div class="kpi-sub">features</div></div>
+    <div class="kpi"><div class="kpi-label">Ready to Ship</div>
+      <div class="kpi-value green">${ready}</div>
+      <div class="kpi-sub">of ${features.length} total</div></div>
+  `;
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────
+let riskChart, trendChart;
+
+function renderCharts() {
+  const low = features.filter(f=>f.risk==='low').length;
+  const med = features.filter(f=>f.risk==='med').length;
+  const high = features.filter(f=>f.risk==='high').length;
+
+  const style = getComputedStyle(document.documentElement);
+  const g = style.getPropertyValue('--green').trim();
+  const y = style.getPropertyValue('--yellow').trim();
+  const r = style.getPropertyValue('--red').trim();
+  const bd = style.getPropertyValue('--border').trim();
+  const m = style.getPropertyValue('--muted').trim();
+
+  if (riskChart) riskChart.destroy();
+  riskChart = new Chart(document.getElementById('riskChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Low','Med','High'],
+      datasets: [{ data: [low,med,high], backgroundColor: [g,y,r], borderColor: '#111', borderWidth: 3 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: m, font: { family: 'Courier New', size: 10 }, boxWidth: 10 } }
+      }
+    }
+  });
+
+  const avgConf = Math.round(features.reduce((s,f)=>s+f.confidence,0)/features.length);
+  const newTrend = [...trendData.slice(1), avgConf];
+  trendData = newTrend;
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: ['W-6','W-5','W-4','W-3','W-2','W-1','Now'],
+      datasets: [{
+        data: trendData,
+        borderColor: g, backgroundColor: 'rgba(34,197,94,0.08)',
+        pointRadius: 3, pointBackgroundColor: g,
+        tension: 0.4, fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: bd }, ticks: { color: m, font: { family: 'Courier New', size: 9 } } },
+        y: { grid: { color: bd }, ticks: { color: m, font: { family: 'Courier New', size: 9 } }, min: 40, max: 100 }
+      }
+    }
+  });
+}
+
+// ── TABLE ─────────────────────────────────────────────────────────────────
+function render() {
+  renderKPIs();
+  const rows = getFiltered();
+  document.getElementById('rowCount').textContent = `${rows.length} of ${features.length} features`;
+  const tbody = document.getElementById('tableBody');
+  if (!rows.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No features match the current filters</td></tr>';
+    return;
+  }
+  tbody.innerHTML = rows.map(f => {
+    const cc = confColor(f.cc || f.confidence);
+    const done = f.checklist.filter(c=>c.done).length;
+    const total = f.checklist.length;
+    const pct = total ? done/total : 0;
+    const ob = openBlockers(f);
+    return `
+    <tr onclick="openDrawer(${f.id})" ${f.id === selectedId ? 'class="selected"' : ''}>
+      <td><div class="feature-name">${f.name}</div></td>
+      <td><div class="owner-cell">${f.owner}</div></td>
+      <td>
+        <div class="conf-wrap">
+          <div class="conf-bar"><div class="conf-fill" style="width:${f.confidence}%;background:${confColor(f.confidence)}"></div></div>
+          <span class="conf-num" style="color:${confColor(f.confidence)}">${f.confidence}</span>
+        </div>
+      </td>
+      <td><span class="badge ${f.risk}">${f.risk}</span></td>
+      <td style="color:${ob>0?'var(--red)':'var(--muted)'};font-family:var(--mono);font-weight:${ob>0?700:400}">${ob > 0 ? '⊗ '+ob : '—'}</td>
+      <td>
+        <div class="checklist-wrap">
+          <div class="checklist-bar"><div class="checklist-fill" style="width:${pct*100}%"></div></div>
+          <span class="checklist-num">${done}/${total}</span>
+        </div>
+      </td>
+      <td><span class="status-pill ${f.status}">${f.status.replace('-',' ')}</span></td>
+      <td style="color:var(--muted);font-size:11px;">${f.targetDate}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── DRAWER ────────────────────────────────────────────────────────────────
+function openDrawer(id) {
+  selectedId = id;
+  const f = features.find(x=>x.id===id);
+  render();
+
+  document.getElementById('drawerTitle').textContent = f.name;
+  document.getElementById('drawerMeta').textContent = `Owner: ${f.owner} · Target: ${f.targetDate}`;
+
+  const done = f.checklist.filter(c=>c.done).length;
+  const total = f.checklist.length;
+  const ob = openBlockers(f);
+
+  document.getElementById('drawerBody').innerHTML = `
+    <!-- Confidence -->
+    <div>
+      <div class="drawer-section-title">Confidence Score</div>
+      <div class="conf-gauge-row">
+        <div class="conf-gauge-num" style="color:${confColor(f.confidence)}">${f.confidence}</div>
+        <div class="conf-gauge-bar"><div class="conf-gauge-fill" style="width:${f.confidence}%;background:${confColor(f.confidence)}"></div></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div>
+      <div class="drawer-section-title">Summary</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-box-label">Risk</div>
+          <div class="stat-box-val" style="color:${f.risk==='high'?'var(--red)':f.risk==='med'?'var(--yellow)':'var(--green)'}">${f.risk.toUpperCase()}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Blockers</div>
+          <div class="stat-box-val" style="color:${ob>0?'var(--red)':'var(--green)'}">${ob}</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-label">Checklist</div>
+          <div class="stat-box-val">${done}/${total}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blockers -->
+    <div>
+      <div class="drawer-section-title">Blockers</div>
+      <div id="blockerList">${renderBlockers(f)}</div>
+      <div class="add-row">
+        <input class="add-input" id="blockerInput" type="text" placeholder="Describe the blocker...">
+        <button class="add-btn" onclick="addBlocker(${f.id})">+ Add</button>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div>
+      <div class="drawer-section-title">Release Checklist (${done}/${total})</div>
+      <div id="checklistItems">${renderChecklist(f)}</div>
+    </div>
+
+    <!-- Notes -->
+    <div>
+      <div class="drawer-section-title">Notes</div>
+      <textarea class="notes-area" id="notesArea" placeholder="Add notes, decisions, or context...">${f.notes||''}</textarea>
+      <button class="save-notes-btn" onclick="saveNotes(${f.id})">Save Notes</button>
+    </div>
+  `;
+
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+
+function renderBlockers(f) {
+  if (!f.blockers.length) return '<div style="color:var(--muted);font-size:12px;font-family:var(--mono);padding:8px 0">No blockers — clear to ship.</div>';
+  return f.blockers.map(b => `
+    <div class="blocker-item ${b.resolved?'resolved':''}">
+      <div class="blocker-dot ${b.resolved?'done':'open'}"></div>
+      <div>
+        <div class="blocker-text">${b.text}</div>
+        <div class="blocker-owner">${b.owner}</div>
+      </div>
+      ${!b.resolved ? `<button class="resolve-btn" onclick="resolveBlocker(${f.id},${b.id})">Resolve</button>` : '<span style="font-size:10px;color:var(--green);font-family:var(--mono)">✓ Done</span>'}
+    </div>`).join('');
+}
+
+function renderChecklist(f) {
+  return f.checklist.map(c => `
+    <div class="check-item ${c.done?'checked':''}" onclick="toggleCheck(${f.id},${c.id})">
+      <div class="check-box-ui ${c.done?'checked':''}">${c.done?'✓':''}</div>
+      <div class="check-item-label">${c.label}</div>
+    </div>`).join('');
+}
+
+function closeDrawer() {
+  selectedId = null;
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  render();
+}
+
+function addBlocker(fid) {
+  const input = document.getElementById('blockerInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const f = features.find(x=>x.id===fid);
+  const newId = f.blockers.length ? Math.max(...f.blockers.map(b=>b.id))+1 : 1;
+  f.blockers.push({ id: newId, text, owner: CURRENT_USER, resolved: false });
+  save(); openDrawer(fid);
+}
+
+function resolveBlocker(fid, bid) {
+  const f = features.find(x=>x.id===fid);
+  const b = f.blockers.find(x=>x.id===bid);
+  if (b) b.resolved = true;
+  save(); openDrawer(fid);
+}
+
+function toggleCheck(fid, cid) {
+  const f = features.find(x=>x.id===fid);
+  const c = f.checklist.find(x=>x.id===cid);
+  if (c) c.done = !c.done;
+  // Recalc confidence based on checklist completion
+  const pct = f.checklist.filter(x=>x.done).length / f.checklist.length;
+  const openB = openBlockers(f);
+  f.confidence = Math.min(99, Math.round(
+    pct * 70 + (openB === 0 ? 20 : Math.max(0, 20 - openB * 6)) + 10
+  ));
+  save(); openDrawer(fid);
+}
+
+function saveNotes(fid) {
+  const f = features.find(x=>x.id===fid);
+  f.notes = document.getElementById('notesArea').value;
+  save();
+  const btn = document.querySelector('.save-notes-btn');
+  if (btn) { btn.textContent = '✓ Saved'; setTimeout(()=>{ btn.textContent='Save Notes'; },1500); }
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const rows = getFiltered();
+  const header = 'Feature,Owner,Confidence,Risk,Open Blockers,Checklist Done,Total Checklist,Status,Target Date';
+  const data = rows.map(f => {
+    const done = f.checklist.filter(c=>c.done).length;
+    return `"${f.name}","${f.owner}",${f.confidence},${f.risk},${openBlockers(f)},${done},${f.checklist.length},${f.status},${f.targetDate}`;
+  });
+  const blob = new Blob([header+'\n'+data.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'release-readiness.csv'; a.click();
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+render();
+renderCharts();
+</script>
+</body>
+</html>
