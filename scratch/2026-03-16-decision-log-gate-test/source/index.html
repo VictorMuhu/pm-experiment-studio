@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Decision Log Gate Test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" role="banner">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__title">Decision Log Gate Test</div>
+          <div class="brand__meta">
+            <span class="pill pill--neutral">CX REVIEW HARNESS</span>
+            <span class="pill pill--neutral">DENSE ANALYST CONSOLE</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <div class="kpi">
+          <div class="kpi__label">VERDICT</div>
+          <div class="kpi__value" id="kpiVerdict">—</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__label">GATE SCORE</div>
+          <div class="kpi__value" id="kpiScore">—</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi__label">BLOCKERS</div>
+          <div class="kpi__value" id="kpiBlockers">—</div>
+        </div>
+
+        <div class="divider-v" aria-hidden="true"></div>
+
+        <button class="btn btn--ghost" id="btnLoadDemo" type="button" title="Load a realistic draft decision log">
+          <span class="btn__icon" aria-hidden="true">⤓</span><span class="btn__label">LOAD DEMO</span>
+        </button>
+        <button class="btn btn--outline" id="btnAnalyze" type="button" title="Analyze the draft decision log (Ctrl/⌘ + Enter)">
+          <span class="btn__icon" aria-hidden="true">⎚</span><span class="btn__label">ANALYZE</span>
+        </button>
+        <button class="btn btn--ghost" id="btnCopyReport" type="button" title="Copy report summary to clipboard">
+          <span class="btn__icon" aria-hidden="true">⧉</span><span class="btn__label">COPY REPORT</span>
+        </button>
+        <button class="btn btn--ghost" id="btnReset" type="button" title="Reset">
+          <span class="btn__icon" aria-hidden="true">↺</span><span class="btn__label">RESET</span>
+        </button>
+      </div>
+    </header>
+
+    <div class="layout" role="main">
+      <aside class="sidebar" aria-label="Checks and thresholds">
+        <div class="panel__header">
+          <div class="panel__title">GATES</div>
+          <div class="panel__subtitle">Signals tuned for “template-y” logs</div>
+        </div>
+
+        <div class="sidebar__section">
+          <div class="section__header">
+            <div class="section__title">THRESHOLDS</div>
+            <div class="section__hint">Local-only; no data leaves your browser</div>
+          </div>
+
+          <div class="form-grid">
+            <label class="field">
+              <div class="field__label">PASS SCORE</div>
+              <input class="input input--mono" id="inputPassScore" type="number" min="0" max="100" step="1" value="70" />
+              <div class="field__help">≥ this score → publish recommendation (unless blockers)</div>
+            </label>
+
+            <label class="field">
+              <div class="field__label">MAX BLOCKERS</div>
+              <input class="input input--mono" id="inputMaxBlockers" type="number" min="0" max="10" step="1" value="0" />
+              <div class="field__help">> this count → scratch recommendation</div>
+            </label>
+
+            <label class="field">
+              <div class="field__label">MIN DECISION WORDS</div>
+              <input class="input input--mono" id="inputMinWords" type="number" min="80" max="2000" step="10" value="220" />
+              <div class="field__help">Below this tends to be template-only</div>
+            </label>
+
+            <label class="field">
+              <div class="field__label">STRICT MODE</div>
+              <select class="input input--mono" id="inputStrictMode">
+                <option value="off">OFF</option>
+                <option value="on" selected>ON</option>
+              </select>
+              <div class="field__help">ON: bracket prompts and “kept it simple” are blockers</div>
+            </label>
+          </div>
+        </div>
+
+        <div class="sidebar__section">
+          <div class="section__header">
+            <div class="section__title">FOCUS</div>
+            <div class="section__hint">Quick filters for the issue table</div>
+          </div>
+
+          <div class="chips" role="toolbar" aria-label="Issue filters">
+            <button class="chip chip--active" type="button" data-filter="all" id="filterAll">ALL</button>
+            <button class="chip" type="button" data-filter="blocker" id="filterBlockers">BLOCKERS</button>
+            <button class="chip" type="button" data-filter="warning" id="filterWarnings">WARNINGS</button>
+            <button class="chip" type="button" data-filter="info" id="filterInfo">INFO</button>
+          </div>
+
+          <div class="sidebar__mini">
+            <div class="minirow">
+              <div class="minirow__k">LAST RUN</div>
+              <div class="minirow__v" id="lastRun">—</div>
+            </div>
+            <div class="minirow">
+              <div class="minirow__k">DOC STATS</div>
+              <div class="minirow__v" id="docStats">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="sidebar__section">
+          <div class="section__header">
+            <div class="section__title">KNOWN TEMPLATE PHRASES</div>
+            <div class="section__hint">Used as signals, not absolute truth</div>
+          </div>
+
+          <div class="phrase-list" id="phraseList" aria-label="Template phrase list"></div>
+        </div>
+      </aside>
+
+      <section class="main">
+        <div class="pane" aria-label="Input decision log">
+          <div class="panel__header panel__header--sticky">
+            <div class="panel__title">INPUT</div>
+            <div class="panel__subtitle">Paste a decision-log.md draft (Ctrl/⌘+Enter to analyze)</div>
+            <div class="panel__actions">
+              <label class="toggle">
+                <input type="checkbox" id="toggleLineNumbers" checked />
+                <span class="toggle__text">LINE #</span>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="toggleAutoAnalyze" />
+                <span class="toggle__text">AUTO</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="editor">
+            <div class="editor__gutter" id="gutter" aria-hidden="true"></div>
+            <textarea class="textarea textarea--mono" id="inputText" spellcheck="false" aria-label="Decision log input"></textarea>
+          </div>
+
+          <div class="statusline" aria-label="Input status">
+            <div class="statusline__left" id="inputHint">Paste a draft, then run ANALYZE.</div>
+            <div class="statusline__right" id="cursorInfo">Ln 1, Col 1</div>
+          </div>
+        </div>
+
+        <div class="pane" aria-label="Issues table">
+          <div class="panel__header panel__header--sticky">
+            <div class="panel__title">ISSUES</div>
+            <div class="panel__subtitle">Blockers prevent publish; warnings degrade signal</div>
+            <div class="panel__actions">
+              <div class="search">
+                <span class="search__icon" aria-hidden="true">⌕</span>
+                <input class="input input--mono" id="inputSearch" type="text" placeholder="SEARCH ISSUES (e.g., bracket, scope, react)" />
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="Issues table region">
+            <table class="table" aria-label="Issues table">
+              <thead>
+                <tr>
+                  <th style="width: 110px;">SEVERITY</th>
+                  <th style="width: 170px;">SIGNAL</th>
+                  <th>DETAIL</th>
+                  <th style="width: 110px;">LINE</th>
+                </tr>
+              </thead>
+              <tbody id="issuesTbody">
+                <!-- rows inserted by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="statusline" aria-label="Issues status">
+            <div class="statusline__left" id="issuesSummary">—</div>
+            <div class="statusline__right">
+              <span class="mono" id="activeFilterLabel">FILTER: ALL</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="detail" aria-label="Detail and fixes panel">
+        <div class="panel__header">
+          <div class="panel__title">DETAIL</div>
+          <div class="panel__subtitle">Click an issue row to see suggested edits</div>
+        </div>
+
+        <div class="detail__body">
+          <div class="detailcard">
+            <div class="detailcard__header">
+              <div class="detailcard__title" id="detailTitle">No selection</div>
+              <div class="detailcard__meta" id="detailMeta">—</div>
+            </div>
+
+            <div class="detailcard__section">
+              <div class="detailcard__label">WHY THIS MATTERS</div>
+              <div class="detailcard__text" id="detailWhy">Select a row in the issues table.</div>
+            </div>
+
+            <div class="detailcard__section">
+              <div class="detailcard__label">SUGGESTED FIX</div>
+              <div class="detailcard__text" id="detailFix">—</div>
+            </div>
+
+            <div class="detailcard__section">
+              <div class="detailcard__label">SNIPPET</div>
+              <pre class="snippet" id="detailSnippet">—</pre>
+            </div>
+
+            <div class="detailcard__actions">
+              <button class="btn btn--outline" id="btnJumpToLine" type="button" disabled>
+                <span class="btn__icon" aria-hidden="true">↳</span><span class="btn__label">JUMP TO LINE</span>
+              </button>
+              <button class="btn btn--ghost" id="btnCopyFix" type="button" disabled>
+                <span class="btn__icon" aria-hidden="true">⧉</span><span class="btn__label">COPY FIX TEXT</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="detailcard">
+            <div class="detailcard__header">
+              <div class="detailcard__title">RECOMMENDATION</div>
+              <div class="detailcard__meta" id="recMeta">—</div>
+            </div>
+
+            <div class="recgrid" aria-label="Recommendation grid">
+              <div class="recgrid__row">
+                <div class="recgrid__k">REPO ROUTE</div>
+                <div class="recgrid__v" id="recRoute">—</div>
+              </div>
+              <div class="recgrid__row">
+                <div class="recgrid__k">RATIONALE</div>
+                <div class="recgrid__v" id="recRationale">—</div>
+              </div>
+              <div class="recgrid__row">
+                <div class="recgrid__k">NEXT ACTION</div>
+                <div class="recgrid__v" id="recNext">—</div>
+              </div>
+            </div>
+
+            <div class="detailcard__section">
+              <div class="detailcard__label">COPY-PASTE REVIEW COMMENT</div>
+              <textarea class="textarea textarea--mono textarea--small" id="reviewComment" spellcheck="false" aria-label="Generated review comment"></textarea>
+              <div class="detailcard__note">Writes a concrete reviewer comment; you still own the judgment.</div>
+            </div>
+
+            <div class="detailcard__actions">
+              <button class="btn btn--outline" id="btnCopyComment" type="button">
+                <span class="btn__icon" aria-hidden="true">⧉</span><span class="btn__label">COPY COMMENT</span>
+              </button>
+              <button class="btn btn--ghost" id="btnClearSelection" type="button">
+                <span class="btn__icon" aria-hidden="true">⨯</span><span class="btn__label">CLEAR</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
