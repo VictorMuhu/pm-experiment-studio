@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fix Verification Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="crt">
+    <header class="topbar panel">
+      <div class="brand">
+        <div class="sigil" aria-hidden="true"></div>
+        <div>
+          <div class="title">FIX VERIFICATION RUN</div>
+          <div class="subtitle">PM PRODUCTIVITY TOOLS • DRAFT HARNESS</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="navbtn" data-view="dashboard" aria-current="page">DASHBOARD</button>
+        <span class="sep" aria-hidden="true">|</span>
+        <button class="navbtn" data-view="generator">GENERATOR</button>
+        <span class="sep" aria-hidden="true">|</span>
+        <button class="navbtn" data-view="runs">RUNS</button>
+        <span class="sep" aria-hidden="true">|</span>
+        <button class="navbtn" data-view="decisions">DECISION LOG</button>
+        <span class="sep" aria-hidden="true">|</span>
+        <button class="navbtn" data-view="settings">SETTINGS</button>
+      </nav>
+
+      <div class="statusline">
+        <div class="tag tag-cyan" title="Local persistence">⟦ LOCAL ⟧</div>
+        <div class="tag tag-pink" id="ceilingTag" title="Token ceiling safety">⟦ CEILING: 8192 ⟧</div>
+        <div class="tag" id="healthTag" title="Health status">⟦ HEALTH: OK ⟧</div>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="left panel">
+        <div class="panelhdr">
+          <div class="hdrtitle">RUN CONTROL</div>
+          <div class="hdrmeta"><span id="nowClock">--:--:--</span></div>
+        </div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="projName">PROJECT NAME</label>
+            <input id="projName" type="text" spellcheck="false" value="Fix Verification Run" />
+          </div>
+          <div class="field">
+            <label for="category">CATEGORY</label>
+            <input id="category" type="text" spellcheck="false" value="PM productivity tools" />
+          </div>
+          <div class="field">
+            <label for="styleId">STYLE ID</label>
+            <input id="styleId" type="text" spellcheck="false" value="retro-future" />
+          </div>
+          <div class="field">
+            <label for="budget">TOKEN BUDGET</label>
+            <input id="budget" type="number" min="512" step="128" value="7600" />
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="field">
+            <label for="features">FEATURES (ONE PER LINE)</label>
+            <textarea id="features" rows="8" spellcheck="false">Multi-file pack output (README + manifest + decision log)
+Style-matrix compliance notes embedded
+Token budgeting + truncation alarms
+Run history with diff highlights
+Local persistence + export/import
+Diagnostics that explain failures in &lt; 2 minutes</textarea>
+          </div>
+          <div class="field">
+            <label for="constraints">CONSTRAINTS / NOTES</label>
+            <textarea id="constraints" rows="8" spellcheck="false">Avoid truncation. Keep rich density. Make failures diagnosable quickly.
+No CDN JS. Vanilla only. Google Fonts allowed.</textarea>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary" id="btnGenerate">GENERATE PACK</button>
+          <button class="btn" id="btnSaveRun">SAVE RUN</button>
+          <button class="btn" id="btnClearDraft">CLEAR DRAFT</button>
+        </div>
+
+        <div class="meterwrap">
+          <div class="meterhdr">
+            <div class="hdrtitle">BUDGET METER</div>
+            <div class="hdrmeta"><span id="budgetReadout">0 / 7600</span></div>
+          </div>
+          <div class="meter" role="progressbar" aria-valuemin="0" aria-valuemax="7600" aria-valuenow="0">
+            <div class="meterfill" id="meterFill"></div>
+            <div class="meterscan" aria-hidden="true"></div>
+          </div>
+          <div class="tiny" id="budgetHint">Estimates are based on characters → tokens (~4 chars/token). Adjust budget to stress-test.</div>
+        </div>
+
+        <div class="panel panelmini">
+          <div class="panelhdr">
+            <div class="hdrtitle">DIAGNOSTICS</div>
+            <div class="hdrmeta"><button class="linkbtn" id="btnCopyDiag">COPY</button></div>
+          </div>
+          <div class="log" id="diagLog" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="center panel">
+        <div class="panelhdr">
+          <div class="hdrtitle">MAIN DISPLAY</div>
+          <div class="hdrmeta">
+            <span class="tag tag-cyan" id="activeViewTag">⟦ VIEW: DASHBOARD ⟧</span>
+          </div>
+        </div>
+
+        <div class="views">
+          <section class="view active" id="view-dashboard" data-view="dashboard">
+            <div class="kpis">
+              <div class="kpi card">
+                <div class="kpilabel">RUNS SAVED</div>
+                <div class="kpivalue" id="kpiRuns">0</div>
+                <div class="kpinote">Local history in this browser.</div>
+              </div>
+              <div class="kpi card">
+                <div class="kpilabel">LAST STATUS</div>
+                <div class="kpivalue" id="kpiStatus">—</div>
+                <div class="kpinote">Based on budget checks.</div>
+              </div>
+              <div class="kpi card">
+                <div class="kpilabel">PACK SIZE (EST.)</div>
+                <div class="kpivalue" id="kpiSize">0</div>
+                <div class="kpinote">Chars across README+manifest+log.</div>
+              </div>
+              <div class="kpi card">
+                <div class="kpilabel">RISK</div>
+                <div class="kpivalue" id="kpiRisk">LOW</div>
+                <div class="kpinote">Truncation / density / structure.</div>
+              </div>
+            </div>
+
+            <div class="panel subpanel">
+              <div class="panelhdr">
+                <div class="hdrtitle">CHECKLIST</div>
+                <div class="hdrmeta">STYLE: RETRO-FUTURE</div>
+              </div>
+              <div class="checkgrid" id="checklist"></div>
+            </div>
+
+            <div class="panel subpanel">
+              <div class="panelhdr">
+                <div class="hdrtitle">QUICK ACTIONS</div>
+                <div class="hdrmeta">NO NETWORK REQUIRED</div>
+              </div>
+              <div class="actions">
+                <button class="btn" id="btnNewDecision">ADD DECISION</button>
+                <button class="btn" id="btnExportAll">EXPORT JSON</button>
+                <label class="btn filebtn" for="importFile">IMPORT JSON</label>
+                <input id="importFile" type="file" accept="application/json" />
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="view-generator" data-view="generator">
+            <div class="tabs" role="tablist" aria-label="Pack tabs">
+              <button class="tab active" role="tab" aria-selected="true" data-tab="readme">README</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="manifest">MANIFEST</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="decisions">DECISION LOG</button>
+              <button class="tab" role="tab" aria-selected="false" data-tab="compliance">COMPLIANCE</button>
+            </div>
+
+            <div class="tabpanes">
+              <div class="tabpane active" data-tab="readme">
+                <div class="panehdr">
+                  <div class="tag">&lt; README.md &gt;</div>
+                  <div class="paneactions">
+                    <button class="btn" data-copy="readme">COPY</button>
+                    <button class="btn" data-download="readme">DOWNLOAD</button>
+                  </div>
+                </div>
+                <textarea id="outReadme" class="output" rows="18" spellcheck="false" readonly></textarea>
+              </div>
+
+              <div class="tabpane" data-tab="manifest">
+                <div class="panehdr">
+                  <div class="tag tag-cyan">&lt; manifest.json &gt;</div>
+                  <div class="paneactions">
+                    <button class="btn" data-copy="manifest">COPY</button>
+                    <button class="btn" data-download="manifest">DOWNLOAD</button>
+                  </div>
+                </div>
+                <textarea id="outManifest" class="output" rows="18" spellcheck="false" readonly></textarea>
+              </div>
+
+              <div class="tabpane" data-tab="decisions">
+                <div class="panehdr">
+                  <div class="tag tag-pink">&lt; decision-log.md &gt;</div>
+                  <div class="paneactions">
+                    <button class="btn" data-copy="decisions">COPY</button>
+                    <button class="btn" data-download="decisions">DOWNLOAD</button>
+                  </div>
+                </div>
+                <textarea id="outDecisions" class="output" rows="18" spellcheck="false" readonly></textarea>
+              </div>
+
+              <div class="tabpane" data-tab="compliance">
+                <div class="panehdr">
+                  <div class="tag">&lt; style-compliance.txt &gt;</div>
+                  <div class="paneactions">
+                    <button class="btn" data-copy="compliance">COPY</button>
+                    <button class="btn" data-download="compliance">DOWNLOAD</button>
+                  </div>
+                </div>
+                <textarea id="outCompliance" class="output" rows="18" spellcheck="false" readonly></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="view-runs" data-view="runs">
+            <div class="panel subpanel">
+              <div class="panelhdr">
+                <div class="hdrtitle">RUN HISTORY</div>
+                <div class="hdrmeta">
+                  <button class="btn" id="btnDeleteSelected">DELETE</button>
+                  <button class="btn" id="btnWipeRuns">WIPE ALL</button>
+                </div>
+              </div>
+
+              <div class="tablewrap">
+                <table class="table" id="runsTable">
+                  <thead>
+                    <tr>
+                      <th>SELECT</th>
+                      <th>TIME</th>
+                      <th>PROJECT</th>
+                      <th>STATUS</th>
+                      <th>EST. TOKENS</th>
+                      <th>NOTES</th>
+                    </tr>
+                  </thead>
+                  <tbody id="runsTbody"></tbody>
+                </table>
+              </div>
+
+              <div class="compare">
+                <div class="cmpcol">
+                  <div class="cmphead">
+                    <div class="tag tag-cyan">&lt; A &gt;</div>
+                    <select id="compareA"></select>
+                    <button class="btn" id="btnLoadA">LOAD</button>
+                  </div>
+                  <pre class="diff" id="diffA"></pre>
+                </div>
+                <div class="cmpcol">
+                  <div class="cmphead">
+                    <div class="tag tag-pink">&lt; B &gt;</div>
+                    <select id="compareB"></select>
+                    <button class="btn" id="btnLoadB">LOAD</button>
+                  </div>
+                  <pre class="diff" id="diffB"></pre>
+                </div>
+              </div>
+              <div class="tiny">Diff is a quick heuristic: lines starting with <span class="hlplus">+</span> and <span class="hlminus">-</span> show changes vs the other selection.</div>
+            </div>
+          </section>
+
+          <section class="view" id="view-decisions" data-view="decisions">
+            <div class="panel subpanel">
+              <div class="panelhdr">
+                <div class="hdrtitle">DECISION LOG (LOCAL)</div>
+                <div class="hdrmeta">
+                  <button class="btn" id="btnDecisionExport">EXPORT</button>
+                  <button class="btn" id="btnDecisionClear">CLEAR</button>
+                </div>
+              </div>
+
+              <form id="decisionForm" class="decisionform">
+                <div class="grid2">
+                  <div class="field">
+                    <label for="decTitle">TITLE</label>
+                    <input id="decTitle" type="text" spellcheck="false" placeholder="e.g., Keep token estimator simple (chars/4) for speed" />
+                  </div>
+                  <div class="field">
+                    <label for="decType">TYPE</label>
+                    <select id="decType">
+                      <option value="scope">SCOPE</option>
+                      <option value="style">STYLE</option>
+                      <option value="tech">TECH</option>
+                      <option value="risk">RISK</option>
+                      <option value="ux">UX</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="decRationale">RATIONALE</label>
+                  <textarea id="decRationale" rows="4" spellcheck="false" placeholder="Why this decision exists; what it prevents; tradeoffs."></textarea>
+                </div>
+                <div class="grid2">
+                  <div class="field">
+                    <label for="decAlternatives">ALTERNATIVES (OPTIONAL)</label>
+                    <input id="decAlternatives" type="text" spellcheck="false" placeholder="Other options considered" />
+                  </div>
+                  <div class="field">
+                    <label for="decOwner">OWNER</label>
+                    <input id="decOwner" type="text" spellcheck="false" placeholder="You / team / role" />
+                  </div>
+                </div>
+                <div class="actions">
+                  <button class="btn primary" type="submit">ADD DECISION</button>
+                  <button class="btn" type="button" id="btnDecisionSeed">SEED EXAMPLES</button>
+                </div>
+              </form>
+
+              <div class="decisions" id="decisionList"></div>
+            </div>
+          </section>
+
+          <section class="view" id="view-settings" data-view="settings">
+            <div class="panel subpanel">
+              <div class="panelhdr">
+                <div class="hdrtitle">SETTINGS</div>
+                <div class="hdrmeta">PERSISTED</div>
+              </div>
+
+              <div class="grid2">
+                <div class="field">
+                  <label for="autosave">AUTO-SAVE DRAFT</label>
+                  <select id="autosave">
+                    <option value="on">ON</option>
+                    <option value="off">OFF</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="scanlines">SCANLINES</label>
+                  <select id="scanlines">
+                    <option value="on">ON</option>
+                    <option value="off">OFF</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="motion">MOTION</label>
+                  <select id="motion">
+                    <option value="subtle">SUBTLE</option>
+                    <option value="off">OFF</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="tokenMode">TOKEN ESTIMATOR</label>
+                  <select id="tokenMode">
+                    <option value="chars4">CHARS / 4</option>
+                    <option value="chars35">CHARS / 3.5</option>
+                    <option value="chars5">CHARS / 5</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="panel panelmini">
+                <div class="panelhdr">
+                  <div class="hdrtitle">DANGER ZONE</div>
+                  <div class="hdrmeta">IRREVERSIBLE</div>
+                </div>
+                <div class="actions">
+                  <button class="btn danger" id="btnResetAll">RESET ALL LOCAL DATA</button>
+                </div>
+                <div class="tiny">Resets draft, runs, and decisions stored in localStorage.</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <aside class="right panel">
+        <div class="panelhdr">
+          <div class="hdrtitle">LIVE STREAM</div>
+          <div class="hdrmeta">STRUCTURE WATCH</div>
+        </div>
+
+        <div class="stream" id="stream">
+          <div class="streamrow"><span class="k">PACK</span><span class="v" id="streamPack">—</span></div>
+          <div class="streamrow"><span class="k">README</span><span class="v" id="streamReadme">0</span></div>
+          <div class="streamrow"><span class="k">MANIFEST</span><span class="v" id="streamManifest">0</span></div>
+          <div class="streamrow"><span class="k">DECISION LOG</span><span class="v" id="streamDecisions">0</span></div>
+          <div class="streamrow"><span class="k">COMPLIANCE</span><span class="v" id="streamCompliance">0</span></div>
+          <hr class="hr" />
+          <div class="streamrow"><span class="k">SECTIONS OK</span><span class="v" id="streamSections">—</span></div>
+          <div class="streamrow"><span class="k">DENSITY</span><span class="v" id="streamDensity">—</span></div>
+          <div class="streamrow"><span class="k">TRUNC. RISK</span><span class="v" id="streamTrunc">—</span></div>
+          <hr class="hr" />
+          <div class="streamrow"><span class="k">LAST RUN</span><span class="v" id="streamLastRun">—</span></div>
+        </div>
+
+        <div class="panel panelmini">
+          <div class="panelhdr">
+            <div class="hdrtitle">SHORTCUTS</div>
+            <div class="hdrmeta">KEYS</div>
+          </div>
+          <div class="tiny">
+            <div><span class="tag">&lt; CTRL+ENTER &gt;</span> GENERATE</div>
+            <div><span class="tag tag-cyan">&lt; CTRL+S &gt;</span> SAVE RUN</div>
+            <div><span class="tag tag-pink">&lt; CTRL+K &gt;</span> CLEAR DIAGNOSTICS</div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <div class="tiny">CRT MODE • CENTERED PANEL LAYOUT • CORNER BRACKETS • NEON GLOW • LOCAL PERSISTENCE</div>
+      <div class="tiny">NO EXTERNAL JS • VANILLA ONLY • BUILT FOR DIAGNOSABILITY</div>
+    </footer>
+  </div>
+
+  <div class="sweep" id="sweep" aria-hidden="true"></div>
+
+  <dialog class="modal" id="modal">
+    <form method="dialog" class="modalinner panel">
+      <div class="panelhdr">
+        <div class="hdrtitle" id="modalTitle">MODAL</div>
+        <div class="hdrmeta"><button class="btn" value="cancel">CLOSE</button></div>
+      </div>
+      <div class="modalbody">
+        <pre class="modalpre" id="modalPre"></pre>
+      </div>
+      <menu class="modalmenu">
+        <button class="btn primary" id="modalCopy" value="default">COPY</button>
+        <button class="btn" value="cancel">CANCEL</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
