@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Feature Flag Impact Board</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg0:#0b1020;
+      --bg1:#0f1730;
+      --card:#121b36;
+      --card2:#0f1835;
+      --muted:#93a4c8;
+      --text:#eaf0ff;
+      --soft:#cfe0ff;
+      --line:rgba(255,255,255,.12);
+      --shadow: 0 18px 50px rgba(0,0,0,.35);
+      --shadow2: 0 10px 30px rgba(0,0,0,.28);
+      --radius-xl: 28px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-sm: 12px;
+      --accentA:#7c5cff;
+      --accentB:#2ee9a6;
+      --accentC:#ff6aa2;
+      --accentD:#ffd24a;
+      --accentE:#4dd2ff;
+      --good:#2ee9a6;
+      --warn:#ffd24a;
+      --risk:#ff6aa2;
+      --info:#4dd2ff;
+      --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+    }
+    [data-theme="light"]{
+      --bg0:#f6f7ff;
+      --bg1:#eef0ff;
+      --card:#ffffff;
+      --card2:#ffffff;
+      --muted:#546180;
+      --text:#17223b;
+      --soft:#1a2a52;
+      --line:rgba(22,32,60,.12);
+      --shadow: 0 18px 50px rgba(22,32,60,.14);
+      --shadow2: 0 10px 30px rgba(22,32,60,.10);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 15% 15%, rgba(124,92,255,.35), transparent 60%),
+        radial-gradient(900px 600px at 80% 12%, rgba(77,210,255,.25), transparent 60%),
+        radial-gradient(900px 650px at 70% 85%, rgba(46,233,166,.18), transparent 62%),
+        radial-gradient(700px 500px at 25% 85%, rgba(255,106,162,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      overflow-x:hidden;
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:24px 18px 40px;}
+    header{
+      position:sticky;top:0;z-index:10;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(180deg, rgba(11,16,32,.8), rgba(11,16,32,.35));
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    [data-theme="light"] header{
+      background: linear-gradient(180deg, rgba(246,247,255,.82), rgba(246,247,255,.45));
+      border-bottom: 1px solid rgba(22,32,60,.08);
+    }
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;
+      padding:14px 18px;max-width:1200px;margin:0 auto;
+    }
+    .brand{display:flex;align-items:center;gap:12px;min-width:260px;}
+    .logo{
+      width:44px;height:44px;border-radius:14px;position:relative;
+      background:
+        radial-gradient(12px 12px at 25% 30%, rgba(255,255,255,.8), rgba(255,255,255,0) 55%),
+        conic-gradient(from 210deg, var(--accentA), var(--accentE), var(--accentB), var(--accentC), var(--accentA));
+      box-shadow: 0 14px 30px rgba(0,0,0,.22), inset 0 0 0 1px rgba(255,255,255,.18);
+      overflow:hidden;
+    }
+    .logo:after{
+      content:"";position:absolute;inset:-20px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.25), rgba(255,255,255,0) 55%);
+    }
+    .titleblock h1{margin:0;font-size:18px;font-weight:900;letter-spacing:-.02em;line-height:1.1;}
+    .subtitle{font-size:12px;color:var(--muted);font-weight:700;margin-top:2px;line-height:1.3;}
+    .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    button{
+      cursor:pointer;
+      font-family:var(--sans);
+      font-weight:800;font-size:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+      padding:10px 14px;
+      transition: background .14s, transform .1s;
+    }
+    [data-theme="light"] button{
+      border:1px solid rgba(22,32,60,.14);
+      background: rgba(22,32,60,.04);
+    }
+    button:hover{background: rgba(255,255,255,.14);}
+    [data-theme="light"] button:hover{background: rgba(22,32,60,.08);}
+    button:active{transform:scale(.97);}
+    button.primary{
+      background: linear-gradient(135deg, rgba(124,92,255,.85), rgba(77,210,255,.7));
+      border-color: rgba(124,92,255,.5);
+      color:#fff;
+    }
+    button.primary:hover{background: linear-gradient(135deg, rgba(124,92,255,1), rgba(77,210,255,.9));}
+    .pill{
+      display:flex;align-items:center;gap:10px;
+      border-radius:14px;border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      padding:8px 12px;
+    }
+    [data-theme="light"] .pill{
+      border:1px solid rgba(22,32,60,.14);background: rgba(22,32,60,.03);
+    }
+    .pill input{
+      background:none;border:none;outline:none;
+      color:var(--text);font-family:var(--sans);font-weight:700;font-size:12px;
+      width:160px;
+    }
+    .pill input::placeholder{color:var(--muted);}
+    .kbd{
+      font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:700;
+      border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:2px 5px;
+    }
+    [data-theme="light"] .kbd{border:1px solid rgba(22,32,60,.18);}
+    .seg{
+      display:flex;border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      overflow:hidden;
+    }
+    [data-theme="light"] .seg{border:1px solid rgba(22,32,60,.14);}
+    .seg button{
+      border:none;padding:9px 10px;border-radius:0;
+      background:transparent;box-shadow:none;font-weight:800;font-size:12px;color:var(--muted);
+    }
+    .seg button[aria-pressed="true"]{background: rgba(255,255,255,.08);color:var(--text);}
+    [data-theme="light"] .seg button[aria-pressed="true"]{background: rgba(22,32,60,.06);}
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:16px;align-items:start;}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+    .panel{
+      border-radius:var(--radius-xl);
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 400px at 10% 0%, rgba(124,92,255,.20), transparent 60%),
+        radial-gradient(700px 350px at 90% 100%, rgba(77,210,255,.15), transparent 60%),
+        rgba(0,0,0,.28);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    [data-theme="light"] .panel{
+      border:1px solid rgba(22,32,60,.10);
+      background:
+        radial-gradient(900px 400px at 10% 0%, rgba(124,92,255,.10), transparent 60%),
+        radial-gradient(700px 350px at 90% 100%, rgba(77,210,255,.08), transparent 60%),
+        rgba(255,255,255,.82);
+    }
+    .panel-header{
+      padding:16px 18px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;
+    }
+    [data-theme="light"] .panel-header{border-bottom:1px solid rgba(22,32,60,.08);}
+    .panel-header h2{margin:0 0 3px;font-size:14px;font-weight:900;letter-spacing:.1px;}
+    .panel-header p{margin:0;font-size:12px;color:var(--muted);font-weight:700;line-height:1.4;}
+    .filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .table{width:100%;border-collapse:separate;border-spacing:0;}
+    .thead{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+    .thead th{
+      padding:10px 14px;text-align:left;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.10);position:sticky;top:0;z-index:2;backdrop-filter: blur(8px);
+    }
+    [data-theme="light"] .thead th{border-bottom:1px solid rgba(22,32,60,.10);background: rgba(255,255,255,.75);}
+    .tbody tr{transition: background .12s ease, transform .12s ease;cursor:pointer;}
+    .tbody tr:hover{background: rgba(255,255,255,.06);}
+    [data-theme="light"] .tbody tr:hover{background: rgba(22,32,60,.03);}
+    .tbody tr.selected{background: rgba(124,92,255,.12);}
+    [data-theme="light"] .tbody tr.selected{background: rgba(124,92,255,.07);}
+    .tbody td{padding:12px 14px;border-bottom: 1px solid rgba(255,255,255,.08);vertical-align:middle;}
+    [data-theme="light"] .tbody td{border-bottom: 1px solid rgba(22,32,60,.08);}
+    .flagcell{display:flex;align-items:center;gap:10px;min-width:260px;}
+    .flagname{display:flex;flex-direction:column;gap:4px;line-height:1.1;}
+    .flagname strong{font-size:13px;font-weight:900;letter-spacing:.2px;}
+    .flagname code{
+      font-family:var(--mono);font-size:11px;color:var(--muted);
+      background: rgba(0,0,0,.18);border: 1px solid rgba(255,255,255,.10);
+      padding:3px 7px;border-radius: 999px;width:fit-content;
+    }
+    [data-theme="light"] .flagname code{background: rgba(22,32,60,.04);border: 1px solid rgba(22,32,60,.12);}
+    .bubble{
+      width:34px;height:34px;border-radius:14px;flex:0 0 auto;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 10px 22px rgba(0,0,0,.22);
+      background:
+        radial-gradient(10px 10px at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,0) 60%),
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,0)),
+        linear-gradient(135deg, var(--accentA), var(--accentC));
+      transform: rotate(-6deg);
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:7px 10px;border-radius: 999px;font-weight:900;font-size:12px;letter-spacing:.2px;
+      border: 1px solid rgba(255,255,255,.14);background: rgba(255,255,255,.06);white-space:nowrap;
+    }
+    [data-theme="light"] .badge{border: 1px solid rgba(22,32,60,.12);background: rgba(22,32,60,.03);}
+    .dot{width:10px;height:10px;border-radius:99px;box-shadow: 0 8px 16px rgba(0,0,0,.22);}
+    .dot.good{background: var(--good)}
+    .dot.warn{background: var(--warn)}
+    .dot.risk{background: var(--risk)}
+    .dot.info{background: var(--info)}
+    .metric{display:flex;align-items:baseline;gap:8px;white-space:nowrap;}
+    .metric .delta{font-weight:900;font-size:13px;letter-spacing:.2px;}
+    .metric .unit{font-size:12px;color:var(--muted);font-weight:700;}
+    .spark{
+      width:82px;height:18px;border-radius:999px;
+      background: rgba(0,0,0,.18);border: 1px solid rgba(255,255,255,.10);
+      overflow:hidden;position:relative;margin-top:6px;
+    }
+    [data-theme="light"] .spark{background: rgba(22,32,60,.04);border: 1px solid rgba(22,32,60,.12);}
+    .spark i{position:absolute;inset:0;transform-origin:left center;opacity:.95;}
+    .spark i.pos{background: linear-gradient(90deg, rgba(46,233,166,.15), rgba(46,233,166,.6));}
+    .spark i.neg{background: linear-gradient(90deg, rgba(255,106,162,.15), rgba(255,106,162,.6));}
+    .spark i.flat{background: linear-gradient(90deg, rgba(255,210,74,.12), rgba(255,210,74,.45));}
+    .owner{display:flex;align-items:center;gap:10px;min-width:150px;}
+    .avatar{
+      width:28px;height:28px;border-radius:12px;flex:0 0 auto;
+      box-shadow: 0 10px 18px rgba(0,0,0,.22);
+    }
+    .owner .meta{display:flex;flex-direction:column;line-height:1.1;}
+    .owner .meta strong{font-size:13px;}
+    .owner .meta span{font-size:12px;color:var(--muted);font-family:var(--mono);}
+    .row-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;min-width:240px;}
+    .row-actions button{padding:8px 10px;font-weight:900;font-size:12px;}
+    .btn-ghost{background: rgba(255,255,255,.05);}
+    .btn-good{background: linear-gradient(135deg, rgba(46,233,166,.28), rgba(46,233,166,.10));border-color: rgba(46,233,166,.28);}
+    .btn-warn{background: linear-gradient(135deg, rgba(255,210,74,.25), rgba(255,210,74,.10));border-color: rgba(255,210,74,.28);}
+    .btn-risk{background: linear-gradient(135deg, rgba(255,106,162,.22), rgba(255,106,162,.10));border-color: rgba(255,106,162,.30);}
+    .side{display:flex;flex-direction:column;gap:16px;}
+    .kpi{display:grid;grid-template-columns: repeat(3,1fr);gap:12px;padding:14px;}
+    .kpi .tile{
+      border-radius:18px;padding:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(200px 120px at 20% 10%, rgba(255,255,255,.12), transparent 60%),
+        rgba(0,0,0,.12);
+      box-shadow: var(--shadow2);min-height:88px;position:relative;overflow:hidden;
+    }
+    [data-theme="light"] .kpi .tile{
+      background:
+        radial-gradient(220px 120px at 20% 10%, rgba(124,92,255,.10), transparent 60%),
+        rgba(22,32,60,.03);
+      border:1px solid rgba(22,32,60,.10);
+    }
+    .kpi .tile:after{
+      content:"";position:absolute;inset:-40px -70px auto auto;width:160px;height:160px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0) 55%);
+      transform: rotate(12deg);pointer-events:none;
+    }
+    .kpi .label{font-size:12px;color:var(--muted);font-weight:800;letter-spacing:.2px;margin:0 0 8px;}
+    .kpi .value{font-size:22px;font-weight:1000;letter-spacing:-.02em;margin:0;}
+    .kpi .hint{margin-top:6px;font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+    .detail{padding:14px;}
+    .detail .empty{
+      border-radius:20px;border:1px dashed rgba(255,255,255,.18);
+      background: rgba(0,0,0,.10);padding:24px 16px;
+      color:var(--muted);font-size:13px;line-height:1.5;text-align:center;
+    }
+    [data-theme="light"] .detail .empty{border:1px dashed rgba(22,32,60,.22);background: rgba(22,32,60,.02);}
+    .detail .card{
+      border-radius:22px;border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(700px 260px at 10% 0%, rgba(255,106,162,.12), transparent 60%),
+        radial-gradient(700px 260px at 100% 0%, rgba(46,233,166,.10), transparent 60%),
+        rgba(0,0,0,.10);
+      padding:14px;box-shadow:var(--shadow2);margin-bottom:12px;
+    }
+    [data-theme="light"] .detail .card{
+      border:1px solid rgba(22,32,60,.12);
+      background:
+        radial-gradient(700px 260px at 10% 0%, rgba(255,106,162,.12), transparent 60%),
+        radial-gradient(700px 260px at 100% 0%, rgba(46,233,166,.10), transparent 60%),
+        rgba(255,255,255,.85);
+    }
+    .detail h3{margin:0 0 10px;font-size:14px;letter-spacing:.2px;}
+    .kv{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .kv .item{
+      border-radius:16px;border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);padding:10px;
+    }
+    [data-theme="light"] .kv .item{border:1px solid rgba(22,32,60,.10);background: rgba(22,32,60,.02);}
+    .kv .k{font-size:12px;color:var(--muted);font-weight:900;letter-spacing:.2px;margin:0 0 6px;}
+    .kv .v{margin:0;font-size:13px;font-weight:800;}
+    .kv .v code{font-family:var(--mono);font-size:12px;color:var(--muted);}
+    .kv .v .mini{margin-top:6px;font-size:12px;color:var(--muted);font-weight:700;line-height:1.35;}
+    .recommend{
+      border-radius:18px;padding:12px;border:1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(260px 160px at 20% 30%, rgba(124,92,255,.14), transparent 62%),
+        rgba(0,0,0,.12);
+    }
+    [data-theme="light"] .recommend{
+      border:1px solid rgba(22,32,60,.12);
+      background:
+        radial-gradient(260px 160px at 20% 30%, rgba(124,92,255,.12), transparent 62%),
+        rgba(22,32,60,.02);
+    }
+    .recommend .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+    .recommend .row strong{font-size:13px;}
+    .recommend .row span{font-size:12px;color:var(--muted);font-weight:800;}
+    .recommend .msg{margin:0;font-size:13px;line-height:1.45;color:color-mix(in oklab,var(--text) 92%,var(--muted));font-weight:700;}
+    .health-bar-wrap{margin-bottom:12px;}
+    .health-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+    .health-label-row span{font-size:12px;font-weight:900;color:var(--muted);}
+    .health-label-row strong{font-size:13px;}
+    .health-track{height:8px;border-radius:999px;background:rgba(255,255,255,.10);overflow:hidden;}
+    [data-theme="light"] .health-track{background:rgba(22,32,60,.10);}
+    .health-fill{height:100%;border-radius:999px;transition:width .4s cubic-bezier(.4,0,.2,1);}
+    .notes{margin-top:12px;display:flex;flex-direction:column;gap:10px;}
+    label{font-size:12px;color:var(--muted);font-weight:900;letter-spacing:.2px;}
+    textarea{
+      width:100%;min-height:80px;resize:vertical;border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);background: rgba(0,0,0,.14);
+      color:var(--text);padding:10px 12px;outline:none;
+      font-family:var(--sans);font-weight:700;line-height:1.4;font-size:12px;
+    }
+    [data-theme="light"] textarea{background: rgba(22,32,60,.02);border:1px solid rgba(22,32,60,.12);}
+    .smallrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;margin-top:10px;}
+    .rollout-slider-wrap{margin:10px 0;}
+    .rollout-track{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.10);margin-bottom:6px;}
+    [data-theme="light"] .rollout-track{background:rgba(22,32,60,.10);}
+    .rollout-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accentA),var(--accentE));transition:width .25s;}
+    input[type=range]{width:100%;accent-color:var(--accentA);margin:0;cursor:pointer;}
+    .toast{
+      position:fixed;right:14px;bottom:14px;
+      display:flex;flex-direction:column;gap:8px;z-index:50;
+      max-width:min(420px,calc(100vw - 28px));
+    }
+    .toast .t{
+      border-radius:18px;padding:10px 12px;
+      border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.35);
+      backdrop-filter:blur(10px);box-shadow:var(--shadow2);
+      display:flex;gap:10px;align-items:flex-start;animation:pop .16s ease-out;
+    }
+    [data-theme="light"] .toast .t{border:1px solid rgba(22,32,60,.14);background:rgba(255,255,255,.85);}
+    @keyframes pop{from{transform:translateY(6px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .toast .t .ico{
+      width:28px;height:28px;border-radius:12px;
+      background:linear-gradient(135deg,rgba(255,210,74,.9),rgba(255,106,162,.85));
+      box-shadow:0 10px 18px rgba(0,0,0,.22);flex:0 0 auto;
+    }
+    .toast .t .txt{display:flex;flex-direction:column;gap:3px;}
+    .toast .t .txt strong{font-size:13px;}
+    .toast .t .txt span{font-size:12px;color:var(--muted);font-weight:700;}
+    .footer{
+      margin-top:16px;color:var(--muted);font-size:12px;
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;align-items:center;
+    }
+    .footer a{color:color-mix(in oklab,var(--accentE) 80%,var(--text));text-decoration:none;font-weight:900;}
+    .footer a:hover{text-decoration:underline;}
+    .empty-state{
+      padding:40px 24px;text-align:center;color:var(--muted);
+    }
+    .empty-state p{margin:0;font-size:13px;font-weight:700;line-height:1.5;}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+    dialog::backdrop{background:rgba(0,0,0,.6);backdrop-filter:blur(4px);}
+    .dialog-inner{padding:18px;}
+    .dialog-inner select, .dialog-inner input[type=text], .dialog-inner input[type=number]{
+      width:100%;border-radius:12px;border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);color:var(--text);font-family:var(--sans);
+      font-size:12px;font-weight:700;padding:9px 12px;outline:none;
+    }
+    [data-theme="light"] .dialog-inner select,
+    [data-theme="light"] .dialog-inner input[type=text],
+    [data-theme="light"] .dialog-inner input[type=number]{
+      border:1px solid rgba(22,32,60,.14);background:rgba(22,32,60,.03);
+    }
+    .dialog-inner select option{background:#0f1730;color:#eaf0ff;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+    .form-field{display:flex;flex-direction:column;gap:6px;}
+    .form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand" title="Feature Flag Impact Board">
+        <div class="logo" aria-hidden="true"></div>
+        <div class="titleblock">
+          <h1>Feature Flag Impact Board</h1>
+          <div class="subtitle">Fast, trustworthy rollout decisions: health + metrics + a recommended next action.</div>
+        </div>
+      </div>
+      <div class="actions">
+        <div class="pill" role="search">
+          <span style="font-weight:900;color:var(--muted);font-size:12px;">Search</span>
+          <input id="search" type="search" placeholder="flag name, owner, metric…" autocomplete="off" />
+          <span class="kbd" title="Keyboard shortcut">/</span>
+        </div>
+        <div class="seg" aria-label="View filter">
+          <button id="viewAll" aria-pressed="true" type="button">All</button>
+          <button id="viewNeeds" aria-pressed="false" type="button">Needs action</button>
+          <button id="viewMine" aria-pressed="false" type="button">Mine</button>
+        </div>
+        <button id="themeBtn" type="button" title="Toggle theme"><span aria-hidden="true">◐</span> Theme</button>
+        <button id="addBtn" class="primary" type="button" title="Add a feature flag"><span aria-hidden="true">＋</span> Add flag</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main class="grid" aria-label="Impact board">
+      <section class="panel" aria-label="Flag list">
+        <div class="panel-header">
+          <div>
+            <h2>Flags <span id="flagCount" style="font-size:12px;color:var(--muted);font-weight:700;"></span></h2>
+            <p>Each row combines rollout status, primary metric delta, guardrail stability, and an opinionated next step. Click a row to inspect + update notes.</p>
+          </div>
+          <div class="filters">
+            <div class="seg" aria-label="Sort">
+              <button id="sortRec" aria-pressed="true" type="button">Health</button>
+              <button id="sortRisk" aria-pressed="false" type="button">Risk</button>
+              <button id="sortDelta" aria-pressed="false" type="button">Metric</button>
+            </div>
+            <button id="resetBtn" type="button" class="btn-ghost" title="Reset demo data (clears local changes)">Reset</button>
+          </div>
+        </div>
+        <div style="overflow:auto;max-height:calc(100vh - 170px);">
+          <table class="table" aria-label="Flags table">
+            <thead class="thead">
+              <tr>
+                <th style="min-width:290px;">Flag</th>
+                <th style="min-width:130px;">Status</th>
+                <th style="min-width:170px;">Primary metric</th>
+                <th style="min-width:150px;">Guardrails</th>
+                <th style="min-width:140px;">Owner</th>
+                <th style="min-width:200px;text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbody" class="tbody"></tbody>
+          </table>
+        </div>
+        <div class="footer" style="padding:12px 14px;">
+          <div>Press <span class="kbd" style="padding:2px 6px;border-radius:8px;">/</span> to search, <span class="kbd" style="padding:2px 6px;border-radius:8px;">Esc</span> to clear.</div>
+          <div>Local-only demo · data persists in <span style="font-family:var(--mono);">localStorage</span></div>
+        </div>
+      </section>
+
+      <aside class="side" aria-label="Insights and details">
+        <section class="panel" aria-label="Rollout pulse">
+          <div class="panel-header">
+            <div>
+              <h2>Rollout pulse</h2>
+              <p>At-a-glance counts based on current view. "Ready" = expand or ship recommended.</p>
+            </div>
+          </div>
+          <div class="kpi" id="kpi"></div>
+        </section>
+
+        <section class="panel" aria-label="Selected flag details">
+          <div class="panel-header">
+            <div>
+              <h2>Flag inspector</h2>
+              <p>Make decisions faster: update rollout %, health, and notes. Confidence score updates instantly.</p>
+            </div>
+          </div>
+          <div class="detail" id="detail"></div>
+        </section>
+      </aside>
+    </main>
+    <div class="toast" id="toast" aria-live="polite" aria-relevant="additions"></div>
+  </div>
+
+  <dialog id="addDialog" style="border:none;border-radius:22px;padding:0;width:min(680px,calc(100vw - 24px));box-shadow:var(--shadow);background:transparent;">
+    <div class="panel" style="border-radius:22px;">
+      <div class="panel-header">
+        <div>
+          <h2>Add a new flag</h2>
+          <p>Give it a name, owner, rollout %, and initial metric read. Refine anytime in the inspector.</p>
+        </div>
+        <button id="closeAdd" type="button">✕ Close</button>
+      </div>
+      <div class="dialog-inner">
+        <form id="addForm">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fName">Flag display name</label>
+              <input type="text" id="fName" required maxlength="52" placeholder="e.g. New Checkout Flow" />
+            </div>
+            <div class="form-field">
+              <label for="fOwner">Owner</label>
+              <input type="text" id="fOwner" required maxlength="36" placeholder="e.g. Priya Nair" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fStatus">Status</label>
+              <select id="fStatus">
+                <option value="ramping">Ramping</option>
+                <option value="holding">Holding</option>
+                <option value="paused">Paused</option>
+                <option value="full">Full rollout</option>
+                <option value="disabled">Disabled</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="fRisk">Risk level</label>
+              <select id="fRisk">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fRollout">Rollout % (0–100)</label>
+              <input type="number" id="fRollout" min="0" max="100" value="10" />
+            </div>
+            <div class="form-field">
+              <label for="fBlockers">Blockers count</label>
+              <input type="number" id="fBlockers" min="0" max="99" value="0" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fPrimaryLabel">Primary metric name</label>
+              <input type="text" id="fPrimaryLabel" maxlength="32" placeholder="e.g. Checkout CVR" />
+            </div>
+            <div class="form-field">
+              <label for="fPrimaryDelta">Primary metric delta (%)</label>
+              <input type="number" id="fPrimaryDelta" step="0.1" value="0" placeholder="+2.4" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="fGuardLabel">Guardrail metric name</label>
+              <input type="text" id="fGuardLabel" maxlength="32" placeholder="e.g. p95 Latency (ms)" />
+            </div>
+            <div class="form-field">
+              <label for="fGuardDelta">Guardrail delta (+ = worse)</label>
+              <input type="number" id="fGuardDelta" step="0.1" value="0" placeholder="+5" />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" id="cancelAdd">Cancel</button>
+            <button type="submit" class="primary">Add flag</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <script>
+  (() => {
+    // ── Seed data ───────────────────────────────────────────────────────────
+    const SEED = [
+      {
+        id: 'ff-001',
+        name: 'Enhanced Search Ranking v2',
+        slug: 'enhanced_search_ranking_v2',
+        owner: 'Priya Nair',
+        team: 'Search Platform',
+        rollout: 45,
+        status: 'ramping',
+        risk: 'medium',
+        primary: { label: 'Search CTR', delta: 3.2, unit: '%', higherBetter: true },
+        guard:   { label: 'p95 Latency', delta: 18, unit: 'ms', higherBetter: false },
+        blockers: 1,
+        lastUpdated: '2026-03-14',
+        notes: 'Latency spike appeared at 35% — investigating caching layer. Hold until resolved.',
+        avatarStyle: 'linear-gradient(135deg,#7c5cff,#4dd2ff)'
+      },
+      {
+        id: 'ff-002',
+        name: 'Checkout Flow Redesign',
+        slug: 'checkout_flow_redesign',
+        owner: 'Marcus Webb',
+        team: 'Growth',
+        rollout: 10,
+        status: 'ramping',
+        risk: 'high',
+        primary: { label: 'Checkout CVR', delta: 5.1, unit: '%', higherBetter: true },
+        guard:   { label: 'Cart Abandonment', delta: 0.8, unit: '%', higherBetter: false },
+        blockers: 2,
+        lastUpdated: '2026-03-15',
+        notes: 'Strong CVR signal but mobile abandon rate is up. Investigating payment step UX.',
+        avatarStyle: 'linear-gradient(135deg,#ff6aa2,#ffd24a)'
+      },
+      {
+        id: 'ff-003',
+        name: 'Personalized Feed Algorithm',
+        slug: 'personalized_feed_algo',
+        owner: 'Sana Kim',
+        team: 'Core Product',
+        rollout: 100,
+        status: 'full',
+        risk: 'low',
+        primary: { label: 'Session Depth', delta: 18.4, unit: '%', higherBetter: true },
+        guard:   { label: '7-Day Churn', delta: -2.1, unit: '%', higherBetter: false },
+        blockers: 0,
+        lastUpdated: '2026-03-10',
+        notes: 'Shipped to 100%. Session depth holding strongly. Churn is actually improving — unexpected positive signal.',
+        avatarStyle: 'linear-gradient(135deg,#2ee9a6,#4dd2ff)'
+      },
+      {
+        id: 'ff-004',
+        name: 'Mobile Navigation Overhaul',
+        slug: 'mobile_nav_overhaul',
+        owner: 'Dev Patel',
+        team: 'Mobile',
+        rollout: 30,
+        status: 'holding',
+        risk: 'medium',
+        primary: { label: 'Nav Engagement', delta: 2.7, unit: '%', higherBetter: true },
+        guard:   { label: 'App Crash Rate', delta: 0.3, unit: '%', higherBetter: false },
+        blockers: 1,
+        lastUpdated: '2026-03-13',
+        notes: 'Holding at 30% pending crash investigation. Issue is isolated to Android 12 gesture nav. Fix in next release.',
+        avatarStyle: 'linear-gradient(135deg,#ffd24a,#ff6aa2)'
+      },
+      {
+        id: 'ff-005',
+        name: 'Bulk Export v3',
+        slug: 'bulk_export_v3',
+        owner: 'Lena Torres',
+        team: 'Platform',
+        rollout: 65,
+        status: 'ramping',
+        risk: 'low',
+        primary: { label: 'Export Completion', delta: 22.3, unit: '%', higherBetter: true },
+        guard:   { label: 'API Error Rate', delta: -0.1, unit: '%', higherBetter: false },
+        blockers: 0,
+        lastUpdated: '2026-03-12',
+        notes: 'All metrics green. Scheduling full rollout for Friday deploy window.',
+        avatarStyle: 'linear-gradient(135deg,#4dd2ff,#2ee9a6)'
+      },
+      {
+        id: 'ff-006',
+        name: 'In-App Notification Center',
+        slug: 'inapp_notification_center',
+        owner: 'Josh Mehta',
+        team: 'Engagement',
+        rollout: 5,
+        status: 'ramping',
+        risk: 'high',
+        primary: { label: 'Notification CTR', delta: 8.4, unit: '%', higherBetter: true },
+        guard:   { label: 'DAU 7-Day', delta: -1.2, unit: '%', higherBetter: false },
+        blockers: 3,
+        lastUpdated: '2026-03-16',
+        notes: 'Notification CTR is strong but DAU signal is concerning at this early rollout. Pausing expansion pending eng investigation.',
+        avatarStyle: 'linear-gradient(135deg,#7c5cff,#ff6aa2)'
+      },
+      {
+        id: 'ff-007',
+        name: 'Pricing Page Variant C',
+        slug: 'pricing_page_variant_c',
+        owner: 'Aria Okonjo',
+        team: 'Growth',
+        rollout: 50,
+        status: 'holding',
+        risk: 'medium',
+        primary: { label: 'Plan Upgrade Rate', delta: 1.9, unit: '%', higherBetter: true },
+        guard:   { label: 'Trial Start Rate', delta: -0.4, unit: '%', higherBetter: false },
+        blockers: 1,
+        lastUpdated: '2026-03-11',
+        notes: 'Upgrade rate up slightly but trial start rate dipped. Need more data before expanding. Review scheduled for Friday.',
+        avatarStyle: 'linear-gradient(135deg,#ffd24a,#4dd2ff)'
+      },
+      {
+        id: 'ff-008',
+        name: 'Onboarding Step Simplification',
+        slug: 'onboarding_step_simplification',
+        owner: 'Marcus Webb',
+        team: 'Growth',
+        rollout: 100,
+        status: 'full',
+        risk: 'low',
+        primary: { label: 'Day-1 Activation', delta: 11.3, unit: '%', higherBetter: true },
+        guard:   { label: 'Support Tickets', delta: 3.1, unit: '%', higherBetter: false },
+        blockers: 0,
+        lastUpdated: '2026-03-08',
+        notes: 'Activation up 11.3% — strongest signal this quarter. Support ticket uptick is expected; closing in 2-3 weeks as users self-onboard.',
+        avatarStyle: 'linear-gradient(135deg,#2ee9a6,#7c5cff)'
+      },
+      {
+        id: 'ff-009',
+        name: 'Real-time Collab Cursors',
+        slug: 'realtime_collab_cursors',
+        owner: 'Sana Kim',
+        team: 'Core Product',
+        rollout: 15,
+        status: 'paused',
+        risk: 'high',
+        primary: { label: 'Collab Session Length', delta: 4.2, unit: '%', higherBetter: true },
+        guard:   { label: 'WebSocket Errors', delta: 2.1, unit: '%', higherBetter: false },
+        blockers: 2,
+        lastUpdated: '2026-03-15',
+        notes: 'Paused. WebSocket error rate spiked at 15%. Root cause: cursor fanout under heavy multi-editor load. Rewrite in progress.',
+        avatarStyle: 'linear-gradient(135deg,#ff6aa2,#7c5cff)'
+      },
+      {
+        id: 'ff-010',
+        name: 'Dashboard Widget Lazy Load',
+        slug: 'dashboard_widget_lazy_load',
+        owner: 'Dev Patel',
+        team: 'Platform',
+        rollout: 100,
+        status: 'full',
+        risk: 'low',
+        primary: { label: 'Dashboard Load Time', delta: -340, unit: 'ms', higherBetter: false },
+        guard:   { label: 'API Request Count', delta: 5.2, unit: '%', higherBetter: false },
+        blockers: 0,
+        lastUpdated: '2026-03-09',
+        notes: 'Load time down 340ms — a clear win. API request count increase is expected (lazy load splits requests). No action needed.',
+        avatarStyle: 'linear-gradient(135deg,#4dd2ff,#ffd24a)'
+      }
+    ];
+
+    // ── State ────────────────────────────────────────────────────────────────
+    const STORAGE_KEY = 'ffib_v3_flags';
+    const NOTES_KEY   = 'ffib_v3_notes';
+    let flags      = load();
+    let selectedId = flags[0]?.id ?? null;
+    let activeView = 'all';   // all | needs | mine
+    let sortKey    = 'health'; // health | risk | delta
+    let query      = '';
+    const CURRENT_USER = 'Dev Patel';
+
+    function load() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length) return parsed;
+        }
+      } catch(e) {}
+      return JSON.parse(JSON.stringify(SEED));
+    }
+
+    function save() {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(flags)); } catch(e) {}
+    }
+
+    // ── Health computation ───────────────────────────────────────────────────
+    function computeHealth(f) {
+      let score = 60;
+
+      // Primary metric contribution (+/-)
+      const pBetter = f.primary.higherBetter;
+      const pDelta  = f.primary.delta;
+      if (pBetter ? pDelta > 0 : pDelta < 0) {
+        score += Math.min(25, Math.abs(pDelta) * 3);
+      } else {
+        score -= Math.min(25, Math.abs(pDelta) * 3);
+      }
+
+      // Guardrail contribution (higher always worse for guard in our model)
+      const gDelta = f.guard.delta;
+      const gBetter = f.guard.higherBetter;
+      if (gBetter ? gDelta < 0 : gDelta > 0) {
+        // Guard is worsening
+        score -= Math.min(20, Math.abs(gDelta) * 2.5);
+      }
+
+      // Rollout maturity
+      if (f.rollout < 5)         score -= 10;
+      else if (f.rollout >= 75)  score += 8;
+
+      // Blockers
+      score -= Math.min(20, f.blockers * 8);
+
+      // Risk
+      if (f.risk === 'high')     score -= 12;
+      else if (f.risk === 'low') score += 8;
+
+      // Status
+      if (f.status === 'paused')   score -= 15;
+      if (f.status === 'full')     score += 10;
+      if (f.status === 'disabled') score -= 20;
+
+      score = Math.max(0, Math.min(100, Math.round(score)));
+
+      let label, color, fill, action;
+      if (score >= 75) {
+        label = 'Healthy';   color = 'var(--good)'; fill = '#2ee9a6';
+        action = score >= 85 ? 'Expand rollout' : 'Ready to expand';
+      } else if (score >= 50) {
+        label = 'Stable';    color = 'var(--warn)'; fill = '#ffd24a';
+        action = 'Hold and monitor';
+      } else if (score >= 28) {
+        label = 'At risk';   color = '#ff9d4d'; fill = '#ff9d4d';
+        action = 'Investigate before expanding';
+      } else {
+        label = 'Critical';  color = 'var(--risk)'; fill = '#ff6aa2';
+        action = 'Pause or roll back';
+      }
+
+      // Override for paused/disabled
+      if (f.status === 'paused')   { action = 'Resume after fix'; }
+      if (f.status === 'disabled') { action = 'Re-evaluate or remove'; }
+      if (f.status === 'full' && score >= 75) { action = 'Monitor — ship is done'; }
+
+      return { score, label, color, fill, action };
+    }
+
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function statusMeta(s) {
+      const m = {
+        ramping:  { dot: 'info',  text: 'Ramping' },
+        holding:  { dot: 'warn',  text: 'Holding' },
+        paused:   { dot: 'risk',  text: 'Paused'  },
+        full:     { dot: 'good',  text: 'Full rollout' },
+        disabled: { dot: 'risk',  text: 'Disabled' }
+      };
+      return m[s] || { dot: 'info', text: s };
+    }
+
+    function riskBadge(r) {
+      const c = { low: 'good', medium: 'warn', high: 'risk' };
+      return c[r] || 'info';
+    }
+
+    function fmtDelta(delta, unit, higherBetter) {
+      const v   = typeof delta === 'number' ? delta : parseFloat(delta);
+      const abs = Math.abs(v).toFixed(unit === 'ms' ? 0 : 1);
+      const sign = v > 0 ? '+' : v < 0 ? '−' : '±';
+      const cls  = (higherBetter ? v > 0 : v < 0) ? 'good' : v === 0 ? 'warn' : 'risk';
+      return { sign, abs, unit, cls };
+    }
+
+    function sparkDir(delta, higherBetter) {
+      const v = typeof delta === 'number' ? delta : parseFloat(delta);
+      if (v === 0) return 'flat';
+      return (higherBetter ? v > 0 : v < 0) ? 'pos' : 'neg';
+    }
+
+    function e(tag, attrs = {}, ...children) {
+      const el = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (k === 'style' && typeof v === 'object') {
+          Object.assign(el.style, v);
+        } else if (k.startsWith('on')) {
+          el.addEventListener(k.slice(2), v);
+        } else {
+          el.setAttribute(k, v);
+        }
+      }
+      for (const c of children) {
+        if (c == null) continue;
+        el.append(typeof c === 'string' ? document.createTextNode(c) : c);
+      }
+      return el;
+    }
+
+    function h(html) {
+      const d = document.createElement('div');
+      d.innerHTML = html;
+      return d.firstElementChild;
+    }
+
+    // ── Filter + sort ────────────────────────────────────────────────────────
+    function visibleFlags() {
+      let list = [...flags];
+
+      if (query) {
+        const q = query.toLowerCase();
+        list = list.filter(f =>
+          f.name.toLowerCase().includes(q) ||
+          f.owner.toLowerCase().includes(q) ||
+          f.slug.toLowerCase().includes(q) ||
+          (f.team||'').toLowerCase().includes(q) ||
+          f.primary.label.toLowerCase().includes(q)
+        );
+      }
+
+      if (activeView === 'needs') {
+        list = list.filter(f => {
+          const h = computeHealth(f);
+          return h.score < 60 || f.blockers > 0 || f.status === 'paused';
+        });
+      } else if (activeView === 'mine') {
+        list = list.filter(f => f.owner === CURRENT_USER);
+      }
+
+      if (sortKey === 'health') {
+        list.sort((a, b) => computeHealth(a).score - computeHealth(b).score);
+      } else if (sortKey === 'risk') {
+        const rl = { high: 0, medium: 1, low: 2 };
+        list.sort((a, b) => rl[a.risk] - rl[b.risk]);
+      } else if (sortKey === 'delta') {
+        list.sort((a, b) => {
+          const av = a.primary.higherBetter ? a.primary.delta : -a.primary.delta;
+          const bv = b.primary.higherBetter ? b.primary.delta : -b.primary.delta;
+          return bv - av;
+        });
+      }
+
+      return list;
+    }
+
+    // ── Render rows ──────────────────────────────────────────────────────────
+    function renderRows() {
+      const tbody = document.getElementById('tbody');
+      const list  = visibleFlags();
+      document.getElementById('flagCount').textContent = '(' + list.length + ')';
+
+      if (!list.length) {
+        tbody.innerHTML = '';
+        const empty = document.createElement('tr');
+        empty.innerHTML = '<td colspan="6"><div class="empty-state"><p>No flags match the current filter.</p></div></td>';
+        tbody.appendChild(empty);
+        return;
+      }
+
+      // Ensure selected id is valid
+      if (!list.find(f => f.id === selectedId)) {
+        selectedId = list[0]?.id ?? null;
+      }
+
+      tbody.innerHTML = '';
+      for (const f of list) {
+        const health = computeHealth(f);
+        const sm = statusMeta(f.status);
+        const pd = fmtDelta(f.primary.delta, f.primary.unit, f.primary.higherBetter);
+        const gd = fmtDelta(f.guard.delta,   f.guard.unit,   f.guard.higherBetter);
+        const pDir = sparkDir(f.primary.delta, f.primary.higherBetter);
+        const pPct = Math.min(100, Math.abs(f.primary.delta) * (f.primary.unit === 'ms' ? 0.15 : 12));
+        const gDir = sparkDir(f.guard.delta,  f.guard.higherBetter);
+        const gPct = Math.min(100, Math.abs(f.guard.delta)  * (f.guard.unit === 'ms' ? 0.15 : 12));
+
+        const tr = document.createElement('tr');
+        if (f.id === selectedId) tr.classList.add('selected');
+
+        tr.innerHTML = `
+          <td>
+            <div class="flagcell">
+              <div class="bubble" style="background:radial-gradient(10px 10px at 30% 30%,rgba(255,255,255,.9),rgba(255,255,255,0) 60%),linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,0)),${f.avatarStyle || 'linear-gradient(135deg,var(--accentA),var(--accentC))'}"></div>
+              <div class="flagname">
+                <strong>${f.name}</strong>
+                <code>${f.slug}</code>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span class="badge"><span class="dot ${sm.dot}"></span>${sm.text}</span>
+              <span style="font-size:11px;color:var(--muted);font-weight:700;">${f.rollout}% rollout</span>
+            </div>
+          </td>
+          <td>
+            <div class="metric">
+              <span class="delta" style="color:var(--${pd.cls})">${pd.sign}${pd.abs}${pd.unit}</span>
+              <span class="unit">${f.primary.label}</span>
+            </div>
+            <div class="spark"><i class="${pDir}" style="width:${pPct}%"></i></div>
+          </td>
+          <td>
+            <div class="metric">
+              <span class="delta" style="color:var(--${gd.cls})">${gd.sign}${gd.abs}${gd.unit}</span>
+              <span class="unit">${f.guard.label}</span>
+            </div>
+            <div class="spark"><i class="${gDir}" style="width:${gPct}%"></i></div>
+            ${f.blockers > 0 ? `<div style="font-size:11px;color:var(--risk);font-weight:900;margin-top:4px;">⚠ ${f.blockers} blocker${f.blockers > 1 ? 's' : ''}</div>` : ''}
+          </td>
+          <td>
+            <div class="owner">
+              <div class="avatar" style="background:${f.avatarStyle || 'linear-gradient(135deg,var(--accentE),var(--accentA))'}"></div>
+              <div class="meta">
+                <strong>${f.owner}</strong>
+                <span>${f.team || ''}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row-actions">
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+                <span class="badge" style="border-color:transparent;background:rgba(0,0,0,.15);gap:6px;">
+                  <span style="width:8px;height:8px;border-radius:50%;background:${health.fill};box-shadow:0 0 6px ${health.fill}44;display:inline-block;"></span>
+                  <span style="font-size:11px;font-weight:900;color:${health.color}">${health.label} · ${health.score}</span>
+                </span>
+                <span style="font-size:11px;color:var(--muted);font-weight:700;">${health.action}</span>
+              </div>
+            </div>
+          </td>
+        `;
+
+        tr.addEventListener('click', () => { selectedId = f.id; renderRows(); renderDetail(); });
+        tbody.appendChild(tr);
+      }
+    }
+
+    // ── Render KPI ───────────────────────────────────────────────────────────
+    function renderKpi() {
+      const list   = visibleFlags();
+      const ready  = list.filter(f => computeHealth(f).score >= 70).length;
+      const atRisk = list.filter(f => { const s = computeHealth(f).score; return s >= 28 && s < 50; }).length;
+      const critical = list.filter(f => computeHealth(f).score < 28).length;
+      const avgH   = list.length ? Math.round(list.reduce((a,f) => a + computeHealth(f).score, 0) / list.length) : 0;
+      const blocked = list.filter(f => f.blockers > 0).reduce((a,f) => a + f.blockers, 0);
+
+      const tiles = [
+        { label: 'Ready to expand', value: ready,    hint: 'health ≥ 70', color: 'var(--good)' },
+        { label: 'At risk / Critical', value: atRisk + critical, hint: `${critical} critical`, color: critical > 0 ? 'var(--risk)' : 'var(--warn)' },
+        { label: 'Avg health score', value: avgH + '%', hint: 'across current view', color: avgH >= 70 ? 'var(--good)' : avgH >= 50 ? 'var(--warn)' : 'var(--risk)' },
+        { label: 'Active blockers', value: blocked,  hint: 'across all flags', color: blocked > 0 ? 'var(--risk)' : 'var(--good)' },
+        { label: 'Fully shipped',  value: list.filter(f => f.status === 'full').length, hint: '100% rollout', color: 'var(--info)' },
+        { label: 'Paused / Held',  value: list.filter(f => f.status === 'paused' || f.status === 'holding').length, hint: 'need decision', color: 'var(--warn)' }
+      ];
+
+      const kpi = document.getElementById('kpi');
+      kpi.innerHTML = '';
+      for (const t of tiles) {
+        kpi.insertAdjacentHTML('beforeend', `
+          <div class="tile">
+            <p class="label">${t.label}</p>
+            <p class="value" style="color:${t.color}">${t.value}</p>
+            <div class="hint"><span style="width:8px;height:8px;border-radius:50%;background:${t.color};display:inline-block;"></span>${t.hint}</div>
+          </div>
+        `);
+      }
+    }
+
+    // ── Render detail ────────────────────────────────────────────────────────
+    function renderDetail() {
+      const detail = document.getElementById('detail');
+      const f = flags.find(x => x.id === selectedId);
+
+      if (!f) {
+        detail.innerHTML = `<div class="empty">
+          <div style="font-size:24px;margin-bottom:8px;">↖</div>
+          <p>Select a flag from the board to inspect metrics, update rollout %, and get a recommended next action.</p>
+        </div>`;
+        return;
+      }
+
+      const health = computeHealth(f);
+      const pd = fmtDelta(f.primary.delta, f.primary.unit, f.primary.higherBetter);
+      const gd = fmtDelta(f.guard.delta,   f.guard.unit,   f.guard.higherBetter);
+      const sm = statusMeta(f.status);
+
+      const savedNotes = (() => {
+        try { return JSON.parse(localStorage.getItem(NOTES_KEY) || '{}')[f.id] || f.notes || ''; } catch(e) { return f.notes || ''; }
+      })();
+
+      detail.innerHTML = `
+        <div class="card">
+          <h3 style="font-size:13px;font-weight:900;letter-spacing:.1px;">${f.name}</h3>
+          <div style="margin-bottom:10px;">
+            <div class="health-label-row">
+              <span>Confidence score</span>
+              <strong style="color:${health.color}">${health.label} · ${health.score}/100</strong>
+            </div>
+            <div class="health-track">
+              <div class="health-fill" style="width:${health.score}%;background:linear-gradient(90deg,${health.fill}88,${health.fill});"></div>
+            </div>
+          </div>
+          <div class="kv">
+            <div class="item">
+              <p class="k">Status</p>
+              <p class="v"><span class="badge" style="padding:4px 8px;"><span class="dot ${sm.dot}"></span>${sm.text}</span></p>
+            </div>
+            <div class="item">
+              <p class="k">Risk level</p>
+              <p class="v"><span class="badge" style="padding:4px 8px;"><span class="dot ${riskBadge(f.risk)}"></span>${f.risk.charAt(0).toUpperCase()+f.risk.slice(1)}</span></p>
+            </div>
+            <div class="item">
+              <p class="k">Primary · ${f.primary.label}</p>
+              <p class="v" style="color:var(--${pd.cls})">${pd.sign}${pd.abs}${pd.unit}</p>
+            </div>
+            <div class="item">
+              <p class="k">Guard · ${f.guard.label}</p>
+              <p class="v" style="color:var(--${gd.cls})">${gd.sign}${gd.abs}${gd.unit}</p>
+            </div>
+          </div>
+          <div class="item" style="margin-bottom:10px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);padding:10px;">
+            <p class="k" style="font-size:12px;color:var(--muted);font-weight:900;margin:0 0 6px;">Rollout · ${f.rollout}%</p>
+            <div class="rollout-track">
+              <div class="rollout-fill" id="detail-rollout-fill" style="width:${f.rollout}%"></div>
+            </div>
+            <input type="range" id="detail-rollout-range" min="0" max="100" value="${f.rollout}" />
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:700;margin-top:2px;"><span>0%</span><span>100%</span></div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:700;">Blockers: <strong style="color:${f.blockers>0?'var(--risk)':'var(--good)'}">${f.blockers}</strong> · Last updated: ${f.lastUpdated}</div>
+        </div>
+
+        <div class="recommend">
+          <div class="row">
+            <strong>Recommended action</strong>
+            <span style="color:${health.color}">${health.label}</span>
+          </div>
+          <p class="msg" id="rec-msg">${health.action}. Confidence score ${health.score}/100 based on rollout %, metric delta, guardrail impact, blockers, and risk level.</p>
+        </div>
+
+        <div class="notes">
+          <label for="detail-notes">Notes</label>
+          <textarea id="detail-notes" placeholder="Add decision context, blockers, or next steps…">${savedNotes}</textarea>
+          <div class="smallrow">
+            <span style="font-size:11px;color:var(--muted);">Owner: <strong>${f.owner}</strong> · ${f.team || 'No team'}</span>
+            <button id="saveNoteBtn" class="primary" type="button" style="padding:8px 14px;font-size:12px;">Save note</button>
+          </div>
+        </div>
+      `;
+
+      // Rollout slider interaction
+      const rangeEl = document.getElementById('detail-rollout-range');
+      const fillEl  = document.getElementById('detail-rollout-fill');
+      const recMsg  = document.getElementById('rec-msg');
+
+      rangeEl.addEventListener('input', () => {
+        const pct = parseInt(rangeEl.value, 10);
+        fillEl.style.width = pct + '%';
+        const flagIdx = flags.findIndex(x => x.id === f.id);
+        if (flagIdx >= 0) {
+          flags[flagIdx].rollout = pct;
+          const newH = computeHealth(flags[flagIdx]);
+          recMsg.textContent = newH.action + '. Confidence score ' + newH.score + '/100 based on rollout %, metric delta, guardrail impact, blockers, and risk level.';
+          detail.querySelector('.health-fill').style.width = newH.score + '%';
+          detail.querySelector('[style*="Confidence"]').querySelector('strong').textContent = newH.label + ' · ' + newH.score + '/100';
+          detail.querySelector('[style*="Confidence"]').querySelector('strong').style.color = newH.color;
+          rangeEl.previousElementSibling.querySelector('div').style.width = pct + '%';
+          detail.querySelector('.recommend span[style]').style.color = newH.color;
+          detail.querySelector('.recommend span[style]').textContent = newH.label;
+          detail.querySelector('.k[style]') // rollout label
+          // update rollout label
+          const rolloutLabel = detail.querySelector('.k');
+          if (rolloutLabel && rolloutLabel.textContent.startsWith('Rollout')) {
+            rolloutLabel.textContent = 'Rollout · ' + pct + '%';
+          }
+        }
+      });
+
+      rangeEl.addEventListener('change', () => {
+        save();
+        renderRows();
+        renderKpi();
+        toast('Rollout updated', 'Set to ' + rangeEl.value + '% for ' + f.name);
+      });
+
+      document.getElementById('saveNoteBtn').addEventListener('click', () => {
+        const val = document.getElementById('detail-notes').value;
+        try {
+          const notes = JSON.parse(localStorage.getItem(NOTES_KEY) || '{}');
+          notes[f.id] = val;
+          localStorage.setItem(NOTES_KEY, JSON.stringify(notes));
+        } catch(e) {}
+        const fidx = flags.findIndex(x => x.id === f.id);
+        if (fidx >= 0) flags[fidx].notes = val;
+        save();
+        toast('Note saved', 'Decision context updated for ' + f.name);
+      });
+    }
+
+    // ── Toast ────────────────────────────────────────────────────────────────
+    function toast(title, body) {
+      const container = document.getElementById('toast');
+      const el = document.createElement('div');
+      el.className = 't';
+      el.innerHTML = `<div class="ico"></div><div class="txt"><strong>${title}</strong><span>${body}</span></div>`;
+      container.appendChild(el);
+      setTimeout(() => el.remove(), 4000);
+    }
+
+    // ── Init ─────────────────────────────────────────────────────────────────
+    function init() {
+      renderRows();
+      renderKpi();
+      renderDetail();
+
+      // Search
+      document.getElementById('search').addEventListener('input', ev => {
+        query = ev.target.value.trim();
+        renderRows();
+        renderKpi();
+      });
+
+      // View filter
+      for (const [id, view] of [['viewAll','all'],['viewNeeds','needs'],['viewMine','mine']]) {
+        document.getElementById(id).addEventListener('click', () => {
+          activeView = view;
+          ['viewAll','viewNeeds','viewMine'].forEach(b => document.getElementById(b).setAttribute('aria-pressed', b === id ? 'true' : 'false'));
+          renderRows();
+          renderKpi();
+        });
+      }
+
+      // Sort
+      for (const [id, key] of [['sortRec','health'],['sortRisk','risk'],['sortDelta','delta']]) {
+        document.getElementById(id).addEventListener('click', () => {
+          sortKey = key;
+          ['sortRec','sortRisk','sortDelta'].forEach(b => document.getElementById(b).setAttribute('aria-pressed', b === id ? 'true' : 'false'));
+          renderRows();
+        });
+      }
+
+      // Theme
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme');
+        document.documentElement.setAttribute('data-theme', cur === 'light' ? '' : 'light');
+      });
+
+      // Reset
+      document.getElementById('resetBtn').addEventListener('click', () => {
+        if (!confirm('Reset all flags to demo data? This clears any local changes.')) return;
+        flags = JSON.parse(JSON.stringify(SEED));
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(NOTES_KEY);
+        selectedId = flags[0].id;
+        query = ''; document.getElementById('search').value = '';
+        renderRows(); renderKpi(); renderDetail();
+        toast('Reset', 'Demo data restored.');
+      });
+
+      // Keyboard shortcut
+      document.addEventListener('keydown', e => {
+        if (e.key === '/' && document.activeElement !== document.getElementById('search')) {
+          e.preventDefault();
+          document.getElementById('search').focus();
+        }
+        if (e.key === 'Escape') {
+          document.getElementById('search').value = '';
+          query = '';
+          renderRows(); renderKpi();
+        }
+      });
+
+      // Add flag dialog
+      const dialog = document.getElementById('addDialog');
+      document.getElementById('addBtn').addEventListener('click', () => dialog.showModal());
+      document.getElementById('closeAdd').addEventListener('click', () => dialog.close());
+      document.getElementById('cancelAdd').addEventListener('click', () => dialog.close());
+
+      document.getElementById('addForm').addEventListener('submit', ev => {
+        ev.preventDefault();
+        const newFlag = {
+          id: 'ff-' + Date.now(),
+          name: document.getElementById('fName').value.trim(),
+          slug: document.getElementById('fName').value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+          owner: document.getElementById('fOwner').value.trim(),
+          team: '',
+          rollout: Math.min(100, Math.max(0, parseInt(document.getElementById('fRollout').value, 10) || 0)),
+          status: document.getElementById('fStatus').value,
+          risk: document.getElementById('fRisk').value,
+          primary: {
+            label: document.getElementById('fPrimaryLabel').value.trim() || 'Primary metric',
+            delta: parseFloat(document.getElementById('fPrimaryDelta').value) || 0,
+            unit: '%',
+            higherBetter: true
+          },
+          guard: {
+            label: document.getElementById('fGuardLabel').value.trim() || 'Guardrail',
+            delta: parseFloat(document.getElementById('fGuardDelta').value) || 0,
+            unit: '%',
+            higherBetter: false
+          },
+          blockers: Math.max(0, parseInt(document.getElementById('fBlockers').value, 10) || 0),
+          lastUpdated: new Date().toISOString().split('T')[0],
+          notes: '',
+          avatarStyle: 'linear-gradient(135deg,var(--accentA),var(--accentC))'
+        };
+        flags.unshift(newFlag);
+        selectedId = newFlag.id;
+        save();
+        dialog.close();
+        ev.target.reset();
+        renderRows(); renderKpi(); renderDetail();
+        toast('Flag added', newFlag.name + ' added to the board.');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  })();
+  </script>
+</body>
+</html>
