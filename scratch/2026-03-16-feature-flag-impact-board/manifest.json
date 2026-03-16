@@ -1,0 +1,26 @@
+{
+  "name": "Feature Flag Impact Board",
+  "slug": "feature-flag-impact-board",
+  "date_created": "2026-03-16",
+  "bucket": "GTM workflow",
+  "persona": "Product managers, product ops, and engineering managers responsible for staged rollouts",
+  "problem_statement": "After rolling out features behind flags, teams lack a single view to judge health and decide whether to expand, hold, roll back, or investigate.",
+  "complexity": "Intermediate",
+  "artifact_type": "dashboard",
+  "style_direction": "Dark modern analyst console with playful consumer touches (color pops, crisp typography) and data-dense hierarchy",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "published",
+  "publish_recommendation": "yes",
+  "tags": [
+    "feature-flags",
+    "rollouts",
+    "risk",
+    "guardrails",
+    "internal-tools",
+    "gtm-workflow-tools"
+  ]
+}
