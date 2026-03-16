@@ -1,0 +1,23 @@
+{
+  "name": "Feature Flag Impact Board",
+  "category": "analytics/debugging tools",
+  "complexity": "Simple",
+  "visualStyle": "premium SaaS",
+  "generatedAt": "2026-03-15T00:00:00.000Z",
+  "techStack": [
+    "Vite",
+    "React",
+    "TypeScript",
+    "Tailwind CSS",
+    "Recharts"
+  ],
+  "tags": [
+    "feature-flags",
+    "analytics",
+    "pm-tooling",
+    "dashboard",
+    "risk-monitoring",
+    "dark-mode",
+    "responsive"
+  ]
+}
