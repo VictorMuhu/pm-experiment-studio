@@ -1,0 +1,26 @@
+{
+  "name": "Master Prompt Spec Test",
+  "slug": "launch-readiness-risk-auditor",
+  "date_created": "2026-03-16",
+  "bucket": "GTM workflow tools",
+  "persona": "A PMM at a 50–500 person B2B SaaS company coordinating a GA launch across eng, marketing, sales, and support without a dedicated launch ops function",
+  "problem_statement": "In the final week before a launch, generic copied checklists miss predictable cross-functional gaps, causing late go/no-go surprises and last-minute coordination thrash",
+  "complexity": "Simple",
+  "artifact_type": "single-page web app (scored audit + owner-grouped checklist export)",
+  "style_direction": "mobile-ambient",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "published",
+  "publish_recommendation": "yes",
+  "tags": [
+    "launch",
+    "gtm",
+    "readiness",
+    "checklist",
+    "go-no-go",
+    "cross-functional"
+  ]
+}
