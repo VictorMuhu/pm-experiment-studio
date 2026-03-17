@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="app-header">
+    <div class="container header-row">
+      <div class="brand">
+        <div class="brand-kicker">DECISION WORKSPACE</div>
+        <div class="brand-title">Idea Validator</div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav-item" type="button" data-view="scorecard" aria-current="page">SCORECARD</button>
+        <button class="nav-item" type="button" data-view="assumptions">ASSUMPTIONS</button>
+        <button class="nav-item" type="button" data-view="risks">RISKS</button>
+        <button class="nav-item" type="button" data-view="memo">MEMO</button>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn btn-secondary" type="button" id="btnNew">NEW</button>
+        <button class="btn btn-secondary" type="button" id="btnDuplicate">DUPLICATE</button>
+        <button class="btn btn-primary" type="button" id="btnExport">EXPORT</button>
+      </div>
+    </div>
+    <div class="container header-row header-row-2">
+      <div class="project-select">
+        <label class="label" for="ideaSelect">IDEA</label>
+        <select id="ideaSelect" class="select" aria-label="Select idea"></select>
+      </div>
+      <div class="autosave">
+        <div class="autosave-label">LOCAL SAVE</div>
+        <div class="autosave-value" id="autosaveStatus">READY</div>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div class="container">
+      <section class="hero">
+        <div class="hero-left">
+          <div class="kicker">VERDICT</div>
+          <div class="hero-metric" id="heroVerdict">REFINE FIRST</div>
+          <div class="hero-sub">
+            <div class="sub-item">
+              <div class="label">CONFIDENCE</div>
+              <div class="value" id="heroConfidence">MEDIUM</div>
+            </div>
+            <div class="sub-item">
+              <div class="label">SCORE</div>
+              <div class="value"><span id="heroScore">72</span><span class="muted">/100</span></div>
+            </div>
+            <div class="sub-item">
+              <div class="label">WEAKNESSES</div>
+              <div class="value"><span class="highlight" id="heroWeakCount">2</span></div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-primary" type="button" id="btnRecompute">RECOMPUTE</button>
+            <button class="btn btn-secondary" type="button" id="btnResetDemo">RESTORE DEMO</button>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">IDEA BRIEF</div>
+              <div class="card-meta" id="ideaMeta">UPDATED —</div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label class="label" for="ideaTitle">TITLE</label>
+                <input id="ideaTitle" class="input" type="text" autocomplete="off" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="ideaStage">CONTEXT</label>
+                <select id="ideaStage" class="select">
+                  <option value="seed">SEED / 0–1</option>
+                  <option value="series-a">SERIES A</option>
+                  <option value="growth">GROWTH</option>
+                  <option value="enterprise">ENTERPRISE</option>
+                </select>
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="ideaCustomer">PRIMARY USER</label>
+                <input id="ideaCustomer" class="input" type="text" autocomplete="off" />
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="ideaProblem">PROBLEM (EVIDENCE)</label>
+                <textarea id="ideaProblem" class="textarea" rows="3"></textarea>
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="ideaSolution">SOLUTION (WHAT CHANGES)</label>
+                <textarea id="ideaSolution" class="textarea" rows="3"></textarea>
+              </div>
+
+              <div class="field">
+                <label class="label" for="ideaMetric">PRIMARY METRIC</label>
+                <input id="ideaMetric" class="input" type="text" autocomplete="off" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="ideaTime">TIME-TO-V1 (WEEKS)</label>
+                <input id="ideaTime" class="input" type="number" min="1" max="52" />
+              </div>
+
+              <div class="field">
+                <label class="label" for="ideaReach">REACH (QUARTER)</label>
+                <select id="ideaReach" class="select">
+                  <option value="niche">NICHE</option>
+                  <option value="segment">SEGMENT</option>
+                  <option value="broad">BROAD</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="ideaStrategyFit">STRATEGY FIT</label>
+                <select id="ideaStrategyFit" class="select">
+                  <option value="core">CORE BET</option>
+                  <option value="adjacent">ADJACENT</option>
+                  <option value="distraction">DISTRACTION</option>
+                </select>
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="ideaNotes">NOTES (OPTIONAL)</label>
+                <textarea id="ideaNotes" class="textarea" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-scorecard" data-view="scorecard">
+        <div class="section-head">
+          <div class="section-title">SCORECARD</div>
+          <div class="section-sub">Nine dimensions. One weighted score. Explicit thresholds.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">DIMENSIONS</div>
+            <div class="card-meta">WEIGHTED — OUTPUT IS DECISION-READY</div>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="Scorecard table">
+            <table class="table" id="scoreTable">
+              <thead>
+                <tr>
+                  <th scope="col">DIMENSION</th>
+                  <th scope="col">WEIGHT</th>
+                  <th scope="col">SCORE</th>
+                  <th scope="col">NOTES (WHY)</th>
+                  <th scope="col">WEAKNESS</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="card-footer">
+            <div class="foot-left">
+              <div class="label">TOP WEAKNESSES</div>
+              <div class="foot-text" id="topWeaknesses">—</div>
+            </div>
+            <div class="foot-right">
+              <button class="btn btn-secondary" type="button" id="btnNormalize">NORMALIZE WEIGHTS</button>
+              <button class="btn btn-primary" type="button" id="btnAddAssumptionFromWeakness">ADD ASSUMPTIONS FROM WEAKNESSES</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-assumptions" data-view="assumptions" hidden>
+        <div class="section-head">
+          <div class="section-title">ASSUMPTIONS</div>
+          <div class="section-sub">Turn implicit claims into testable statements with a next step.</div>
+        </div>
+
+        <div class="split">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">ASSUMPTION LOG</div>
+              <div class="card-meta"><span id="assumptionCount">0</span> ITEMS</div>
+            </div>
+
+            <div class="toolbar">
+              <div class="toolbar-left">
+                <div class="label">FILTER</div>
+                <select id="assumptionFilter" class="select select-compact">
+                  <option value="all">ALL</option>
+                  <option value="untested">UNTESTED</option>
+                  <option value="in-progress">IN PROGRESS</option>
+                  <option value="validated">VALIDATED</option>
+                  <option value="invalidated">INVALIDATED</option>
+                </select>
+              </div>
+              <div class="toolbar-right">
+                <button class="btn btn-secondary" type="button" id="btnAddAssumption">ADD</button>
+              </div>
+            </div>
+
+            <div class="table-wrap" role="region" aria-label="Assumptions table">
+              <table class="table" id="assumptionTable">
+                <thead>
+                  <tr>
+                    <th scope="col">STATEMENT</th>
+                    <th scope="col">TYPE</th>
+                    <th scope="col">RISK</th>
+                    <th scope="col">STATUS</th>
+                    <th scope="col">NEXT STEP</th>
+                    <th scope="col">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+
+            <div class="card-footer">
+              <div class="foot-left">
+                <div class="label">WHAT THIS IS</div>
+                <div class="foot-text">If you cannot write the assumption, you cannot evaluate the idea.</div>
+              </div>
+              <div class="foot-right">
+                <button class="btn btn-primary" type="button" id="btnAssumptionDigest">COPY DIGEST</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="assumptionEditorCard" aria-label="Assumption editor">
+            <div class="card-header">
+              <div class="card-title">EDITOR</div>
+              <div class="card-meta" id="assumptionEditorMeta">SELECT AN ITEM —</div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field field-full">
+                <label class="label" for="aStatement">ASSUMPTION</label>
+                <textarea id="aStatement" class="textarea" rows="4" placeholder=""></textarea>
+              </div>
+
+              <div class="field">
+                <label class="label" for="aType">TYPE</label>
+                <select id="aType" class="select">
+                  <option value="value">VALUE</option>
+                  <option value="feasibility">FEASIBILITY</option>
+                  <option value="viability">VIABILITY</option>
+                  <option value="usability">USABILITY</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="aRisk">RISK</label>
+                <select id="aRisk" class="select">
+                  <option value="high">HIGH</option>
+                  <option value="medium">MEDIUM</option>
+                  <option value="low">LOW</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="aStatus">STATUS</label>
+                <select id="aStatus" class="select">
+                  <option value="untested">UNTESTED</option>
+                  <option value="in-progress">IN PROGRESS</option>
+                  <option value="validated">VALIDATED</option>
+                  <option value="invalidated">INVALIDATED</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="label" for="aConfidence">CONFIDENCE</label>
+                <select id="aConfidence" class="select">
+                  <option value="low">LOW</option>
+                  <option value="medium">MEDIUM</option>
+                  <option value="high">HIGH</option>
+                </select>
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="aNext">NEXT STEP (TEST)</label>
+                <input id="aNext" class="input" type="text" autocomplete="off" />
+              </div>
+
+              <div class="field field-full">
+                <label class="label" for="aEvidence">EVIDENCE (LINK OR NOTE)</label>
+                <input id="aEvidence" class="input" type="text" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="editor-actions">
+              <button class="btn btn-secondary" type="button" id="btnAssumptionClear">CLEAR</button>
+              <button class="btn btn-primary" type="button" id="btnAssumptionSave">SAVE</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-risks" data-view="risks" hidden>
+        <div class="section-head">
+          <div class="section-title">RISKS</div>
+          <div class="section-sub">An explicit register: probability, impact, mitigation, owner.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">RISK REGISTER</div>
+            <div class="card-meta">AUTO-FLAGS FROM SCORECARD + MANUAL ENTRY</div>
+          </div>
+
+          <div class="toolbar">
+            <div class="toolbar-left">
+              <div class="label">SORT</div>
+              <select id="riskSort" class="select select-compact">
+                <option value="priority-desc">PRIORITY (HIGH → LOW)</option>
+                <option value="prob-desc">PROBABILITY (HIGH → LOW)</option>
+                <option value="impact-desc">IMPACT (HIGH → LOW)</option>
+                <option value="recent-desc">RECENTLY UPDATED</option>
+              </select>
+            </div>
+            <div class="toolbar-right">
+              <button class="btn btn-secondary" type="button" id="btnAddRisk">ADD</button>
+              <button class="btn btn-primary" type="button" id="btnGenerateRisks">GENERATE FROM WEAKNESSES</button>
+            </div>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="Risks table">
+            <table class="table" id="riskTable">
+              <thead>
+                <tr>
+                  <th scope="col">RISK</th>
+                  <th scope="col">CATEGORY</th>
+                  <th scope="col">PROB.</th>
+                  <th scope="col">IMPACT</th>
+                  <th scope="col">PRIORITY</th>
+                  <th scope="col">MITIGATION</th>
+                  <th scope="col">OWNER</th>
+                  <th scope="col">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="card-footer">
+            <div class="foot-left">
+              <div class="label">RULE</div>
+              <div class="foot-text">Priority = probability × impact. Keep mitigations concrete and owned.</div>
+            </div>
+            <div class="foot-right">
+              <button class="btn btn-primary" type="button" id="btnRiskDigest">COPY REGISTER</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-memo" data-view="memo" hidden>
+        <div class="section-head">
+          <div class="section-title">MEMO</div>
+          <div class="section-sub">One-page summary you can paste into a leadership doc.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">DECISION MEMO</div>
+            <div class="card-meta">COPY-PASTE READY — NO FLUFF</div>
+          </div>
+
+          <div class="memo-grid">
+            <div class="memo-block">
+              <div class="label">TAKEAWAY</div>
+              <div class="memo-takeaway" id="memoTakeaway">—</div>
+            </div>
+
+            <div class="memo-block">
+              <div class="label">THE IDEA</div>
+              <div class="memo-text" id="memoIdea">—</div>
+            </div>
+
+            <div class="memo-block">
+              <div class="label">WHY NOW</div>
+              <div class="memo-text" id="memoWhyNow">—</div>
+            </div>
+
+            <div class="memo-block">
+              <div class="label">SCORE BREAKDOWN</div>
+              <div class="memo-text" id="memoScores">—</div>
+            </div>
+
+            <div class="memo-block">
+              <div class="label">TOP ASSUMPTIONS TO TEST</div>
+              <div class="memo-text" id="memoAssumptions">—</div>
+            </div>
+
+            <div class="memo-block">
+              <div class="label">TOP RISKS</div>
+              <div class="memo-text" id="memoRisks">—</div>
+            </div>
+
+            <div class="memo-actions">
+              <button class="btn btn-secondary" type="button" id="btnCopyMemo">COPY MEMO</button>
+              <button class="btn btn-primary" type="button" id="btnPrint">PRINT</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 18px;">
+          <div class="card-header">
+            <div class="card-title">DECISION CONTROLS</div>
+            <div class="card-meta">FORCES AN EXPLICIT CALL</div>
+          </div>
+
+          <div class="decision-controls">
+            <div class="field">
+              <label class="label" for="decisionOverride">OVERRIDE VERDICT</label>
+              <select id="decisionOverride" class="select">
+                <option value="auto">AUTO (FROM SCORE)</option>
+                <option value="go">GO</option>
+                <option value="refine">REFINE FIRST</option>
+                <option value="no-go">NO-GO</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="decisionOwner">DECISION OWNER</label>
+              <input id="decisionOwner" class="input" type="text" autocomplete="off" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="decisionDate">DECISION DATE</label>
+              <input id="decisionDate" class="input" type="date" />
+            </div>
+
+            <div class="field field-full">
+              <label class="label" for="decisionRationale">RATIONALE (1–3 SENTENCES)</label>
+              <textarea id="decisionRationale" class="textarea" rows="2"></textarea>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div class="foot-left">
+              <div class="label">NOTE</div>
+              <div class="foot-text">Overrides are recorded in the export and memo.</div>
+            </div>
+            <div class="foot-right">
+              <button class="btn btn-primary" type="button" id="btnRebuildMemo">REBUILD MEMO</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="app-footer">
+        <div class="container footer-row">
+          <div class="footer-left">
+            <div class="label">LOCAL-ONLY</div>
+            <div class="footer-text">Data is stored in your browser (localStorage). No network calls.</div>
+          </div>
+          <div class="footer-right">
+            <div class="footer-text" id="storageInfo">—</div>
+          </div>
+        </div>
+      </footer>
+
+      <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+        <div class="toast-inner">
+          <div class="toast-title" id="toastTitle">COPIED</div>
+          <div class="toast-body" id="toastBody">—</div>
+        </div>
+      </div>
+
+      <div class="modal" id="modal" hidden aria-hidden="true">
+        <div class="modal-backdrop" data-close="true"></div>
+        <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+          <div class="modal-head">
+            <div class="modal-title" id="modalTitle">—</div>
+            <button class="btn btn-secondary btn-compact" type="button" id="modalClose">CLOSE</button>
+          </div>
+          <div class="modal-body" id="modalBody"></div>
+          <div class="modal-actions" id="modalActions"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
