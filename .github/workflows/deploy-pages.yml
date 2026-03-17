@@ -43,17 +43,7 @@ jobs:
         run: |
           mkdir -p _site/projects/2026-03-17-design-coach
           cp -r projects/2026-03-17-design-coach/dist/. _site/projects/2026-03-17-design-coach/
-          # Root index redirects to the first (and currently only) project
-          cat > _site/index.html <<'EOF'
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="utf-8" />
-              <meta http-equiv="refresh" content="0; url=projects/2026-03-17-design-coach/" />
-            </head>
-            <body>Redirecting…</body>
-          </html>
-          EOF
+          printf '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=projects/2026-03-17-design-coach/"></head><body>Redirecting...</body></html>\n' > _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
