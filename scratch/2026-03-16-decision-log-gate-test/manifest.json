@@ -1,0 +1,25 @@
+{
+  "name": "Decision Log Gate Test",
+  "slug": "decision-log-gate-test",
+  "date_created": "2026-03-16",
+  "bucket": "customer experience tools",
+  "persona": "A repo maintainer (PM or CX ops lead) who needs to quickly decide if a submission’s decision-log content is real enough to publish without reading the whole PR.",
+  "problem_statement": "Reviewers miss “template-filled” decision logs until late review, creating inconsistent publish vs. scratch decisions and wasting reviewer time.",
+  "complexity": "Intermediate",
+  "artifact_type": "single-page web app",
+  "style_direction": "dense-analyst-console",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "published",
+  "publish_recommendation": "yes",
+  "tags": [
+    "quality-gate",
+    "decision-log",
+    "review-workflow",
+    "rubric",
+    "portfolio-standards"
+  ]
+}
