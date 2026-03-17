@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dependency Risk Radar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="topbar__left">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">DRR</div>
+        <div class="brand__text">
+          <div class="brand__name">Dependency Risk Radar</div>
+          <div class="brand__meta">Paste → triage → checklist</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item" type="button" data-view="triage" aria-current="page">Triage</button>
+        <button class="nav__item" type="button" data-view="registry">Registry</button>
+        <button class="nav__item" type="button" data-view="diff">Scenario Diff</button>
+        <button class="nav__item" type="button" data-view="export">Export</button>
+        <button class="nav__item" type="button" data-view="settings">Settings</button>
+      </nav>
+    </div>
+
+    <div class="topbar__right">
+      <div class="statusline" role="status" aria-live="polite">
+        <span class="statusline__label">WORKSPACE</span>
+        <span class="statusline__value" id="statusWorkspace">Local</span>
+        <span class="statusline__divider" aria-hidden="true">|</span>
+        <span class="statusline__label">LAST RUN</span>
+        <span class="statusline__value" id="statusLastRun">—</span>
+        <span class="statusline__divider" aria-hidden="true">|</span>
+        <span class="statusline__label">ITEMS</span>
+        <span class="statusline__value" id="statusItemCount">0</span>
+      </div>
+      <div class="topbar__actions">
+        <button class="btn" type="button" id="btnNewRun">New run</button>
+        <button class="btn" type="button" id="btnLoadDemo">Load demo</button>
+        <button class="btn btn--accent" type="button" id="btnSaveSnapshot">Save snapshot</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app" role="main">
+    <section class="zone zone--main" aria-label="Main view">
+      <!-- TRIAGE -->
+      <div class="view" data-view-panel="triage">
+        <div class="view__header">
+          <div>
+            <h1 class="h1">Triage</h1>
+            <p class="subtle">Turn a dependency list into a prioritized risk checklist. No network calls. Signals are heuristic and adjustable.</p>
+          </div>
+          <div class="view__headerActions">
+            <button class="btn" type="button" id="btnRunAnalysis">Run analysis</button>
+            <button class="btn" type="button" id="btnClearInput">Clear</button>
+          </div>
+        </div>
+
+        <div class="split">
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Input</h2>
+              <div class="pillRow" aria-label="Input format">
+                <span class="pill">package.json</span>
+                <span class="pill">requirements.txt</span>
+                <span class="pill">pnpm/yarn lock excerpt</span>
+              </div>
+            </div>
+
+            <div class="formGrid">
+              <div class="field">
+                <label class="label" for="inputProjectName">Project name</label>
+                <input class="input" id="inputProjectName" type="text" value="Platform Upgrade — Checkout Service" />
+                <div class="help">Used in exports and snapshot titles.</div>
+              </div>
+              <div class="field">
+                <label class="label" for="inputOwner">Owner</label>
+                <input class="input" id="inputOwner" type="text" value="PM: Lina K. / TL: Marco S." />
+                <div class="help">Who will be asked “is this safe?”</div>
+              </div>
+              <div class="field">
+                <label class="label" for="inputDueDate">Decision date</label>
+                <input class="input" id="inputDueDate" type="date" />
+                <div class="help">Used to flag “needs review before date”.</div>
+              </div>
+              <div class="field">
+                <label class="label" for="inputScope">Upgrade scope</label>
+                <select class="input" id="inputScope">
+                  <option value="minor">Minor bump (patch/minor)</option>
+                  <option value="major" selected>Major bump (breaking changes likely)</option>
+                  <option value="vendor">Vendor switch / fork replacement</option>
+                </select>
+                <div class="help">Adjusts scoring weight for breaking changes.</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="inputDeps">Dependencies (paste)</label>
+              <textarea class="textarea" id="inputDeps" rows="16" spellcheck="false"></textarea>
+              <div class="help">
+                Paste <span class="kbd">dependencies</span>/<span class="kbd">devDependencies</span> blocks, full <span class="kbd">package.json</span>, or a <span class="kbd">requirements.txt</span>.
+                You can also paste lockfile lines like <span class="kbd">react@18.2.0</span>.
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="inlineChecks">
+                <label class="check">
+                  <input type="checkbox" id="chkIncludeDev" checked />
+                  <span>Include dev/test deps</span>
+                </label>
+                <label class="check">
+                  <input type="checkbox" id="chkMergeRegistry" checked />
+                  <span>Merge with Registry signals (local)</span>
+                </label>
+              </div>
+              <div class="mini">
+                <span class="mini__label">Parser status</span>
+                <span class="mini__value" id="parserStatus">Waiting for input</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Results</h2>
+              <div class="mini">
+                <span class="mini__label">Risk model</span>
+                <span class="mini__value" id="riskModelLabel">Balanced</span>
+              </div>
+            </div>
+
+            <div class="metrics" aria-label="Summary metrics">
+              <div class="metric">
+                <div class="metric__label">Overall risk</div>
+                <div class="metric__value" id="metricOverall">—</div>
+                <div class="metric__hint" id="metricOverallHint">Run analysis to compute</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Critical items</div>
+                <div class="metric__value" id="metricCritical">—</div>
+                <div class="metric__hint">Score ≥ 80</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Needs review</div>
+                <div class="metric__value" id="metricReview">—</div>
+                <div class="metric__hint">Score 55–79</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Likely OK</div>
+                <div class="metric__value" id="metricOk">—</div>
+                <div class="metric__hint">Score &lt; 55</div>
+              </div>
+            </div>
+
+            <div class="tableWrap" role="region" aria-label="Triage table" tabindex="0">
+              <table class="table" id="triageTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Package</th>
+                    <th scope="col" class="num">Score</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Reason (top)</th>
+                    <th scope="col" class="num">Signals</th>
+                  </tr>
+                </thead>
+                <tbody id="triageTbody">
+                  <tr>
+                    <td colspan="5" class="emptyCell">No results yet. Paste dependencies and run analysis.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="panel__footer">
+              <div class="inline">
+                <div class="field inlineField">
+                  <label class="label" for="filterText">Filter</label>
+                  <input class="input" id="filterText" type="text" placeholder="e.g., react, aws, auth" />
+                </div>
+                <div class="field inlineField">
+                  <label class="label" for="sortMode">Sort</label>
+                  <select class="input" id="sortMode">
+                    <option value="riskDesc" selected>Risk score (desc)</option>
+                    <option value="nameAsc">Name (A→Z)</option>
+                    <option value="signalsDesc">Signals (desc)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="inline">
+                <button class="btn" type="button" id="btnAddToRegistry">Add selected to Registry</button>
+                <button class="btn" type="button" id="btnMarkReviewed">Mark reviewed</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTRY -->
+      <div class="view" data-view-panel="registry" hidden>
+        <div class="view__header">
+          <div>
+            <h1 class="h1">Registry</h1>
+            <p class="subtle">Local package records with manual signals (owner, last audited, known incidents). Used to add context to triage runs.</p>
+          </div>
+          <div class="view__headerActions">
+            <button class="btn" type="button" id="btnNewRegistryItem">New record</button>
+            <button class="btn" type="button" id="btnPurgeRegistry">Purge registry</button>
+          </div>
+        </div>
+
+        <div class="split split--registry">
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Records</h2>
+              <div class="mini">
+                <span class="mini__label">Count</span>
+                <span class="mini__value" id="registryCount">0</span>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="field">
+                <label class="label" for="registrySearch">Search</label>
+                <input class="input" id="registrySearch" type="text" placeholder="package name, owner, notes" />
+              </div>
+
+              <div class="list" role="list" id="registryList" aria-label="Registry list"></div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Record detail</h2>
+              <div class="inline">
+                <span class="tag tag--ok" id="registryDetailTag">[OK]</span>
+                <button class="btn" type="button" id="btnDeleteRegistryItem">Delete</button>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="formGrid">
+                <div class="field">
+                  <label class="label" for="regName">Package</label>
+                  <input class="input" id="regName" type="text" />
+                  <div class="help">Use exact package name as it appears in dependency files.</div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="regOwner">Owner / SME</label>
+                  <input class="input" id="regOwner" type="text" />
+                  <div class="help">Who can answer “can we upgrade this safely?”</div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="regCriticality">Service criticality</label>
+                  <select class="input" id="regCriticality">
+                    <option value="low">Low</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                  <div class="help">Used to scale risk score when this package is present.</div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="regAuditDate">Last audited</label>
+                  <input class="input" id="regAuditDate" type="date" />
+                  <div class="help">If blank, triage will flag it as “unknown”.</div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="regLastIncident">Last incident</label>
+                  <input class="input" id="regLastIncident" type="date" />
+                  <div class="help">Optional; for packages linked to outages or security events.</div>
+                </div>
+
+                <div class="field">
+                  <label class="label" for="regPinnedVersion">Pinned version</label>
+                  <input class="input" id="regPinnedVersion" type="text" placeholder="e.g., 4.17.21" />
+                  <div class="help">If you must stay pinned for compliance or platform reasons.</div>
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="regNotes">Notes</label>
+                <textarea class="textarea" id="regNotes" rows="7"></textarea>
+                <div class="help">Freeform: migration steps, known incompatibilities, links, “do not bump past X”.</div>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="inline">
+                <button class="btn btn--accent" type="button" id="btnSaveRegistryItem">Save record</button>
+                <button class="btn" type="button" id="btnRiskFromRegistry">Compute registry risk label</button>
+              </div>
+              <div class="mini">
+                <span class="mini__label">Detail status</span>
+                <span class="mini__value" id="registryDetailStatus">Select a record</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIFF -->
+      <div class="view" data-view-panel="diff" hidden>
+        <div class="view__header">
+          <div>
+            <h1 class="h1">Scenario Diff</h1>
+            <p class="subtle">Compare two snapshots (before/after) to see new, removed, and risk-shifted packages. Uses saved snapshots.</p>
+          </div>
+          <div class="view__headerActions">
+            <button class="btn" type="button" id="btnMakeSnapshotFromCurrent">Snapshot current results</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__body">
+            <div class="formGrid formGrid--3">
+              <div class="field">
+                <label class="label" for="diffLeft">Left snapshot</label>
+                <select class="input" id="diffLeft"></select>
+                <div class="help">Baseline (e.g., current prod lockfile)</div>
+              </div>
+              <div class="field">
+                <label class="label" for="diffRight">Right snapshot</label>
+                <select class="input" id="diffRight"></select>
+                <div class="help">Candidate (e.g., upgraded dependencies)</div>
+              </div>
+              <div class="field">
+                <label class="label" for="diffThreshold">Risk delta threshold</label>
+                <select class="input" id="diffThreshold">
+                  <option value="5">≥ 5 points</option>
+                  <option value="10" selected>≥ 10 points</option>
+                  <option value="20">≥ 20 points</option>
+                </select>
+                <div class="help">Only show notable score changes.</div>
+              </div>
+            </div>
+
+            <div class="inline">
+              <button class="btn" type="button" id="btnRunDiff">Run diff</button>
+              <button class="btn" type="button" id="btnClearDiff">Clear</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="metrics metrics--diff">
+              <div class="metric">
+                <div class="metric__label">Added</div>
+                <div class="metric__value" id="diffAdded">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Removed</div>
+                <div class="metric__value" id="diffRemoved">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Risk up</div>
+                <div class="metric__value" id="diffUp">—</div>
+              </div>
+              <div class="metric">
+                <div class="metric__label">Risk down</div>
+                <div class="metric__value" id="diffDown">—</div>
+              </div>
+            </div>
+
+            <div class="tableWrap" role="region" aria-label="Diff table" tabindex="0">
+              <table class="table" id="diffTable">
+                <thead>
+                  <tr>
+                    <th scope="col">Package</th>
+                    <th scope="col">Change</th>
+                    <th scope="col" class="num">Left</th>
+                    <th scope="col" class="num">Right</th>
+                    <th scope="col">Note</th>
+                  </tr>
+                </thead>
+                <tbody id="diffTbody">
+                  <tr><td colspan="5" class="emptyCell">Select snapshots and run diff.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT -->
+      <div class="view" data-view-panel="export" hidden>
+        <div class="view__header">
+          <div>
+            <h1 class="h1">Export</h1>
+            <p class="subtle">Generate a shareable checklist and a risk register excerpt. Copy to clipboard or download JSON for a PR/upgrade RFC.</p>
+          </div>
+          <div class="view__headerActions">
+            <button class="btn" type="button" id="btnCopyReport">Copy report</button>
+            <button class="btn" type="button" id="btnDownloadJson">Download JSON</button>
+          </div>
+        </div>
+
+        <div class="split split--export">
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Report preview</h2>
+              <div class="mini">
+                <span class="mini__label">Format</span>
+                <span class="mini__value">Markdown</span>
+              </div>
+            </div>
+            <div class="codeWrap" role="region" aria-label="Export preview" tabindex="0">
+              <pre class="code" id="exportPreview"></pre>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Include</h2>
+              <div class="mini">
+                <span class="mini__label">Selected</span>
+                <span class="mini__value" id="exportSelectedCount">0</span>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="field">
+                <label class="label" for="exportMode">Checklist mode</label>
+                <select class="input" id="exportMode">
+                  <option value="actionable" selected>Actionable (tasks + owners)</option>
+                  <option value="compact">Compact (table only)</option>
+                </select>
+                <div class="help">Actionable includes suggested owners based on Registry records.</div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="exportCutoff">Max items</label>
+                <select class="input" id="exportCutoff">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                  <option value="all">All</option>
+                </select>
+                <div class="help">Keeps the report “decision-ready” rather than exhaustive.</div>
+              </div>
+
+              <div class="inlineChecks">
+                <label class="check"><input type="checkbox" id="exportIncludeOk" /> <span>Include [OK] items</span></label>
+                <label class="check"><input type="checkbox" id="exportIncludeSignals" checked /> <span>Include signal breakdown</span></label>
+                <label class="check"><input type="checkbox" id="exportIncludeReviewed" checked /> <span>Include reviewed notes</span></label>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <button class="btn btn--accent" type="button" id="btnRegenerateExport">Regenerate preview</button>
+              <div class="mini">
+                <span class="mini__label">Preview status</span>
+                <span class="mini__value" id="exportStatus">No results yet</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="view" data-view-panel="settings" hidden>
+        <div class="view__header">
+          <div>
+            <h1 class="h1">Settings</h1>
+            <p class="subtle">Adjust the risk model. Stored locally. No motion, no tracking, no network.</p>
+          </div>
+          <div class="view__headerActions">
+            <button class="btn" type="button" id="btnResetSettings">Reset to defaults</button>
+          </div>
+        </div>
+
+        <div class="split split--settings">
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Weights</h2>
+              <div class="mini">
+                <span class="mini__label">Preset</span>
+                <span class="mini__value" id="presetLabel">Balanced</span>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="field">
+                <label class="label" for="presetSelect">Preset</label>
+                <select class="input" id="presetSelect">
+                  <option value="balanced" selected>Balanced</option>
+                  <option value="security">Security-first</option>
+                  <option value="stability">Stability-first</option>
+                  <option value="delivery">Delivery-first</option>
+                </select>
+                <div class="help">Presets update weights. You can still fine-tune.</div>
+              </div>
+
+              <div class="sliderRow">
+                <div class="sliderRow__head">
+                  <div class="sliderRow__label">Security exposure weight</div>
+                  <div class="sliderRow__value"><span id="wSecurityVal">35</span></div>
+                </div>
+                <input class="range" type="range" id="wSecurity" min="0" max="60" step="1" />
+                <div class="help">Includes known CVE heuristics + “sensitive area” keywords.</div>
+              </div>
+
+              <div class="sliderRow">
+                <div class="sliderRow__head">
+                  <div class="sliderRow__label">Maintenance weight</div>
+                  <div class="sliderRow__value"><span id="wMaintenanceVal">35</span></div>
+                </div>
+                <input class="range" type="range" id="wMaintenance" min="0" max="60" step="1" />
+                <div class="help">Flags “legacy”, “deprecated”, and low-confidence packages.</div>
+              </div>
+
+              <div class="sliderRow">
+                <div class="sliderRow__head">
+                  <div class="sliderRow__label">Breaking-change weight</div>
+                  <div class="sliderRow__value"><span id="wBreakingVal">20</span></div>
+                </div>
+                <input class="range" type="range" id="wBreaking" min="0" max="60" step="1" />
+                <div class="help">Penalizes major-version jumps more heavily for major upgrades.</div>
+              </div>
+
+              <div class="sliderRow">
+                <div class="sliderRow__head">
+                  <div class="sliderRow__label">Ecosystem momentum (protective)</div>
+                  <div class="sliderRow__value"><span id="wMomentumVal">10</span></div>
+                </div>
+                <input class="range" type="range" id="wMomentum" min="0" max="30" step="1" />
+                <div class="help">Reduces score for “boring but stable” widely adopted deps.</div>
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label class="label" for="sensitiveKeywords">Sensitive-area keywords (comma-separated)</label>
+                <input class="input" id="sensitiveKeywords" type="text" />
+                <div class="help">If a package name matches, security score increases (e.g., auth, crypto, jwt).</div>
+              </div>
+
+              <div class="field">
+                <label class="label" for="deprecatedKeywords">Deprecated/legacy keywords (comma-separated)</label>
+                <input class="input" id="deprecatedKeywords" type="text" />
+                <div class="help">If a package name matches, maintenance score increases (e.g., request, left-pad, core-js@2).</div>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <button class="btn btn--accent" type="button" id="btnSaveSettings">Save settings</button>
+              <div class="mini">
+                <span class="mini__label">Settings</span>
+                <span class="mini__value" id="settingsStatus">Not saved yet</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__titleRow">
+              <h2 class="h2">Local data</h2>
+              <div class="mini">
+                <span class="mini__label">Storage</span>
+                <span class="mini__value">localStorage</span>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="callout">
+                <div class="callout__title">Data stays on this device</div>
+                <div class="callout__body">
+                  Snapshots, registry records, and settings are stored in your browser’s local storage.
+                  Use Export to download JSON backups.
+                </div>
+              </div>
+
+              <div class="inline">
+                <button class="btn" type="button" id="btnBackupAll">Download backup</button>
+                <label class="btn" for="fileRestore" role="button" tabindex="0">Restore backup</label>
+                <input id="fileRestore" type="file" accept="application/json" hidden />
+              </div>
+
+              <div class="divider"></div>
+
+              <div class="field">
+                <label class="label" for="btnClearAll">Danger zone</label>
+                <button class="btn" type="button" id="btnClearAll">Clear all local data</button>
+                <div class="help">Clears snapshots, registry records, and settings.</div>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="mini">
+                <span class="mini__label">Version</span>
+                <span class="mini__value" id="appVersionLabel">1.0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="zone zone--detail" aria-label="Detail panel">
+      <div class="detail">
+        <div class="detail__header">
+          <h2 class="h2">Detail</h2>
+          <div class="detail__actions">
+            <button class="btn" type="button" id="btnSelectAll">Select all</button>
+            <button class="btn" type="button" id="btnSelectNone">Select none</button>
+          </div>
+        </div>
+
+        <div class="detail__body" id="detailBody">
+          <div class="emptyDetail">
+            <div class="emptyDetail__title">No item selected</div>
+            <div class="emptyDetail__body">Click a row in the triage table to inspect signal breakdown and suggested next steps.</div>
+          </div>
+        </div>
+
+        <div class="detail__footer">
+          <div class="mini">
+            <span class="mini__label">Selected</span>
+            <span class="mini__value" id="selectedCount">0</span>
+          </div>
+          <button class="btn btn--accent" type="button" id="btnExportSelected">Open Export</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <section class="alertTray" aria-label="Alert tray">
+    <div class="alertTray__header">
+      <div class="alertTray__title">Alerts</div>
+      <div class="alertTray__meta">
+        <span class="tag tag--warn" id="alertCountTag">[WARN] 0</span>
+      </div>
+      <div class="alertTray__actions">
+        <button class="btn" type="button" id="btnClearAlerts">Clear</button>
+      </div>
+    </div>
+    <div class="alertTray__body" id="alertTrayBody"></div>
+  </section>
+
+  <script src="./app.js"></script>
+</body>
+</html>
