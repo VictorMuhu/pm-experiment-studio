@@ -1,0 +1,26 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "analytics/debugging tools",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company deciding whether an idea deserves roadmap time without a dedicated strategy/research function",
+  "problem_statement": "Senior product leaders commit roadmap capacity to ideas with untested assumptions because the evaluation is informal, unstructured, and hard to challenge in the moment",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with progressive sections and a live-updating verdict side panel",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "product-strategy",
+    "idea-scoring",
+    "assumption-mapping",
+    "roadmap-prioritization",
+    "decision-rationale",
+    "weakness-detection"
+  ]
+}
