@@ -1,0 +1,26 @@
+{
+  "name": "OKR Bet Scorer",
+  "slug": "okr-bet-scorer",
+  "date_created": "2026-03-17",
+  "bucket": "customer experience tools",
+  "persona": "A PM at a 30–200 person SaaS company preparing a quarterly roadmap proposal and needing a fast, explicit mapping between initiatives and already-set OKRs before the planning sync",
+  "problem_statement": "In quarterly planning, initiatives get funded on vague alignment claims, causing orphan bets and uncovered OKRs because no one performs a consistent, explicit initiative-to-OKR scoring and coverage check.",
+  "complexity": "Simple",
+  "artifact_type": "single-page web app (rubric-based scorer + ranking table + OKR coverage grid)",
+  "style_direction": "dense-analyst-console",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "okr",
+    "roadmap-planning",
+    "prioritization",
+    "strategy-alignment",
+    "scoring-rubric",
+    "portfolio-management"
+  ]
+}
