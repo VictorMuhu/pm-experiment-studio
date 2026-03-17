@@ -1,0 +1,27 @@
+{
+  "name": "Dependency Risk Radar",
+  "slug": "dependency-risk-radar",
+  "date_created": "2026-03-17",
+  "bucket": "PM productivity tools",
+  "persona": "A PM or tech lead at a 50–500 person B2B SaaS company doing dependency due diligence before a major upgrade or vendor switch without dedicated AppSec support",
+  "problem_statement": "When planning an upgrade, teams waste days triangulating dependency health and security across sites and still lack a prioritized, evidence-backed triage list for what to upgrade, replace, or investigate first",
+  "complexity": "Complex",
+  "artifact_type": "two-mode paste-and-triage web app with a sortable risk table and per-dependency evidence drawer",
+  "style_direction": "high-contrast-command",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "dependency-risk",
+    "due-diligence",
+    "security-triage",
+    "upgrade-planning",
+    "npm",
+    "pypi",
+    "cve"
+  ]
+}
