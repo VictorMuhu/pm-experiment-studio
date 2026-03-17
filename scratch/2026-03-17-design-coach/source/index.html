@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Design Coach</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topbar__title">
+        <div class="wordmark">Design Coach</div>
+        <div class="subtitle">Blueprint checks for edge cases and review questions</div>
+      </div>
+      <div class="modechip" role="status" aria-live="polite">
+        <span class="modechip__dot" aria-hidden="true"></span>
+        <span class="modechip__text" id="modeText">Adaptive mode</span>
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="grid" aria-label="Widget grid">
+        <article class="tile tile--wide tile--hero" aria-label="Flow summary">
+          <div class="tile__header">
+            <div class="label">FLOW</div>
+            <div class="tag">
+              <span class="tag__dot" aria-hidden="true"></span>
+              <span class="tag__text" id="domainTag">Checkout</span>
+            </div>
+          </div>
+
+          <div class="hero">
+            <div class="hero__value" id="heroValue">12</div>
+            <div class="hero__label">STEPS</div>
+          </div>
+
+          <div class="heroRow">
+            <div class="miniStat">
+              <div class="miniStat__value" id="coverageValue">67%</div>
+              <div class="miniStat__label">EDGE COVERAGE</div>
+            </div>
+            <div class="miniStat">
+              <div class="miniStat__value" id="riskValue">HIGH</div>
+              <div class="miniStat__label">RISK</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="tile" aria-label="Missing edge cases">
+          <div class="tile__header">
+            <div class="label">MISSING</div>
+          </div>
+          <div class="big">
+            <div class="big__value" id="missingValue">4</div>
+            <div class="big__label">EDGE CASES</div>
+          </div>
+          <div class="hint" id="missingHint">Most teams forget permissions + retries</div>
+        </article>
+
+        <article class="tile" aria-label="Review questions count">
+          <div class="tile__header">
+            <div class="label">REVIEW</div>
+          </div>
+          <div class="big">
+            <div class="big__value" id="questionsValue">9</div>
+            <div class="big__label">QUESTIONS</div>
+          </div>
+          <div class="hint" id="questionsHint">Sorted by “most likely to come up”</div>
+        </article>
+
+        <article class="tile tile--wide" aria-label="Edge case checklist">
+          <div class="tile__header">
+            <div class="label">EDGE CHECKLIST</div>
+            <div class="subtle" id="checklistSub">Tap to toggle</div>
+          </div>
+
+          <div class="checklist" id="checklist" role="group" aria-label="Edge case checklist items">
+            <!-- JS inserts checklist items -->
+          </div>
+        </article>
+
+        <article class="tile tile--wide" aria-label="Coach prompt">
+          <div class="tile__header">
+            <div class="label">COACH</div>
+            <div class="subtle" id="coachSub">One question at a time</div>
+          </div>
+
+          <div class="coach">
+            <div class="coach__question" id="coachQuestion">If the payment fails, what does the user see and what can they do next?</div>
+            <div class="coach__meta" id="coachMeta">From “Failure” category</div>
+          </div>
+
+          <button class="primary" id="nextQuestionBtn" type="button">
+            Next question
+          </button>
+        </article>
+      </section>
+
+      <section class="sheet" id="sheet" aria-label="Flow setup">
+        <div class="sheet__inner">
+          <div class="sheet__titleRow">
+            <div>
+              <div class="sheet__title">Set the flow</div>
+              <div class="sheet__subtitle">Minimal input — pick a domain, set steps, then check edge coverage.</div>
+            </div>
+            <button class="ghost" id="resetBtn" type="button" aria-label="Reset to demo flow">Reset</button>
+          </div>
+
+          <div class="controls" role="group" aria-label="Flow controls">
+            <label class="control">
+              <span class="control__label">DOMAIN</span>
+              <select class="control__select" id="domainSelect" aria-label="Choose domain">
+                <option value="checkout">Checkout</option>
+                <option value="onboarding">Onboarding</option>
+                <option value="settings">Account settings</option>
+                <option value="invite">Team invite</option>
+                <option value="upload">File upload</option>
+              </select>
+            </label>
+
+            <label class="control">
+              <span class="control__label">STEPS</span>
+              <div class="stepper" aria-label="Step count">
+                <button class="stepper__btn" id="stepsDownBtn" type="button" aria-label="Decrease steps">−</button>
+                <div class="stepper__value" id="stepsValue" aria-live="polite">12</div>
+                <button class="stepper__btn" id="stepsUpBtn" type="button" aria-label="Increase steps">+</button>
+              </div>
+            </label>
+          </div>
+
+          <div class="legend" aria-label="Legend">
+            <div class="legend__item">
+              <span class="dot dot--ok" aria-hidden="true"></span>
+              <span class="legend__text">Covered</span>
+            </div>
+            <div class="legend__item">
+              <span class="dot dot--missing" aria-hidden="true"></span>
+              <span class="legend__text">Missing</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar" aria-label="Bottom navigation">
+      <button class="tab tab--active" type="button" aria-current="page">
+        <span class="tab__icon" aria-hidden="true">◼︎</span>
+        <span class="tab__label">Dashboard</span>
+      </button>
+      <button class="tab" type="button" id="tabChecklist">
+        <span class="tab__icon" aria-hidden="true">☑︎</span>
+        <span class="tab__label">Checklist</span>
+      </button>
+      <button class="tab" type="button" id="tabCoach">
+        <span class="tab__icon" aria-hidden="true">❓</span>
+        <span class="tab__label">Coach</span>
+      </button>
+      <button class="tab" type="button" id="tabSetup">
+        <span class="tab__icon" aria-hidden="true">⚙︎</span>
+        <span class="tab__label">Setup</span>
+      </button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true">
+    <div class="toast__inner" id="toastInner">Updated</div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
