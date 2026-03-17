@@ -1,0 +1,26 @@
+{
+  "name": "PM Vibe Agent Run",
+  "slug": "pm-vibe-agent-run",
+  "date_created": "2026-03-17",
+  "bucket": "decision simulators",
+  "persona": "A PM at a 30–300 person B2B SaaS company who must make fast trade-offs in weekly prioritization or escalation reviews without an analyst to sanity-check decision coherence",
+  "problem_statement": "PMs often make time-boxed calls under conflicting stakeholder pressure, and the reasoning collapses in review because the chosen action contradicts the constraints they claimed to be operating under",
+  "complexity": "Intermediate",
+  "artifact_type": "single-page web app decision simulator with timed run + rubric-based grading",
+  "style_direction": "dense-analyst-console",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "decision-making",
+    "prioritization",
+    "trade-offs",
+    "scenario-simulator",
+    "rubric-scoring",
+    "leadership-review"
+  ]
+}
