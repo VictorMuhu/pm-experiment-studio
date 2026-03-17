@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Arial:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar" role="banner">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true"></div>
+        <div class="brand__text">
+          <div class="brand__kicker">IDEA VALIDATOR</div>
+          <div class="brand__title">Pressure-test an idea to a defensible decision</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item" type="button" data-view="scorecard" aria-current="page">Scorecard</button>
+        <button class="nav__item" type="button" data-view="assumptions">Assumptions</button>
+        <button class="nav__item" type="button" data-view="plan">Validation Plan</button>
+        <button class="nav__item" type="button" data-view="archive">Archive</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" role="main">
+    <section class="hero" aria-label="Primary verdict">
+      <div class="hero__left">
+        <div class="label">VERDICT</div>
+        <div class="hero__verdictRow">
+          <div id="verdictText" class="hero__verdict">REFINE</div>
+          <button id="saveSnapshotBtn" class="btn btn--primary" type="button">SAVE SNAPSHOT</button>
+        </div>
+        <div class="hero__sub">
+          <span class="label">WHY</span>
+          <span id="verdictReason" class="muted">Strong demand signal, but differentiation and effort are under-specified.</span>
+        </div>
+      </div>
+      <div class="hero__right">
+        <div class="label">CONFIDENCE</div>
+        <div class="hero__metric">
+          <div id="confidenceNumber" class="metric metric--primary">74</div>
+          <div class="metric__unit">/ 100</div>
+        </div>
+        <div class="hero__sub">
+          <span class="label">PRIMARY RISK</span>
+          <span id="primaryRisk" class="muted">Differentiation is assumed, not evidenced</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule" aria-hidden="true"></div>
+
+    <section class="toolbar" aria-label="Idea selection and actions">
+      <div class="toolbar__left">
+        <div class="field">
+          <label class="field__label" for="ideaSelect">Idea</label>
+          <select id="ideaSelect" class="select">
+            <!-- options injected -->
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="ideaName">Name</label>
+          <input id="ideaName" class="input" type="text" autocomplete="off" />
+        </div>
+
+        <div class="field field--grow">
+          <label class="field__label" for="ideaPitch">One-sentence pitch</label>
+          <input id="ideaPitch" class="input" type="text" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="toolbar__right">
+        <button id="newIdeaBtn" class="btn" type="button">NEW</button>
+        <button id="duplicateIdeaBtn" class="btn" type="button">DUPLICATE</button>
+        <button id="exportBtn" class="btn" type="button">EXPORT</button>
+        <button id="resetDemoBtn" class="btn btn--danger" type="button">RESET DEMO</button>
+      </div>
+    </section>
+
+    <section id="view-scorecard" class="view" data-view="scorecard" aria-label="Scorecard view">
+      <div class="grid2">
+        <div class="panel card">
+          <div class="panel__header">
+            <div>
+              <div class="label">SCORECARD</div>
+              <h2 class="h2">Dimensions (0–5) with explicit evidence</h2>
+            </div>
+            <div class="panel__meta">
+              <div class="metaRow">
+                <span class="label">WEAK DIMENSIONS</span>
+                <span id="weakCount" class="metaValue">—</span>
+              </div>
+              <div class="metaRow">
+                <span class="label">NEXT ACTION</span>
+                <span id="nextAction" class="metaValue">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tableWrap" role="region" aria-label="Dimensions table" tabindex="0">
+            <table class="table" aria-describedby="dimensionsHelp">
+              <thead>
+                <tr>
+                  <th scope="col">DIMENSION</th>
+                  <th scope="col">WEIGHT</th>
+                  <th scope="col">SCORE</th>
+                  <th scope="col">EVIDENCE (WHAT DO WE KNOW?)</th>
+                </tr>
+              </thead>
+              <tbody id="dimensionsTbody">
+                <!-- rows injected -->
+              </tbody>
+            </table>
+          </div>
+          <div id="dimensionsHelp" class="help">
+            Scores must be justified. Low-score rows auto-create assumptions and plan tasks.
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="panel__header">
+            <div>
+              <div class="label">TAKEAWAY</div>
+              <h2 class="h2">Board-ready summary (editable)</h2>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="field">
+              <label class="field__label" for="execSummary">Executive summary</label>
+              <textarea id="execSummary" class="textarea" rows="7"></textarea>
+            </div>
+
+            <div class="grid2 grid2--tight">
+              <div class="field">
+                <label class="field__label" for="targetUser">Target user</label>
+                <input id="targetUser" class="input" type="text" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label class="field__label" for="decisionOwner">Decision owner</label>
+                <input id="decisionOwner" class="input" type="text" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="grid2 grid2--tight">
+              <div class="field">
+                <label class="field__label" for="timeHorizon">Time horizon</label>
+                <input id="timeHorizon" class="input" type="text" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label class="field__label" for="budgetBand">Budget band</label>
+                <input id="budgetBand" class="input" type="text" autocomplete="off" />
+              </div>
+            </div>
+
+            <div class="rule" aria-hidden="true"></div>
+
+            <div class="stack">
+              <div class="label">AUTOMATED FLAGS</div>
+              <ul id="flagsList" class="bullets" aria-label="Flags list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-assumptions" class="view is-hidden" data-view="assumptions" aria-label="Assumptions view">
+      <div class="panel card">
+        <div class="panel__header">
+          <div>
+            <div class="label">ASSUMPTIONS</div>
+            <h2 class="h2">What must be true — and how risky that is</h2>
+          </div>
+          <div class="panel__meta">
+            <div class="metaRow">
+              <span class="label">OPEN</span>
+              <span id="assumptionsOpenCount" class="metaValue">—</span>
+            </div>
+            <div class="metaRow">
+              <span class="label">HIGH RISK</span>
+              <span id="assumptionsHighRiskCount" class="metaValue">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters" aria-label="Assumption filters">
+          <div class="field">
+            <label class="field__label" for="assumptionFilterStatus">Status</label>
+            <select id="assumptionFilterStatus" class="select">
+              <option value="all">All</option>
+              <option value="open">Open</option>
+              <option value="validated">Validated</option>
+              <option value="invalidated">Invalidated</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="assumptionFilterRisk">Risk</label>
+            <select id="assumptionFilterRisk" class="select">
+              <option value="all">All</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+          <div class="field field--grow">
+            <label class="field__label" for="assumptionSearch">Search</label>
+            <input id="assumptionSearch" class="input" type="text" placeholder="Type to filter…" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="assumptionSort">Sort</label>
+            <select id="assumptionSort" class="select">
+              <option value="risk-desc">Risk (high → low)</option>
+              <option value="status-open">Status (open first)</option>
+              <option value="dimension">Dimension</option>
+              <option value="recent">Recently updated</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actionsRow">
+          <button id="addAssumptionBtn" class="btn" type="button">ADD ASSUMPTION</button>
+          <button id="bulkValidateBtn" class="btn" type="button">MARK FILTERED AS VALIDATED</button>
+          <div class="actionsRow__note muted">
+            <span class="label">RULE</span>
+            <span>Validated assumptions increase confidence; invalidated ones force “DROP”.</span>
+          </div>
+        </div>
+
+        <div class="tableWrap" role="region" aria-label="Assumptions table" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">ASSUMPTION</th>
+                <th scope="col">DIMENSION</th>
+                <th scope="col">RISK</th>
+                <th scope="col">TEST</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">NOTES</th>
+                <th scope="col">UPDATED</th>
+                <th scope="col">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="assumptionsTbody">
+              <!-- rows injected -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="help">
+          Assumptions are generated when a dimension is scored ≤ 2 or evidence is blank. You can edit them directly.
+        </div>
+      </div>
+    </section>
+
+    <section id="view-plan" class="view is-hidden" data-view="plan" aria-label="Validation plan view">
+      <div class="grid2">
+        <div class="panel card">
+          <div class="panel__header">
+            <div>
+              <div class="label">VALIDATION PLAN</div>
+              <h2 class="h2">A sequence of tests that resolves the highest-risk unknowns first</h2>
+            </div>
+            <div class="panel__meta">
+              <div class="metaRow">
+                <span class="label">PLAN LENGTH</span>
+                <span id="planCount" class="metaValue">—</span>
+              </div>
+              <div class="metaRow">
+                <span class="label">EST. DAYS</span>
+                <span id="planDays" class="metaValue">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="actionsRow">
+            <button id="autoPlanBtn" class="btn btn--primary" type="button">REBUILD PLAN FROM ASSUMPTIONS</button>
+            <button id="addPlanTaskBtn" class="btn" type="button">ADD TASK</button>
+            <div class="actionsRow__note muted">
+              <span class="label">ORDER</span>
+              <span>Drag is intentionally omitted. Reorder with ↑ / ↓ to keep it deliberate.</span>
+            </div>
+          </div>
+
+          <div class="tableWrap" role="region" aria-label="Plan table" tabindex="0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">TASK</th>
+                  <th scope="col">METHOD</th>
+                  <th scope="col">OWNER</th>
+                  <th scope="col">EFFORT</th>
+                  <th scope="col">SUCCESS CRITERIA</th>
+                  <th scope="col">STATUS</th>
+                  <th scope="col">REORDER</th>
+                </tr>
+              </thead>
+              <tbody id="planTbody">
+                <!-- rows injected -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="help">
+            Effort is a planning aid (S/M/L). The tool recommends effort based on method, but you can override.
+          </div>
+        </div>
+
+        <div class="panel card">
+          <div class="panel__header">
+            <div>
+              <div class="label">DECISION MEMO</div>
+              <h2 class="h2">Copy/paste-ready summary for exec review</h2>
+            </div>
+          </div>
+
+          <div class="stack">
+            <div class="field">
+              <label class="field__label" for="memoOutput">Memo</label>
+              <textarea id="memoOutput" class="textarea" rows="15" readonly></textarea>
+            </div>
+            <div class="actionsRow actionsRow--right">
+              <button id="copyMemoBtn" class="btn btn--primary" type="button">COPY MEMO</button>
+              <button id="refreshMemoBtn" class="btn" type="button">REFRESH</button>
+            </div>
+            <div id="copyToast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-archive" class="view is-hidden" data-view="archive" aria-label="Archive view">
+      <div class="panel card">
+        <div class="panel__header">
+          <div>
+            <div class="label">ARCHIVE</div>
+            <h2 class="h2">Saved snapshots — what you believed at the time</h2>
+          </div>
+          <div class="panel__meta">
+            <div class="metaRow">
+              <span class="label">SNAPSHOTS</span>
+              <span id="snapshotCount" class="metaValue">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="filters" aria-label="Archive filters">
+          <div class="field field--grow">
+            <label class="field__label" for="archiveSearch">Search</label>
+            <input id="archiveSearch" class="input" type="text" placeholder="Idea name, verdict, key risk…" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label class="field__label" for="archiveSort">Sort</label>
+            <select id="archiveSort" class="select">
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="confidence-desc">Confidence (high → low)</option>
+              <option value="verdict">Verdict</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="archiveVerdict">Verdict</label>
+            <select id="archiveVerdict" class="select">
+              <option value="all">All</option>
+              <option value="commit">Commit</option>
+              <option value="refine">Refine</option>
+              <option value="drop">Drop</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tableWrap" role="region" aria-label="Snapshots table" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">CAPTURED</th>
+                <th scope="col">IDEA</th>
+                <th scope="col">VERDICT</th>
+                <th scope="col">CONF.</th>
+                <th scope="col">PRIMARY RISK</th>
+                <th scope="col">NOTES</th>
+                <th scope="col">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="archiveTbody">
+              <!-- rows injected -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="help">
+          Snapshots are immutable. Use them to compare how scores changed after validation.
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer" role="contentinfo">
+      <div class="rule" aria-hidden="true"></div>
+      <div class="footer__inner">
+        <div class="muted">
+          <span class="label">LOCAL</span>
+          <span>All data stays in your browser (localStorage).</span>
+        </div>
+        <div class="muted footer__right">
+          <span class="label">SHORTCUTS</span>
+          <span>Ctrl/⌘+S save snapshot • Ctrl/⌘+K jump views</span>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div id="modalOverlay" class="modalOverlay is-hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal card">
+      <div class="modal__header">
+        <div>
+          <div class="label" id="modalKicker">EDIT</div>
+          <h2 id="modalTitle" class="h2">Item</h2>
+        </div>
+        <button id="modalCloseBtn" class="btn" type="button">CLOSE</button>
+      </div>
+      <div class="modal__body">
+        <div id="modalBody"><!-- injected --></div>
+      </div>
+      <div class="modal__footer">
+        <button id="modalSecondaryBtn" class="btn" type="button">CANCEL</button>
+        <button id="modalPrimaryBtn" class="btn btn--primary" type="button">SAVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
