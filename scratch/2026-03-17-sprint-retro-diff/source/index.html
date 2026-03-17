@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sprint Retro Diff</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar__brand">
+        <div class="brand-mark" aria-hidden="true">🧩</div>
+        <div class="brand-text">
+          <div class="brand-title">Sprint Retro Diff</div>
+          <div class="brand-subtitle">Two-sprint comparison worksheet</div>
+        </div>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="icon-btn" id="btnLoadDemo" type="button" title="Load realistic demo data" aria-label="Load realistic demo data">
+          <span aria-hidden="true">✨</span>
+          <span class="icon-btn__label">Demo</span>
+        </button>
+        <button class="icon-btn" id="btnReset" type="button" title="Reset" aria-label="Reset">
+          <span aria-hidden="true">🔄</span>
+          <span class="icon-btn__label">Reset</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="main" class="main">
+      <section class="hero full-bleed">
+        <div class="container hero__inner">
+          <div class="hero__copy">
+            <h1 class="hero__title">Turn “it felt better” into a retro-ready story.</h1>
+            <p class="hero__lede">
+              Compare the last two sprints with a quick worksheet—velocity, scope churn, and blocker notes—
+              and get a structured “what likely moved the needle” summary.
+            </p>
+
+            <div class="hero__meta">
+              <div class="pill-tag pill-tag--accent3" role="note" aria-label="Progress">
+                <span aria-hidden="true">🧠</span>
+                <span><strong id="progressLabel">Step 1 of 3</strong></span>
+              </div>
+              <div class="pill-tag pill-tag--accent2" role="note" aria-label="Local only">
+                <span aria-hidden="true">🔒</span>
+                <span>Runs locally (no uploads)</span>
+              </div>
+            </div>
+
+            <div class="hero__cta">
+              <button class="btn btn--primary" id="btnPrimaryCta" type="button">
+                <span class="btn__icon" aria-hidden="true">🚀</span>
+                <span class="btn__label">Start</span>
+              </button>
+              <button class="btn btn--secondary" id="btnJumpOutput" type="button">
+                <span class="btn__icon" aria-hidden="true">🧾</span>
+                <span class="btn__label">Jump to summary</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="hero__scorecard" aria-label="Quick delta preview">
+            <div class="scorecard card card--accent2">
+              <div class="scorecard__title">Delta preview</div>
+              <div class="scorecard__row">
+                <div class="score metric">
+                  <div class="metric__label">Velocity</div>
+                  <div class="metric__value" id="previewVelocity">—</div>
+                </div>
+                <div class="score metric">
+                  <div class="metric__label">Scope churn</div>
+                  <div class="metric__value" id="previewChurn">—</div>
+                </div>
+              </div>
+              <div class="scorecard__row">
+                <div class="score metric">
+                  <div class="metric__label">Blockers</div>
+                  <div class="metric__value" id="previewBlockers">—</div>
+                </div>
+                <div class="score metric">
+                  <div class="metric__label">Signal</div>
+                  <div class="metric__value" id="previewSignal">—</div>
+                </div>
+              </div>
+              <p class="scorecard__hint">
+                Fill the worksheet to update this live. Use <strong>Demo</strong> for realistic starter data.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section" aria-label="Step content">
+        <div class="stepper" role="tablist" aria-label="Worksheet steps">
+          <button class="stepper__tab" type="button" data-step="1" role="tab" aria-controls="panel-step-1" aria-selected="true">
+            <span class="stepper__emoji" aria-hidden="true">📈</span>
+            <span class="stepper__label">Numbers</span>
+          </button>
+          <button class="stepper__tab" type="button" data-step="2" role="tab" aria-controls="panel-step-2" aria-selected="false">
+            <span class="stepper__emoji" aria-hidden="true">🧯</span>
+            <span class="stepper__label">Events</span>
+          </button>
+          <button class="stepper__tab" type="button" data-step="3" role="tab" aria-controls="panel-step-3" aria-selected="false">
+            <span class="stepper__emoji" aria-hidden="true">🧾</span>
+            <span class="stepper__label">Summary</span>
+          </button>
+        </div>
+
+        <div class="panel-stack">
+          <section class="panel card card--accent3" id="panel-step-1" role="tabpanel" aria-label="Step 1: Numbers">
+            <div class="panel__header">
+              <h2 class="panel__title">Step 1 — Put in the facts</h2>
+              <p class="panel__subtitle">Keep it lightweight. The goal is a defensible delta, not perfect accounting.</p>
+            </div>
+
+            <div class="grid-two">
+              <div class="card inner-card">
+                <div class="inner-card__title">
+                  <span aria-hidden="true">🏁</span> Sprint A (previous)
+                </div>
+
+                <label class="field">
+                  <span class="field__label">Sprint name</span>
+                  <input class="input" id="aName" type="text" placeholder="e.g., Sprint 24 (Feb 3–14)" maxlength="64">
+                </label>
+
+                <div class="grid-two grid-two--tight">
+                  <label class="field">
+                    <span class="field__label">Velocity (points)</span>
+                    <input class="input" id="aVelocity" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 31">
+                  </label>
+                  <label class="field">
+                    <span class="field__label">Planned points</span>
+                    <input class="input" id="aPlanned" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 38">
+                  </label>
+                </div>
+
+                <div class="grid-two grid-two--tight">
+                  <label class="field">
+                    <span class="field__label">Team days lost</span>
+                    <input class="input" id="aDaysLost" type="number" min="0" step="0.5" inputmode="decimal" placeholder="e.g., 2.0">
+                  </label>
+                  <label class="field">
+                    <span class="field__label">On-call / incidents</span>
+                    <input class="input" id="aIncidents" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 3">
+                  </label>
+                </div>
+
+                <label class="field">
+                  <span class="field__label">Quality notes (optional)</span>
+                  <textarea class="textarea" id="aQuality" rows="3" placeholder="e.g., 2 hotfixes; flaky E2E slowed merges"></textarea>
+                </label>
+              </div>
+
+              <div class="card inner-card">
+                <div class="inner-card__title">
+                  <span aria-hidden="true">🌟</span> Sprint B (most recent)
+                </div>
+
+                <label class="field">
+                  <span class="field__label">Sprint name</span>
+                  <input class="input" id="bName" type="text" placeholder="e.g., Sprint 25 (Feb 17–28)" maxlength="64">
+                </label>
+
+                <div class="grid-two grid-two--tight">
+                  <label class="field">
+                    <span class="field__label">Velocity (points)</span>
+                    <input class="input" id="bVelocity" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 42">
+                  </label>
+                  <label class="field">
+                    <span class="field__label">Planned points</span>
+                    <input class="input" id="bPlanned" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 40">
+                  </label>
+                </div>
+
+                <div class="grid-two grid-two--tight">
+                  <label class="field">
+                    <span class="field__label">Team days lost</span>
+                    <input class="input" id="bDaysLost" type="number" min="0" step="0.5" inputmode="decimal" placeholder="e.g., 0.5">
+                  </label>
+                  <label class="field">
+                    <span class="field__label">On-call / incidents</span>
+                    <input class="input" id="bIncidents" type="number" min="0" step="1" inputmode="numeric" placeholder="e.g., 1">
+                  </label>
+                </div>
+
+                <label class="field">
+                  <span class="field__label">Quality notes (optional)</span>
+                  <textarea class="textarea" id="bQuality" rows="3" placeholder="e.g., no hotfixes; release cut on time"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="panel__footerLeft">
+                <div class="pill-tag pill-tag--accent" id="numbersHint">
+                  <span aria-hidden="true">🧮</span>
+                  <span>Tip: “Days lost” is a great equalizer when velocity swings.</span>
+                </div>
+              </div>
+              <div class="panel__footerRight">
+                <button class="btn btn--primary" id="btnNextFrom1" type="button">
+                  <span class="btn__icon" aria-hidden="true">➡️</span>
+                  <span class="btn__label">Next: events</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel card card--accent" id="panel-step-2" role="tabpanel" aria-label="Step 2: Events" hidden>
+            <div class="panel__header">
+              <h2 class="panel__title">Step 2 — Track what changed</h2>
+              <p class="panel__subtitle">
+                Add scope-change events and blockers for each sprint. Keep notes short—your future self will thank you.
+              </p>
+            </div>
+
+            <div class="section-split full-bleed">
+              <div class="container section-split__inner">
+                <div class="split-title">
+                  <div class="split-title__emoji" aria-hidden="true">🧩</div>
+                  <div>
+                    <div class="split-title__label">Scope changes</div>
+                    <div class="split-title__hint">Add the events you’d point to in a retro.</div>
+                  </div>
+                </div>
+
+                <div class="grid-two">
+                  <div class="card inner-card inner-card--tint2">
+                    <div class="inner-card__title">
+                      <span aria-hidden="true">🏁</span> Sprint A scope changes
+                    </div>
+
+                    <form class="inline-form" id="formScopeA">
+                      <label class="field field--inline">
+                        <span class="sr-only">Type</span>
+                        <select class="select" id="scopeAType">
+                          <option value="added">Added</option>
+                          <option value="removed">Removed</option>
+                          <option value="changed">Changed</option>
+                        </select>
+                      </label>
+                      <label class="field field--inline">
+                        <span class="sr-only">Points</span>
+                        <input class="input" id="scopeAPoints" type="number" min="0" step="1" inputmode="numeric" placeholder="pts">
+                      </label>
+                      <label class="field field--grow field--inline">
+                        <span class="sr-only">Note</span>
+                        <input class="input" id="scopeANote" type="text" maxlength="90" placeholder="e.g., Added SSO: enterprise deal unblock">
+                      </label>
+                      <button class="btn btn--primary btn--small" type="submit">
+                        <span class="btn__icon" aria-hidden="true">➕</span>
+                        <span class="btn__label">Add</span>
+                      </button>
+                    </form>
+
+                    <div class="list" id="scopeAList" aria-label="Sprint A scope change list"></div>
+                  </div>
+
+                  <div class="card inner-card inner-card--tint2">
+                    <div class="inner-card__title">
+                      <span aria-hidden="true">🌟</span> Sprint B scope changes
+                    </div>
+
+                    <form class="inline-form" id="formScopeB">
+                      <label class="field field--inline">
+                        <span class="sr-only">Type</span>
+                        <select class="select" id="scopeBType">
+                          <option value="added">Added</option>
+                          <option value="removed">Removed</option>
+                          <option value="changed">Changed</option>
+                        </select>
+                      </label>
+                      <label class="field field--inline">
+                        <span class="sr-only">Points</span>
+                        <input class="input" id="scopeBPoints" type="number" min="0" step="1" inputmode="numeric" placeholder="pts">
+                      </label>
+                      <label class="field field--grow field--inline">
+                        <span class="sr-only">Note</span>
+                        <input class="input" id="scopeBNote" type="text" maxlength="90" placeholder="e.g., Removed export rewrite: too risky mid-sprint">
+                      </label>
+                      <button class="btn btn--primary btn--small" type="submit">
+                        <span class="btn__icon" aria-hidden="true">➕</span>
+                        <span class="btn__label">Add</span>
+                      </button>
+                    </form>
+
+                    <div class="list" id="scopeBList" aria-label="Sprint B scope change list"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section-split full-bleed section-split--accent3">
+              <div class="container section-split__inner">
+                <div class="split-title">
+                  <div class="split-title__emoji" aria-hidden="true">🧯</div>
+                  <div>
+                    <div class="split-title__label">Blockers</div>
+                    <div class="split-title__hint">Capture the things that interrupted flow.</div>
+                  </div>
+                </div>
+
+                <div class="grid-two">
+                  <div class="card inner-card inner-card--tint3">
+                    <div class="inner-card__title">
+                      <span aria-hidden="true">🏁</span> Sprint A blockers
+                    </div>
+
+                    <form class="inline-form" id="formBlockerA">
+                      <label class="field field--inline">
+                        <span class="sr-only">Severity</span>
+                        <select class="select" id="blockerASeverity">
+                          <option value="high">High</option>
+                          <option value="medium" selected>Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </label>
+                      <label class="field field--inline">
+                        <span class="sr-only">Days</span>
+                        <input class="input" id="blockerADays" type="number" min="0" step="0.5" inputmode="decimal" placeholder="days">
+                      </label>
+                      <label class="field field--grow field--inline">
+                        <span class="sr-only">Note</span>
+                        <input class="input" id="blockerANote" type="text" maxlength="90" placeholder="e.g., Data backfill stalled merges for 1.5d">
+                      </label>
+                      <button class="btn btn--primary btn--small" type="submit">
+                        <span class="btn__icon" aria-hidden="true">➕</span>
+                        <span class="btn__label">Add</span>
+                      </button>
+                    </form>
+
+                    <div class="list" id="blockerAList" aria-label="Sprint A blocker list"></div>
+                  </div>
+
+                  <div class="card inner-card inner-card--tint3">
+                    <div class="inner-card__title">
+                      <span aria-hidden="true">🌟</span> Sprint B blockers
+                    </div>
+
+                    <form class="inline-form" id="formBlockerB">
+                      <label class="field field--inline">
+                        <span class="sr-only">Severity</span>
+                        <select class="select" id="blockerBSeverity">
+                          <option value="high">High</option>
+                          <option value="medium" selected>Medium</option>
+                          <option value="low">Low</option>
+                        </select>
+                      </label>
+                      <label class="field field--inline">
+                        <span class="sr-only">Days</span>
+                        <input class="input" id="blockerBDays" type="number" min="0" step="0.5" inputmode="decimal" placeholder="days">
+                      </label>
+                      <label class="field field--grow field--inline">
+                        <span class="sr-only">Note</span>
+                        <input class="input" id="blockerBNote" type="text" maxlength="90" placeholder="e.g., Auth library upgrade caused 0.5d rework">
+                      </label>
+                      <button class="btn btn--primary btn--small" type="submit">
+                        <span class="btn__icon" aria-hidden="true">➕</span>
+                        <span class="btn__label">Add</span>
+                      </button>
+                    </form>
+
+                    <div class="list" id="blockerBList" aria-label="Sprint B blocker list"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="panel__footerLeft">
+                <div class="pill-tag pill-tag--accent2" id="eventsHint">
+                  <span aria-hidden="true">🎯</span>
+                  <span>Tip: “Changed” is for rework—same ticket, new shape.</span>
+                </div>
+              </div>
+              <div class="panel__footerRight">
+                <button class="btn btn--ghost" id="btnBackFrom2" type="button">
+                  <span class="btn__icon" aria-hidden="true">⬅️</span>
+                  <span class="btn__label">Back</span>
+                </button>
+                <button class="btn btn--primary" id="btnNextFrom2" type="button">
+                  <span class="btn__icon" aria-hidden="true">➡️</span>
+                  <span class="btn__label">Next: summary</span>
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel card card--accent2" id="panel-step-3" role="tabpanel" aria-label="Step 3: Summary" hidden>
+            <div class="panel__header">
+              <h2 class="panel__title">Step 3 — Your retro-ready summary</h2>
+              <p class="panel__subtitle">
+                This isn’t “the truth.” It’s a structured hypothesis you can sanity-check with the team.
+              </p>
+            </div>
+
+            <div class="summary-grid">
+              <div class="card inner-card inner-card--tint2">
+                <div class="inner-card__title">
+                  <span aria-hidden="true">🧭</span> What likely moved the needle
+                </div>
+                <div class="insights" id="insightsList" aria-label="Insights list"></div>
+              </div>
+
+              <div class="card inner-card inner-card--tint3">
+                <div class="inner-card__title">
+                  <span aria-hidden="true">🧪</span> Keep / Stop / Try next sprint
+                </div>
+                <div class="kst" id="kstList" aria-label="Keep stop try list"></div>
+              </div>
+
+              <div class="card inner-card">
+                <div class="inner-card__title">
+                  <span aria-hidden="true">📋</span> Copy-paste block
+                </div>
+                <div class="copybox">
+                  <textarea class="textarea textarea--monoish" id="copyText" rows="10" readonly></textarea>
+                  <div class="copybox__actions">
+                    <button class="btn btn--primary" id="btnCopy" type="button">
+                      <span class="btn__icon" aria-hidden="true">📎</span>
+                      <span class="btn__label">Copy</span>
+                    </button>
+                    <button class="btn btn--secondary" id="btnRegen" type="button">
+                      <span class="btn__icon" aria-hidden="true">🔁</span>
+                      <span class="btn__label">Refresh</span>
+                    </button>
+                  </div>
+                  <div class="copybox__note" id="copyNote" role="status" aria-live="polite"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel__footer">
+              <div class="panel__footerLeft">
+                <div class="pill-tag pill-tag--accent3" id="celebrateTag" hidden>
+                  <span aria-hidden="true">🎉</span>
+                  <span>Summary ready—paste it into your retro doc.</span>
+                </div>
+              </div>
+              <div class="panel__footerRight">
+                <button class="btn btn--ghost" id="btnBackFrom3" type="button">
+                  <span class="btn__icon" aria-hidden="true">⬅️</span>
+                  <span class="btn__label">Back</span>
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Bottom navigation">
+      <button class="bottom-nav__item is-active" type="button" data-step="1" aria-label="Numbers tab">
+        <span class="bottom-nav__icon" aria-hidden="true">📈</span>
+        <span class="bottom-nav__label">Numbers</span>
+      </button>
+      <button class="bottom-nav__item" type="button" data-step="2" aria-label="Events tab">
+        <span class="bottom-nav__icon" aria-hidden="true">🧯</span>
+        <span class="bottom-nav__label">Events</span>
+      </button>
+      <button class="bottom-nav__item" type="button" data-step="3" aria-label="Summary tab">
+        <span class="bottom-nav__icon" aria-hidden="true">🧾</span>
+        <span class="bottom-nav__label">Summary</span>
+      </button>
+      <button class="bottom-nav__item" type="button" id="navDemo" aria-label="Load demo">
+        <span class="bottom-nav__icon" aria-hidden="true">✨</span>
+        <span class="bottom-nav__label">Demo</span>
+      </button>
+    </nav>
+  </div>
+  <script src="./app.js"></script>
+</body>
+</html>
