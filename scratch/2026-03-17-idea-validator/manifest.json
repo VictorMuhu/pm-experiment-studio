@@ -1,0 +1,26 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "PM productivity tools",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company deciding whether an idea deserves roadmap time without dedicated strategy or research support",
+  "problem_statement": "In roadmap planning, teams commit to ideas with vague value props and untested assumptions, discovering basic risks only after design and engineering time is already spent",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with a live-updating rubric, assumptions breakdown, weakness flags, and a sticky verdict panel",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "product-discovery",
+    "roadmap-triage",
+    "idea-evaluation",
+    "assumptions",
+    "prioritization",
+    "decision-support"
+  ]
+}
