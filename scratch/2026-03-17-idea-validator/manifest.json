@@ -1,0 +1,25 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "decision simulators",
+  "persona": "A Head of Product or founder at a 20–150 person B2B SaaS company deciding whether an idea deserves a discovery sprint under limited research bandwidth",
+  "problem_statement": "Teams commit roadmap time to exciting ideas before pressure-testing assumptions, leading to late discovery of vague value props, crowded alternatives, or hidden complexity",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with real-time scoring, weakness flags, assumption breakdown, and a persistent verdict side panel",
+  "style_direction": "editorial-elegance",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "published",
+  "publish_recommendation": "yes",
+  "tags": [
+    "product-strategy",
+    "idea-intake",
+    "assumption-mapping",
+    "decision-rubric",
+    "roadmap"
+  ]
+}
