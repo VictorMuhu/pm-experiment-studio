@@ -31,7 +31,11 @@ jobs:
         working-directory: projects/2026-03-17-design-coach
         env:
           VITE_BASE_PATH: /pm-experiment-studio/projects/2026-03-17-design-coach/
+ meta/github-pages-deploy
+        run: npm install --legacy-peer-deps && npm run build
+=======
         run: npm install && npm run build
+ main
 
       # Assemble the Pages artifact under _site/
       # Each project goes in its own subdirectory so future projects can be added.
