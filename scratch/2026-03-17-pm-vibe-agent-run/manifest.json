@@ -1,0 +1,25 @@
+{
+  "name": "PM Vibe Agent Run",
+  "slug": "pm-vibe-agent-run",
+  "date_created": "2026-03-17",
+  "bucket": "analytics/debugging tools",
+  "persona": "A PM at a 30–200 person B2B SaaS company triaging a sudden KPI spike/drop in Slack and needing a coordinated first-hour investigation plan without a formal data-on-call process",
+  "problem_statement": "When a KPI moves suddenly, PMs default to ad hoc checks and underspecified analyst asks, causing missed hypothesis categories and slow, noisy investigation loops",
+  "complexity": "Intermediate",
+  "artifact_type": "single-page web app that generates a structured anomaly investigation run plan (checklist + brief export)",
+  "style_direction": "high-contrast-command",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "anomaly-triage",
+    "analytics-investigation",
+    "incident-brief",
+    "hypothesis-checklist",
+    "metric-debugging"
+  ]
+}

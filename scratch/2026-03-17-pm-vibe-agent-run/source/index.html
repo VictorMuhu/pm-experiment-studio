@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PM Vibe Agent Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" role="banner" aria-label="Command bar">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__title">PM Vibe Agent Run</div>
+          <div class="brand__sub">Anomaly investigation run log builder</div>
+        </div>
+      </div>
+
+      <nav class="topbar__nav" aria-label="Primary navigation">
+        <button class="navbtn is-active" type="button" data-view="run">Run</button>
+        <button class="navbtn" type="button" data-view="brief">Brief</button>
+        <button class="navbtn" type="button" data-view="data">Data Cuts</button>
+      </nav>
+
+      <div class="topbar__right">
+        <div class="statusline" aria-label="Current run status">
+          <div class="statusline__item">
+            <span class="label">Run</span>
+            <span class="value" id="runName">—</span>
+          </div>
+          <div class="statusline__divider"></div>
+          <div class="statusline__item">
+            <span class="label">Confidence</span>
+            <span class="value value--mono" id="confidenceValue">—</span>
+          </div>
+          <div class="statusline__item">
+            <span class="label">Completed</span>
+            <span class="value value--mono" id="completedValue">—</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="statusbar" aria-label="Status bar">
+      <div class="statusbar__left">
+        <div class="pill">
+          <span class="pill__k">Metric</span>
+          <span class="pill__v" id="metricPill">—</span>
+        </div>
+        <div class="pill">
+          <span class="pill__k">Window</span>
+          <span class="pill__v" id="windowPill">—</span>
+        </div>
+        <div class="pill">
+          <span class="pill__k">Direction</span>
+          <span class="pill__v" id="directionPill">—</span>
+        </div>
+        <div class="pill">
+          <span class="pill__k">Magnitude</span>
+          <span class="pill__v" id="magnitudePill">—</span>
+        </div>
+      </div>
+
+      <div class="statusbar__center">
+        <div class="modegroup" role="group" aria-label="View mode">
+          <span class="label">Mode</span>
+          <div class="seg" aria-label="Mode toggle">
+            <button type="button" class="seg__btn is-active" data-mode="triage">Triage</button>
+            <button type="button" class="seg__btn" data-mode="deepdive">Deep dive</button>
+          </div>
+        </div>
+
+        <div class="modegroup" role="group" aria-label="Filter">
+          <span class="label">Filter</span>
+          <div class="seg" aria-label="Item filter toggle">
+            <button type="button" class="seg__btn is-active" data-filter="open">Open</button>
+            <button type="button" class="seg__btn" data-filter="all">All</button>
+          </div>
+        </div>
+
+        <div class="modegroup" role="group" aria-label="Sort">
+          <span class="label">Sort</span>
+          <div class="seg" aria-label="Sort toggle">
+            <button type="button" class="seg__btn is-active" data-sort="priority">Priority</button>
+            <button type="button" class="seg__btn" data-sort="time">Time</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="statusbar__right">
+        <button class="btn" type="button" id="btnExport" aria-label="Export brief to clipboard">
+          Export brief
+        </button>
+        <button class="btn" type="button" id="btnReset" aria-label="Reset run to demo state">
+          Reset demo
+        </button>
+      </div>
+    </section>
+
+    <main class="grid" role="main" aria-label="Run console">
+      <section class="zone zone--main" aria-label="Main view">
+        <div class="zone__header">
+          <h2 class="zone__title">Run plan</h2>
+          <div class="zone__meta">
+            <div class="tag tag--ok" id="runSeverityTag">[OK]</div>
+            <div class="hint" id="runHint">Select an item to see details.</div>
+          </div>
+        </div>
+
+        <div class="split">
+          <section class="panel panel--tasks" aria-label="Checklist">
+            <div class="panel__header">
+              <div class="panel__title">Checklist</div>
+              <div class="panel__tools">
+                <span class="label">Quick add</span>
+                <button class="btn btn--sm" type="button" id="btnAddTask">Add item</button>
+              </div>
+            </div>
+
+            <div class="tablewrap" role="region" aria-label="Checklist table" tabindex="0">
+              <table class="table" aria-describedby="tableDesc">
+                <caption class="sr-only" id="tableDesc">Checklist items with priority, timebox, owner, and status.</caption>
+                <thead>
+                  <tr>
+                    <th scope="col" class="col--prio">PRIO</th>
+                    <th scope="col">ACTION</th>
+                    <th scope="col">OWNER</th>
+                    <th scope="col" class="col--time col--num">TIME</th>
+                    <th scope="col">STATE</th>
+                  </tr>
+                </thead>
+                <tbody id="taskTbody"></tbody>
+              </table>
+            </div>
+
+            <div class="panel__footer">
+              <div class="counts" aria-label="Counts">
+                <div class="counts__item">
+                  <span class="label">Open</span>
+                  <span class="value value--mono" id="openCount">—</span>
+                </div>
+                <div class="counts__item">
+                  <span class="label">Blocked</span>
+                  <span class="value value--mono" id="blockedCount">—</span>
+                </div>
+                <div class="counts__item">
+                  <span class="label">Completed</span>
+                  <span class="value value--mono" id="doneCount">—</span>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel--hypotheses" aria-label="Hypothesis queue">
+            <div class="panel__header">
+              <div class="panel__title">Hypothesis queue</div>
+              <div class="panel__tools">
+                <span class="label">Confidence</span>
+                <div class="gauge" aria-label="Confidence gauge">
+                  <div class="gauge__ring" aria-hidden="true">
+                    <svg viewBox="0 0 44 44" width="44" height="44" focusable="false" aria-hidden="true">
+                      <circle class="gauge__track" cx="22" cy="22" r="18"></circle>
+                      <circle class="gauge__value" cx="22" cy="22" r="18"></circle>
+                    </svg>
+                    <div class="gauge__num value--mono" id="gaugeNum">—</div>
+                  </div>
+                  <div class="gauge__meta">
+                    <div class="label">Target: ≥ 70</div>
+                    <div class="hint">Increases as checks are confirmed.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cardlist" id="hypList" role="list" aria-label="Hypothesis list"></div>
+          </section>
+        </div>
+      </section>
+
+      <aside class="zone zone--detail" aria-label="Detail panel">
+        <div class="zone__header">
+          <h2 class="zone__title">Inspector</h2>
+          <div class="zone__meta">
+            <div class="tag tag--warn" id="selectionTag">[WARN]</div>
+            <div class="hint" id="selectionHint">No item selected.</div>
+          </div>
+        </div>
+
+        <section class="inspector" aria-label="Selection details">
+          <div class="inspector__block">
+            <div class="label">Selected</div>
+            <div class="inspector__title" id="selTitle">—</div>
+            <div class="inspector__subtitle" id="selSubtitle">—</div>
+          </div>
+
+          <div class="inspector__block">
+            <div class="label">Why this is on the list</div>
+            <div class="inspector__body" id="selRationale">Select a checklist item or hypothesis.</div>
+          </div>
+
+          <div class="inspector__block inspector__block--grid">
+            <div class="kv">
+              <div class="label">Owner</div>
+              <div class="value" id="selOwner">—</div>
+            </div>
+            <div class="kv">
+              <div class="label">Timebox</div>
+              <div class="value value--mono" id="selTimebox">—</div>
+            </div>
+            <div class="kv">
+              <div class="label">Severity</div>
+              <div class="value" id="selSeverity">—</div>
+            </div>
+            <div class="kv">
+              <div class="label">State</div>
+              <div class="value" id="selState">—</div>
+            </div>
+          </div>
+
+          <div class="inspector__block">
+            <div class="label">Suggested data cuts / queries</div>
+            <div class="querylist" id="selQueries" aria-label="Query list"></div>
+          </div>
+
+          <div class="inspector__block">
+            <div class="label">Actions</div>
+            <div class="actionrow">
+              <button class="btn" type="button" id="btnMarkDone">Mark complete</button>
+              <button class="btn" type="button" id="btnMarkBlocked">Mark blocked</button>
+              <button class="btn" type="button" id="btnMarkOpen">Mark open</button>
+            </div>
+            <div class="hint" id="actionHint">Actions apply to the selected checklist item only.</div>
+          </div>
+
+          <div class="inspector__block">
+            <div class="label">Run notes (local)</div>
+            <textarea class="textarea" id="runNotes" rows="6" aria-label="Run notes"></textarea>
+            <div class="hint">Notes are kept in this tab until you refresh. Export includes notes.</div>
+          </div>
+        </section>
+      </aside>
+
+      <section class="zone zone--tray" aria-label="Alert tray">
+        <div class="zone__header">
+          <h2 class="zone__title">Alert tray</h2>
+          <div class="zone__meta">
+            <div class="hint">Flags conditions that can invalidate conclusions.</div>
+          </div>
+        </div>
+        <div class="tray" id="alertTray" role="list" aria-label="Alerts"></div>
+      </section>
+
+      <section class="zone zone--alt zone--brief" aria-label="Brief view" hidden>
+        <div class="zone__header">
+          <h2 class="zone__title">Incident-style brief</h2>
+          <div class="zone__meta">
+            <div class="hint">Paste-ready summary for Slack / Jira / Confluence.</div>
+          </div>
+        </div>
+        <div class="brief">
+          <div class="brief__tools">
+            <button class="btn" type="button" id="btnCopyBrief">Copy to clipboard</button>
+            <button class="btn" type="button" id="btnRefreshBrief">Refresh brief</button>
+          </div>
+          <textarea class="textarea textarea--mono" id="briefText" rows="22" aria-label="Brief text"></textarea>
+        </div>
+      </section>
+
+      <section class="zone zone--alt zone--data" aria-label="Data cuts view" hidden>
+        <div class="zone__header">
+          <h2 class="zone__title">Data cuts & checks</h2>
+          <div class="zone__meta">
+            <div class="hint">Concrete slices to ask for; avoids “can you look into it?”</div>
+          </div>
+        </div>
+        <div class="datacuts">
+          <div class="datacuts__left">
+            <div class="panel panel--cuts">
+              <div class="panel__header">
+                <div class="panel__title">Cuts catalog</div>
+                <div class="panel__tools">
+                  <span class="label">Scope</span>
+                  <div class="seg" aria-label="Cut scope toggle">
+                    <button type="button" class="seg__btn is-active" data-cutscope="recommended">Recommended</button>
+                    <button type="button" class="seg__btn" data-cutscope="all">All</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cutlist" id="cutList" role="list" aria-label="Data cuts list"></div>
+            </div>
+          </div>
+          <div class="datacuts__right">
+            <div class="panel panel--cutdetail" aria-label="Data cut details">
+              <div class="panel__header">
+                <div class="panel__title">Cut detail</div>
+                <div class="panel__tools">
+                  <span class="label">Selected cut</span>
+                  <span class="value" id="cutSelTitle">—</span>
+                </div>
+              </div>
+              <div class="cutdetail">
+                <div class="cutdetail__block">
+                  <div class="label">Question</div>
+                  <div class="value" id="cutQuestion">—</div>
+                </div>
+                <div class="cutdetail__block">
+                  <div class="label">How to pull</div>
+                  <pre class="code" id="cutSQL" aria-label="SQL snippet">—</pre>
+                </div>
+                <div class="cutdetail__block">
+                  <div class="label">Interpretation notes</div>
+                  <div class="hint" id="cutNotes">—</div>
+                </div>
+                <div class="cutdetail__block">
+                  <div class="label">Add to checklist</div>
+                  <button class="btn" type="button" id="btnAddCutAsTask">Add as checklist item</button>
+                  <div class="hint">Adds a new action scoped to this cut.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel--clipboard" aria-label="Ask template">
+              <div class="panel__header">
+                <div class="panel__title">Analyst ask template</div>
+                <div class="panel__tools">
+                  <button class="btn btn--sm" type="button" id="btnCopyAsk">Copy ask</button>
+                </div>
+              </div>
+              <textarea class="textarea textarea--mono" id="askTemplate" rows="10" aria-label="Ask template"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <div class="toast__inner" id="toastText">Copied.</div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
