@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Arial:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="topbar" role="banner">
+    <div class="topbar__inner">
+      <div class="brand">
+        <div class="brand__title">IDEA VALIDATOR</div>
+        <div class="brand__sub">Structured idea review — seven dimensions, fragile assumptions, verdict</div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item is-active" data-view="scorecard" type="button">SCORECARD</button>
+        <button class="nav__item" data-view="assumptions" type="button">ASSUMPTIONS</button>
+        <button class="nav__item" data-view="evidence" type="button">EVIDENCE</button>
+        <button class="nav__item" data-view="export" type="button">EXPORT</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="app" role="main">
+    <section class="hero" aria-label="Verdict summary">
+      <div class="hero__grid">
+        <div class="hero__metric">
+          <div class="kicker">VERDICT</div>
+          <div class="hero__verdict" id="heroVerdict">NEEDS EVIDENCE</div>
+          <div class="hero__meta">
+            <div class="hero__metaRow">
+              <div class="metaItem">
+                <div class="kicker">TOTAL SCORE</div>
+                <div class="metaItem__value"><span id="heroScore">—</span><span class="metaItem__unit">/ 100</span></div>
+              </div>
+              <div class="metaItem">
+                <div class="kicker">FRAGILE ASSUMPTIONS</div>
+                <div class="metaItem__value"><span id="heroFragile">—</span></div>
+              </div>
+              <div class="metaItem">
+                <div class="kicker">EVIDENCE COVERAGE</div>
+                <div class="metaItem__value"><span id="heroCoverage">—</span><span class="metaItem__unit">%</span></div>
+              </div>
+            </div>
+            <div class="hero__oneThing">
+              <div class="kicker">ONE NUMBER THAT MATTERS</div>
+              <div class="hero__highlight">
+                <span class="hero__highlightLabel">DECISION CONFIDENCE</span>
+                <span class="hero__highlightValue" id="heroConfidence">—</span>
+              </div>
+              <div class="hero__note" id="heroNote">Set scores and assumptions to generate a defensible decision summary.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero__controls" aria-label="Idea selection and actions">
+          <div class="panel">
+            <div class="panel__header">
+              <div class="panel__title">WORKSPACE</div>
+              <div class="panel__actions">
+                <button class="btn btn--ghost" id="btnNewIdea" type="button">NEW</button>
+                <button class="btn" id="btnDuplicateIdea" type="button">DUPLICATE</button>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <label class="field">
+                <div class="field__label">IDEA</div>
+                <select class="select" id="ideaSelect" aria-label="Select idea"></select>
+              </label>
+
+              <label class="field">
+                <div class="field__label">TITLE</div>
+                <input class="input" id="ideaTitle" type="text" autocomplete="off" />
+              </label>
+
+              <label class="field">
+                <div class="field__label">USER / BUYER</div>
+                <input class="input" id="ideaPersona" type="text" autocomplete="off" />
+              </label>
+
+              <label class="field">
+                <div class="field__label">CONTEXT</div>
+                <input class="input" id="ideaContext" type="text" autocomplete="off" />
+              </label>
+
+              <label class="field">
+                <div class="field__label">ONE-SENTENCE PITCH</div>
+                <textarea class="textarea" id="ideaPitch" rows="3"></textarea>
+              </label>
+
+              <div class="panel__footer">
+                <div class="kicker">LAST UPDATED</div>
+                <div class="mono" id="ideaUpdated">—</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__header">
+              <div class="panel__title">DECISION CONTROLS</div>
+              <div class="panel__actions">
+                <button class="btn btn--ghost" id="btnResetScores" type="button">RESET SCORES</button>
+                <button class="btn" id="btnMarkReviewed" type="button">MARK REVIEWED</button>
+              </div>
+            </div>
+            <div class="panel__body">
+              <label class="field">
+                <div class="field__label">DECISION DATE</div>
+                <input class="input" id="decisionDate" type="date" />
+              </label>
+              <label class="field">
+                <div class="field__label">REVIEWER</div>
+                <input class="input" id="reviewerName" type="text" autocomplete="off" />
+              </label>
+              <label class="field">
+                <div class="field__label">DECISION NOTES</div>
+                <textarea class="textarea" id="decisionNotes" rows="4"></textarea>
+              </label>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__header">
+              <div class="panel__title">DATA</div>
+            </div>
+            <div class="panel__body">
+              <div class="stack">
+                <button class="btn" id="btnExportJson" type="button">EXPORT JSON</button>
+                <label class="btn btn--ghost btn--file" for="importFile">IMPORT JSON</label>
+                <input id="importFile" type="file" accept="application/json" />
+                <button class="btn btn--danger" id="btnWipeAll" type="button">WIPE LOCAL DATA</button>
+              </div>
+              <div class="hint">
+                Local-only persistence (browser storage). Use Export if you want to share or archive.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="rule"></div>
+
+    <section class="views" aria-label="Workspace views">
+      <section class="view is-active" id="view-scorecard" data-view="scorecard" aria-label="Scorecard view">
+        <div class="view__header">
+          <div>
+            <div class="kicker">SCORECARD</div>
+            <h1 class="h1">Seven dimensions. One decision.</h1>
+          </div>
+          <div class="view__right">
+            <div class="kicker">PRIMARY RISK</div>
+            <div class="view__primaryRisk" id="primaryRisk">—</div>
+          </div>
+        </div>
+
+        <div class="scoreGrid" id="scoreGrid" aria-label="Score dimensions"></div>
+
+        <div class="rule"></div>
+
+        <div class="twoCol">
+          <div class="panel">
+            <div class="panel__header">
+              <div class="panel__title">TOP NEXT STEPS</div>
+            </div>
+            <div class="panel__body">
+              <ol class="list" id="nextSteps"></ol>
+              <div class="hint">These are generated from your lowest-scoring dimensions and most fragile assumptions.</div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__header">
+              <div class="panel__title">DIMENSION NOTES</div>
+            </div>
+            <div class="panel__body">
+              <label class="field">
+                <div class="field__label">CURRENT FOCUS</div>
+                <select class="select" id="dimensionNotesSelect" aria-label="Select dimension for notes"></select>
+              </label>
+              <label class="field">
+                <div class="field__label">NOTES</div>
+                <textarea class="textarea" id="dimensionNotesText" rows="9"></textarea>
+              </label>
+              <div class="hint">Keep notes to evidence, constraints, and decision rationale. Avoid feature brainstorms here.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-assumptions" data-view="assumptions" aria-label="Assumptions view">
+        <div class="view__header">
+          <div>
+            <div class="kicker">ASSUMPTIONS</div>
+            <h1 class="h1">Make the fragile parts explicit.</h1>
+          </div>
+          <div class="view__right">
+            <div class="kicker">FRAGILE</div>
+            <div class="view__primaryRisk" id="assumptionsFragileCount">—</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar__left">
+            <button class="btn" id="btnAddAssumption" type="button">ADD ASSUMPTION</button>
+            <button class="btn btn--ghost" id="btnSeedAssumptions" type="button">SEED COMMON</button>
+          </div>
+          <div class="toolbar__right">
+            <label class="field field--inline">
+              <div class="field__label">FILTER</div>
+              <select class="select" id="assumptionFilter">
+                <option value="all">ALL</option>
+                <option value="fragile">FRAGILE ONLY</option>
+                <option value="evidenceMissing">EVIDENCE MISSING</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" aria-label="Assumptions table">
+            <thead>
+              <tr>
+                <th>ASSUMPTION</th>
+                <th>WHY IT MUST BE TRUE</th>
+                <th>SEVERITY</th>
+                <th>EVIDENCE</th>
+                <th>OWNER</th>
+                <th>DUE</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="assumptionsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="hint">Severity = impact if false. Evidence reduces fragility. Keep entries testable.</div>
+      </section>
+
+      <section class="view" id="view-evidence" data-view="evidence" aria-label="Evidence view">
+        <div class="view__header">
+          <div>
+            <div class="kicker">EVIDENCE</div>
+            <h1 class="h1">A registry you can defend in a leadership room.</h1>
+          </div>
+          <div class="view__right">
+            <div class="kicker">COVERAGE</div>
+            <div class="view__primaryRisk"><span id="evidenceCoverage">—</span>%</div>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="toolbar__left">
+            <button class="btn" id="btnAddEvidence" type="button">ADD EVIDENCE</button>
+            <button class="btn btn--ghost" id="btnLinkUnlinked" type="button">LINK TO FRAGILE</button>
+          </div>
+          <div class="toolbar__right">
+            <label class="field field--inline">
+              <div class="field__label">TYPE</div>
+              <select class="select" id="evidenceTypeFilter">
+                <option value="all">ALL</option>
+                <option value="user">USER</option>
+                <option value="data">DATA</option>
+                <option value="competitive">COMPETITIVE</option>
+                <option value="technical">TECHNICAL</option>
+                <option value="revenue">REVENUE</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="tableWrap">
+          <table class="table" aria-label="Evidence table">
+            <thead>
+              <tr>
+                <th>EVIDENCE</th>
+                <th>TYPE</th>
+                <th>STRENGTH</th>
+                <th>DATE</th>
+                <th>LINK</th>
+                <th>ASSUMPTIONS</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="evidenceTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="rule"></div>
+
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">COVERAGE MAP</div>
+          </div>
+          <div class="panel__body">
+            <div class="coverage" id="coverageMap" aria-label="Coverage map"></div>
+            <div class="hint">Coverage is computed as the share of assumptions linked to at least one evidence item (any strength).</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="view-export" data-view="export" aria-label="Export view">
+        <div class="view__header">
+          <div>
+            <div class="kicker">EXPORT</div>
+            <h1 class="h1">One-page decision memo.</h1>
+          </div>
+          <div class="view__right">
+            <button class="btn" id="btnCopyMemo" type="button">COPY MEMO</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel__header">
+            <div class="panel__title">DECISION MEMO (TEXT)</div>
+            <div class="panel__actions">
+              <button class="btn btn--ghost" id="btnRefreshMemo" type="button">REFRESH</button>
+            </div>
+          </div>
+          <div class="panel__body">
+            <textarea class="textarea textarea--mono" id="memoText" rows="22" aria-label="Decision memo text"></textarea>
+            <div class="hint" id="copyStatus" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <div class="kicker">LOCAL WORKSPACE</div>
+      <div class="footer__meta">
+        <span class="mono" id="storageStatus">—</span>
+        <span class="sep">—</span>
+        <span class="mono" id="dataCounts">—</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
