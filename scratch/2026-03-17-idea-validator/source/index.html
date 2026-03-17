@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Arial:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="container">
+      <div class="brand">
+        <div class="brand__title">IDEA VALIDATOR</div>
+        <div class="brand__sub">Real-time pressure test • explicit verdict • delegable next steps</div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item" data-view="scoreboard" type="button">Scoreboard</button>
+        <button class="nav__item" data-view="inputs" type="button">Inputs</button>
+        <button class="nav__item" data-view="assumptions" type="button">Assumptions</button>
+        <button class="nav__item" data-view="actions" type="button">Actions</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main" role="main">
+    <div class="container">
+      <section class="meta" aria-label="Workspace Controls">
+        <div class="meta__left">
+          <div class="field">
+            <label class="label" for="ideaTitle">Idea title</label>
+            <input id="ideaTitle" class="input" type="text" placeholder="e.g., SOC 2 autopilot for startups" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="ideaStage">Stage</label>
+            <select id="ideaStage" class="select" aria-label="Idea stage">
+              <option value="new">New (0–2 hours)</option>
+              <option value="shaped">Shaped (2–8 hours)</option>
+              <option value="ready">Ready for validation sprint</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="meta__right">
+          <div class="meta__buttons">
+            <button id="btnNew" class="btn btn--ghost" type="button">New</button>
+            <button id="btnLoadDemo" class="btn btn--ghost" type="button">Load demo</button>
+            <button id="btnExport" class="btn" type="button">Export memo</button>
+          </div>
+          <div class="meta__status">
+            <div class="kicker">Saved</div>
+            <div id="saveStatus" class="meta__statusValue">Local</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-scoreboard" class="view" data-view="scoreboard" aria-label="Scoreboard">
+        <div class="hero">
+          <div class="hero__left">
+            <div class="kicker">Verdict</div>
+            <div id="verdict" class="hero__metric">REFINE</div>
+            <div id="verdictRationale" class="hero__sub">
+              Tighten the ICP and prove willingness-to-pay before any build
+            </div>
+          </div>
+
+          <div class="hero__right">
+            <div class="kicker">Confidence Score</div>
+            <div class="hero__metricWrap">
+              <div id="confidenceScore" class="hero__metric hero__metric--highlight">72</div>
+              <div class="hero__metricSuffix">/ 100</div>
+            </div>
+            <div class="hero__sub">
+              Weighted across 6 dimensions; highlights show the single most important number on the page.
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="kicker">Score breakdown</div>
+            <div class="section__hint">Adjust weights, then pressure-test weak dimensions in Assumptions.</div>
+          </div>
+
+          <div class="tableWrap">
+            <table class="table" aria-label="Score breakdown table">
+              <thead>
+                <tr>
+                  <th>Dimension</th>
+                  <th>Score</th>
+                  <th>Weight</th>
+                  <th>Weighted</th>
+                  <th>Signal</th>
+                </tr>
+              </thead>
+              <tbody id="scoreRows"></tbody>
+            </table>
+          </div>
+
+          <div class="section__footer">
+            <div class="tagsLine" id="scoreTags"></div>
+          </div>
+        </div>
+
+        <div class="twoCol">
+          <div class="card">
+            <div class="card__header">
+              <div class="kicker">Primary risk</div>
+              <div class="card__title" id="primaryRiskTitle">Willingness to pay unproven</div>
+            </div>
+            <div class="card__body" id="primaryRiskBody">
+              Your pricing story is inferred from competitors rather than evidence. Run 8 paid-intent conversations.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__header">
+              <div class="kicker">Next 72 hours</div>
+              <div class="card__title" id="next72Title">Validation sprint plan</div>
+            </div>
+            <div class="card__body" id="next72Body">
+              Execute 3 actions with owners and due dates. Focus on the lowest-scoring dimension.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-inputs" class="view" data-view="inputs" aria-label="Inputs">
+        <div class="pageHeader">
+          <div class="kicker">Inputs</div>
+          <h1 class="pageTitle">Shape the idea into something falsifiable</h1>
+          <p class="pageSub">
+            Score follows inputs. Keep it concrete: who, what job, why now, and what changes if you do nothing.
+          </p>
+        </div>
+
+        <div class="gridForm">
+          <div class="block">
+            <div class="block__header">
+              <div class="kicker">Customer + Problem</div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="icp">ICP (who exactly)</label>
+              <input id="icp" class="input" type="text" autocomplete="off" placeholder="e.g., 20–200 employee B2B SaaS with 1 security lead and no GRC tooling" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="problem">Problem statement (moment + consequence)</label>
+              <textarea id="problem" class="textarea" rows="4" placeholder="e.g., Security questionnaires stall deals for weeks; founders pull engineers into one-off evidence hunts and miss quarter-end targets"></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label" for="currentAlt">Current alternative (what they do today)</label>
+              <input id="currentAlt" class="input" type="text" autocomplete="off" placeholder="Spreadsheets, shared drive folders, consultant, Vanta/Drata later" />
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block__header">
+              <div class="kicker">Solution + Market</div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="solution">Solution concept (1 sentence)</label>
+              <textarea id="solution" class="textarea" rows="3" placeholder="e.g., A SOC 2 evidence autopilot that continuously collects artifacts, answers questionnaires, and prepares audit-ready reports"></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label" for="differentiator">Differentiator (why you win)</label>
+              <input id="differentiator" class="input" type="text" autocomplete="off" placeholder="Evidence collection via integrations + narrative templates tuned for sales cycles" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="whyNow">Why now (trigger)</label>
+              <input id="whyNow" class="input" type="text" autocomplete="off" placeholder="AI governance pressure + security reviews moving earlier in procurement" />
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block__header">
+              <div class="kicker">Economics</div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="pricing">Pricing hypothesis</label>
+              <input id="pricing" class="input" type="text" autocomplete="off" placeholder="$499–$1,499 / month depending on integrations + vendor questionnaires volume" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="budgetOwner">Budget owner</label>
+              <input id="budgetOwner" class="input" type="text" autocomplete="off" placeholder="Head of Security, CTO, or Finance depending on stage" />
+            </div>
+
+            <div class="field">
+              <label class="label" for="roi">Primary ROI story</label>
+              <textarea id="roi" class="textarea" rows="3" placeholder="Reduce deal cycle time and engineering interruptions; increase win rate for security-gated buyers"></textarea>
+            </div>
+          </div>
+
+          <div class="block">
+            <div class="block__header">
+              <div class="kicker">Constraints</div>
+            </div>
+
+            <div class="field">
+              <label class="label" for="dependencies">Critical dependencies</label>
+              <textarea id="dependencies" class="textarea" rows="3" placeholder="Integrations with Google Workspace/Okta/Jira; audit framework mappings; evidence storage security"></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label" for="risks">Known risks (unscored)</label>
+              <textarea id="risks" class="textarea" rows="3" placeholder="Regulatory interpretations, procurement friction, high switching costs, long sales cycles"></textarea>
+            </div>
+
+            <div class="field">
+              <label class="label" for="notes">Notes</label>
+              <textarea id="notes" class="textarea" rows="3" placeholder="Anything that will matter in the memo"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="kicker">Scoring inputs</div>
+            <div class="section__hint">Pick an evidence level per dimension; adjust weight only if the business context demands it.</div>
+          </div>
+
+          <div id="scoringInputs" class="scoringInputs" aria-label="Scoring inputs"></div>
+        </div>
+      </section>
+
+      <section id="view-assumptions" class="view" data-view="assumptions" aria-label="Assumptions">
+        <div class="pageHeader">
+          <div class="kicker">Assumptions</div>
+          <h1 class="pageTitle">Make the fragile parts explicit</h1>
+          <p class="pageSub">
+            Each assumption is scored by impact × uncertainty. The top items define your validation plan.
+          </p>
+        </div>
+
+        <div class="section">
+          <div class="section__header">
+            <div class="kicker">Assumption register</div>
+            <div class="section__hint">Add assumptions, then sort by risk. Keep them falsifiable.</div>
+          </div>
+
+          <div class="toolbar">
+            <button id="btnAddAssumption" class="btn" type="button">Add assumption</button>
+            <div class="toolbar__spacer"></div>
+            <div class="fieldInline">
+              <label class="label" for="assumptionSort">Sort</label>
+              <select id="assumptionSort" class="select select--small">
+                <option value="riskDesc">Risk (high → low)</option>
+                <option value="impactDesc">Impact (high → low)</option>
+                <option value="uncertaintyDesc">Uncertainty (high → low)</option>
+                <option value="recent">Recently edited</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tableWrap">
+            <table class="table" aria-label="Assumptions table">
+              <thead>
+                <tr>
+                  <th>Assumption</th>
+                  <th>Type</th>
+                  <th>Impact</th>
+                  <th>Uncertainty</th>
+                  <th>Risk</th>
+                  <th>Evidence</th>
+                  <th>Owner</th>
+                  <th>Due</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="assumptionRows"></tbody>
+            </table>
+          </div>
+
+          <div class="section__footer">
+            <div class="tagsLine" id="assumptionTags"></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-actions" class="view" data-view="actions" aria-label="Actions">
+        <div class="pageHeader">
+          <div class="kicker">Actions</div>
+          <h1 class="pageTitle">Delegate validation work with no ambiguity</h1>
+          <p class="pageSub">
+            Actions are generated from your riskiest assumptions. Edit them so the work is assignable today.
+          </p>
+        </div>
+
+        <div class="twoCol">
+          <div class="section section--tight">
+            <div class="section__header">
+              <div class="kicker">Top actions</div>
+              <div class="section__hint">Keep 3–5. If you have more, you do not have a thesis.</div>
+            </div>
+
+            <div class="toolbar">
+              <button id="btnGenerateActions" class="btn" type="button">Generate from assumptions</button>
+              <button id="btnAddAction" class="btn btn--ghost" type="button">Add manual action</button>
+            </div>
+
+            <div class="tableWrap">
+              <table class="table" aria-label="Actions table">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Type</th>
+                    <th>Owner</th>
+                    <th>Due</th>
+                    <th>Effort</th>
+                    <th>Expected signal</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="actionRows"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card card--sticky">
+            <div class="card__header">
+              <div class="kicker">Decision memo</div>
+              <div class="card__title">One-page export preview</div>
+            </div>
+            <div class="card__body">
+              <div class="memo">
+                <div class="memo__line">
+                  <div class="memo__label">Title</div>
+                  <div id="memoTitle" class="memo__value">—</div>
+                </div>
+                <div class="memo__line">
+                  <div class="memo__label">Verdict</div>
+                  <div id="memoVerdict" class="memo__value memo__value--highlight">—</div>
+                </div>
+                <div class="memo__line">
+                  <div class="memo__label">Confidence</div>
+                  <div id="memoConfidence" class="memo__value">—</div>
+                </div>
+
+                <hr class="rule" />
+
+                <div class="memo__block">
+                  <div class="memo__label">ICP</div>
+                  <div id="memoICP" class="memo__value">—</div>
+                </div>
+                <div class="memo__block">
+                  <div class="memo__label">Problem</div>
+                  <div id="memoProblem" class="memo__value">—</div>
+                </div>
+                <div class="memo__block">
+                  <div class="memo__label">Solution</div>
+                  <div id="memoSolution" class="memo__value">—</div>
+                </div>
+
+                <hr class="rule" />
+
+                <div class="memo__block">
+                  <div class="memo__label">Primary risk</div>
+                  <div id="memoRisk" class="memo__value">—</div>
+                </div>
+
+                <div class="memo__block">
+                  <div class="memo__label">Next actions (72h)</div>
+                  <div id="memoActions" class="memo__value">—</div>
+                </div>
+
+                <div class="memo__foot">
+                  <div class="kicker">Note</div>
+                  <div class="memo__muted">Export produces a plain-text memo for email / docs. No external services.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer" role="contentinfo">
+        <div class="container">
+          <div class="footer__line">
+            <div class="footer__left">
+              <span class="kicker">Mode</span>
+              <span class="footer__value">Local-only • no network calls</span>
+            </div>
+            <div class="footer__right">
+              <span class="kicker">Data</span>
+              <span id="dataBadge" class="footer__value">1 workspace</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

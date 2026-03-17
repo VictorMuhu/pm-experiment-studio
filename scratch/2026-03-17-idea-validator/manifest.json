@@ -1,0 +1,27 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "decision simulators",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company making go/no-go calls during roadmap planning without a dedicated research function",
+  "problem_statement": "Teams green-light product ideas based on narrative and bias without writing down assumptions, making risks invisible until after roadmap time is already spent",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with live-updating scoring workspace and a persistent verdict side panel",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "product-strategy",
+    "idea-triage",
+    "assumption-mapping",
+    "roadmap-planning",
+    "decision-support",
+    "validation-planning",
+    "scoring-rubric"
+  ]
+}
