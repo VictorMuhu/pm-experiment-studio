@@ -1,0 +1,72 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "projects/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build projects
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build design-coach
+        working-directory: projects/2026-03-17-design-coach
+        env:
+          VITE_BASE_PATH: /pm-experiment-studio/projects/2026-03-17-design-coach/
+        run: npm install && npm run build
+
+      # Assemble the Pages artifact under _site/
+      # Each project goes in its own subdirectory so future projects can be added.
+      - name: Assemble site
+        run: |
+          mkdir -p _site/projects/2026-03-17-design-coach
+          cp -r projects/2026-03-17-design-coach/dist/. _site/projects/2026-03-17-design-coach/
+          # Root index redirects to the first (and currently only) project
+          cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta http-equiv="refresh" content="0; url=projects/2026-03-17-design-coach/" />
+            </head>
+            <body>Redirecting…</body>
+          </html>
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
