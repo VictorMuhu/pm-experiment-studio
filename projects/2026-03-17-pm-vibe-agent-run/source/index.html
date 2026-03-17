@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PM Vibe Agent Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <aside class="sidebar" aria-label="Primary">
+      <div class="sidebar__top">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true"></div>
+          <div class="brand__text">
+            <div class="brand__name">PM Vibe Agent Run</div>
+            <div class="brand__sub">Daily run log → structured update</div>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="Sections">
+          <div class="nav__group">
+            <div class="nav__label">Run log</div>
+            <button class="nav__item is-active" data-route="today" type="button">
+              <span class="nav__icon" aria-hidden="true">●</span>
+              <span class="nav__text">Today</span>
+              <span class="nav__meta" id="navTodayMeta">—</span>
+            </button>
+            <button class="nav__item" data-route="history" type="button">
+              <span class="nav__icon" aria-hidden="true">↻</span>
+              <span class="nav__text">History</span>
+              <span class="nav__meta" id="navHistoryMeta">—</span>
+            </button>
+          </div>
+
+          <div class="nav__group">
+            <div class="nav__label">Output</div>
+            <button class="nav__item" data-route="update" type="button">
+              <span class="nav__icon" aria-hidden="true">⇢</span>
+              <span class="nav__text">Exec update</span>
+              <span class="nav__meta" id="navUpdateMeta">—</span>
+            </button>
+          </div>
+        </nav>
+      </div>
+
+      <div class="sidebar__bottom">
+        <div class="sidebar__hint">
+          <div class="sidebar__hint-title">Demo data loaded</div>
+          <div class="sidebar__hint-sub">Click an item to inspect, resolve, or convert to an ask.</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" aria-label="Main content">
+      <header class="topbar">
+        <div class="topbar__left">
+          <div class="page-title">
+            <div class="page-title__kicker" id="pageKicker">Today</div>
+            <h1 class="page-title__h1" id="pageTitle">Run snapshot</h1>
+          </div>
+        </div>
+
+        <div class="topbar__right">
+          <div class="segmented" role="tablist" aria-label="View mode">
+            <button class="segmented__btn is-active" type="button" id="modeBtnTriage" data-mode="triage" role="tab" aria-selected="true">
+              Triage
+            </button>
+            <button class="segmented__btn" type="button" id="modeBtnReview" data-mode="review" role="tab" aria-selected="false">
+              Review
+            </button>
+          </div>
+
+          <button class="btn btn--ghost" type="button" id="openHelpBtn">How this works</button>
+        </div>
+      </header>
+
+      <section class="content">
+        <div class="grid">
+          <section class="panel panel--input" aria-label="Input and metrics">
+            <div class="panel__header">
+              <div>
+                <div class="panel__title">Daily notes</div>
+                <div class="panel__subtitle">Paste messy notes. Click “Parse” to normalize into a repeatable shape.</div>
+              </div>
+              <div class="panel__actions">
+                <button class="btn btn--ghost" type="button" id="loadDemoBtn">Reload demo</button>
+                <button class="btn btn--primary" type="button" id="parseBtn">Parse notes</button>
+              </div>
+            </div>
+
+            <div class="panel__body">
+              <div class="notes">
+                <label class="label" for="notesInput">Raw notes</label>
+                <textarea id="notesInput" class="textarea" rows="10" spellcheck="false"></textarea>
+                <div class="notes__meta">
+                  <div class="caption" id="notesMeta">—</div>
+                  <div class="notes__meta-actions">
+                    <button class="btn btn--ghost btn--small" type="button" id="clearNotesBtn">Clear</button>
+                    <button class="btn btn--ghost btn--small" type="button" id="seedAltBtn">Try another day</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="metrics" aria-label="Live metrics">
+                <div class="metric-card">
+                  <div class="metric-card__row">
+                    <div class="metric-card__title">Vibe score</div>
+                    <span class="pill pill--neutral" id="vibeLabelPill">—</span>
+                  </div>
+                  <div class="metric-card__main">
+                    <div class="ring" id="vibeRing" aria-label="Vibe score ring">
+                      <svg class="ring__svg" viewBox="0 0 44 44" aria-hidden="true">
+                        <circle class="ring__track" cx="22" cy="22" r="18" />
+                        <circle class="ring__value" cx="22" cy="22" r="18" />
+                      </svg>
+                      <div class="ring__text">
+                        <div class="ring__number" id="vibeScoreNum">—</div>
+                        <div class="ring__caption">/100</div>
+                      </div>
+                    </div>
+
+                    <div class="metric-stack">
+                      <div class="metric">
+                        <div class="metric__label">Open risks</div>
+                        <div class="metric__value" id="metricOpenRisks">—</div>
+                      </div>
+                      <div class="metric">
+                        <div class="metric__label">Unconfirmed decisions</div>
+                        <div class="metric__value" id="metricUnconfirmedDecisions">—</div>
+                      </div>
+                      <div class="metric">
+                        <div class="metric__label">Asks not sent</div>
+                        <div class="metric__value" id="metricPendingAsks">—</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="metric-card__footer">
+                    <div class="caption" id="metricFooterCaption">Vibe updates when you resolve items or convert notes to asks.</div>
+                  </div>
+                </div>
+
+                <div class="filters">
+                  <div class="filters__row">
+                    <div>
+                      <div class="label">Filter</div>
+                      <div class="caption">Show what needs attention.</div>
+                    </div>
+
+                    <div class="select" role="group" aria-label="Filter selector">
+                      <button class="select__btn is-active" type="button" data-filter="all">All</button>
+                      <button class="select__btn" type="button" data-filter="attention">Needs attention</button>
+                      <button class="select__btn" type="button" data-filter="resolved">Resolved</button>
+                    </div>
+                  </div>
+
+                  <div class="filters__row">
+                    <div>
+                      <div class="label">Sort</div>
+                      <div class="caption">Optimized for scanning.</div>
+                    </div>
+
+                    <div class="select" role="group" aria-label="Sort selector">
+                      <button class="select__btn is-active" type="button" data-sort="severity">Severity</button>
+                      <button class="select__btn" type="button" data-sort="type">Type</button>
+                      <button class="select__btn" type="button" data-sort="time">Time</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel--table" aria-label="Structured items">
+            <div class="panel__header">
+              <div>
+                <div class="panel__title">Structured run items</div>
+                <div class="panel__subtitle">Click a row to inspect details and take action.</div>
+              </div>
+              <div class="panel__actions">
+                <div class="badge-count" id="itemCountBadge" aria-label="Item count badge">—</div>
+              </div>
+            </div>
+
+            <div class="panel__body panel__body--flush">
+              <div class="table-wrap" role="region" aria-label="Items table">
+                <table class="table" id="itemsTable">
+                  <thead>
+                    <tr>
+                      <th class="col-type">
+                        <button class="th-btn" type="button" data-th-sort="type" aria-label="Sort by type">
+                          Type <span class="sort-indicator" id="sortIndicatorType" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th class="col-title">Item</th>
+                      <th class="col-sev">
+                        <button class="th-btn" type="button" data-th-sort="severity" aria-label="Sort by severity">
+                          Severity <span class="sort-indicator" id="sortIndicatorSeverity" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                      <th class="col-status">Status</th>
+                      <th class="col-age">
+                        <button class="th-btn" type="button" data-th-sort="time" aria-label="Sort by time">
+                          Time <span class="sort-indicator" id="sortIndicatorTime" aria-hidden="true">▾</span>
+                        </button>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="itemsTbody">
+                    <!-- rows injected -->
+                  </tbody>
+                </table>
+
+                <div class="skeleton" id="tableSkeleton" aria-hidden="true">
+                  <div class="skeleton__row"></div>
+                  <div class="skeleton__row"></div>
+                  <div class="skeleton__row"></div>
+                  <div class="skeleton__row"></div>
+                  <div class="skeleton__row"></div>
+                  <div class="skeleton__row"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel panel--right" aria-label="Inspector">
+            <div class="panel__header">
+              <div>
+                <div class="panel__title">Inspector</div>
+                <div class="panel__subtitle" id="inspectorSubtitle">Select a run item to view context, decision framing, and actions.</div>
+              </div>
+              <div class="panel__actions">
+                <button class="btn btn--ghost btn--small" type="button" id="copyItemBtn" disabled>Copy</button>
+              </div>
+            </div>
+
+            <div class="panel__body inspector" id="inspectorBody">
+              <div class="empty-state" id="inspectorEmpty">
+                <div class="empty-state__title">Nothing selected</div>
+                <div class="empty-state__sub">Pick a row in the table to reveal the details panel.</div>
+              </div>
+
+              <div class="inspector__content" id="inspectorContent" hidden>
+                <div class="inspector__top">
+                  <div class="inspector__header">
+                    <div class="inspector__type" id="inspectorType">—</div>
+                    <div class="inspector__title" id="inspectorTitle">—</div>
+                    <div class="inspector__meta">
+                      <span class="pill pill--neutral" id="inspectorSeverityPill">—</span>
+                      <span class="pill pill--neutral" id="inspectorStatusPill">—</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="inspector__section">
+                  <div class="section-label">Context</div>
+                  <div class="body" id="inspectorContext">—</div>
+                </div>
+
+                <div class="inspector__section">
+                  <div class="section-label">Impact</div>
+                  <div class="body" id="inspectorImpact">—</div>
+                </div>
+
+                <div class="inspector__section">
+                  <div class="section-label">Next step</div>
+                  <div class="body" id="inspectorNext">—</div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="inspector__section">
+                  <div class="section-label">Actions</div>
+                  <div class="actions">
+                    <button class="btn btn--primary" type="button" id="resolveBtn">Mark resolved</button>
+                    <button class="btn btn--ghost" type="button" id="convertToAskBtn">Convert to ask</button>
+                  </div>
+                  <div class="caption inspector__hint" id="inspectorHint">Resolving items improves the vibe score and clears “needs attention” filters.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <section class="panel panel--wide" aria-label="Exec update panel" id="updatePanel" hidden>
+          <div class="panel__header">
+            <div>
+              <div class="panel__title">Exec-ready update</div>
+              <div class="panel__subtitle">Mode toggle changes the tone; copy/paste to Slack or your weekly email.</div>
+            </div>
+            <div class="panel__actions">
+              <div class="segmented segmented--small" role="tablist" aria-label="Update tone">
+                <button class="segmented__btn is-active" type="button" id="toneBtnCrisp" data-tone="crisp" role="tab" aria-selected="true">Crisp</button>
+                <button class="segmented__btn" type="button" id="toneBtnCandid" data-tone="candid" role="tab" aria-selected="false">Candid</button>
+              </div>
+              <button class="btn btn--primary" type="button" id="copyUpdateBtn">Copy update</button>
+            </div>
+          </div>
+          <div class="panel__body">
+            <div class="update-grid">
+              <div class="update-block">
+                <div class="section-label">Generated update</div>
+                <pre class="update" id="updateOutput" aria-label="Generated update output"></pre>
+                <div class="caption" id="updateMeta">—</div>
+              </div>
+
+              <div class="update-block">
+                <div class="section-label">What changed today</div>
+                <div class="change-list" id="changeList">
+                  <!-- injected -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" aria-live="polite" aria-atomic="true" hidden>
+      <div class="toast__inner" id="toastInner">Copied</div>
+    </div>
+
+    <div class="modal-backdrop" id="modalBackdrop" hidden>
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal__header">
+          <div>
+            <div class="modal__title" id="modalTitle">How this works</div>
+            <div class="modal__subtitle">A run log is only useful if it’s consistent. This prototype enforces the shape.</div>
+          </div>
+          <button class="icon-btn" type="button" id="closeModalBtn" aria-label="Close dialog">×</button>
+        </div>
+
+        <div class="modal__body">
+          <div class="modal__section">
+            <div class="section-label">Flow</div>
+            <ul class="list">
+              <li><span class="list__strong">Paste</span> whatever you captured today (Slack snippets, meeting bullets, open questions).</li>
+              <li><span class="list__strong">Parse</span> to split notes into risks, decisions, asks, and progress updates.</li>
+              <li><span class="list__strong">Triage</span> by resolving items or converting fuzzy notes into explicit asks.</li>
+              <li><span class="list__strong">Copy</span> an exec-ready update with a stable structure and daily “vibe” score.</li>
+            </ul>
+          </div>
+
+          <div class="modal__section">
+            <div class="section-label">Vibe scoring (prototype)</div>
+            <div class="body">A simple heuristic: open high-severity risks and unconfirmed decisions pull the score down; resolved items and shipped updates lift it. It’s meant to be comparable day-to-day, not “correct.”</div>
+          </div>
+
+          <div class="modal__section">
+            <div class="section-label">Tip</div>
+            <div class="body">Click any row to open the inspector; that’s where you can resolve or convert to an ask.</div>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button class="btn btn--ghost" type="button" id="closeModalBtn2">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
