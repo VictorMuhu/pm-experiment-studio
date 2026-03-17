@@ -1,0 +1,25 @@
+{
+  "name": "Idea Validator",
+  "slug": "2026-03-17-idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "GTM workflow tools",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company who needs to decide whether an idea deserves roadmap time and align leadership on the rationale",
+  "problem_statement": "Teams greenlight product ideas off intuition and vague differentiation, discovering weak assumptions and hidden complexity only after roadmap time is already committed",
+  "complexity": "Simple",
+  "artifact_type": "single-page web app with live scoring and a pinned verdict panel",
+  "style_direction": "tactile-dashboard",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "idea-evaluation",
+    "product-strategy",
+    "assumption-mapping",
+    "validation-planning",
+    "gtm"
+  ]
+}
