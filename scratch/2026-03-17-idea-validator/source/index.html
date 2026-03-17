@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="wrap topbar__inner">
+      <div class="brand">
+        <div class="brand__title">IDEA VALIDATOR</div>
+        <div class="brand__subtitle">PRESSURE-TEST WORKSPACE</div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item" type="button" data-view="scorecard" aria-current="page">Scorecard</button>
+        <button class="nav__item" type="button" data-view="assumptions">Assumptions</button>
+        <button class="nav__item" type="button" data-view="plan">Validation Plan</button>
+        <button class="nav__item" type="button" data-view="library">Library</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" role="main">
+    <section class="view view--active" data-view-panel="scorecard">
+      <header class="view__header">
+        <div class="label">PRIMARY TAKEAWAY</div>
+        <div class="hero">
+          <div class="hero__metric">
+            <div class="hero__number" id="heroScore">82</div>
+            <div class="hero__meta">
+              <div class="hero__verdict" id="heroVerdict">STRONG CANDIDATE</div>
+              <div class="hero__sub" id="heroSub">Confidence-weighted score from 0–100</div>
+            </div>
+          </div>
+          <div class="hero__key">
+            <div class="label">ONE NUMBER THAT MATTERS MOST</div>
+            <div class="keyline">
+              <div class="keyline__value" id="keyRisk">RISK: 18</div>
+              <div class="keyline__note">Higher risk means more fragile assumptions</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">IDEA BRIEF</div>
+            <h2 class="card__title">Define the concept in one pass</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn btn--primary" id="btnSaveIdea" type="button">Save</button>
+            <button class="btn" id="btnResetToDemo" type="button">Load demo</button>
+          </div>
+        </div>
+
+        <div class="form grid2">
+          <div class="field">
+            <label class="field__label" for="ideaName">Idea name</label>
+            <input class="input" id="ideaName" type="text" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ideaStage">Company context</label>
+            <select class="input" id="ideaStage">
+              <option value="seed">Seed / pre-PMF</option>
+              <option value="series-a">Series A–B scaling</option>
+              <option value="growth">Growth / multi-product</option>
+              <option value="enterprise">Enterprise / regulated</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ideaUser">Primary user</label>
+            <input class="input" id="ideaUser" type="text" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ideaJTBD">Job-to-be-done</label>
+            <input class="input" id="ideaJTBD" type="text" autocomplete="off" />
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label" for="ideaPain">Pain (specific moment + consequence)</label>
+            <textarea class="input input--area" id="ideaPain" rows="2"></textarea>
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label" for="ideaSolution">Solution (what changes for the user?)</label>
+            <textarea class="input input--area" id="ideaSolution" rows="2"></textarea>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ideaAlt">Current alternative</label>
+            <input class="input" id="ideaAlt" type="text" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ideaDifferentiation">Differentiation (one line)</label>
+            <input class="input" id="ideaDifferentiation" type="text" autocomplete="off" />
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">SCORING MODEL</div>
+            <h2 class="card__title">Score what must be true</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn" id="btnExportJSON" type="button">Export</button>
+          </div>
+        </div>
+
+        <div class="scoring">
+          <div class="scoring__summary">
+            <div class="metricRow">
+              <div class="metricRow__label">WEIGHTED SCORE</div>
+              <div class="metricRow__value"><span id="weightedScore">82</span><span class="muted">/100</span></div>
+            </div>
+            <div class="metricRow metricRow--highlight">
+              <div class="metricRow__label">MOST IMPORTANT GAP</div>
+              <div class="metricRow__value metricRow__value--gold" id="topGap">Willingness to pay (confidence low)</div>
+            </div>
+          </div>
+
+          <div class="tableWrap" role="region" aria-label="Score dimensions">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">DIMENSION</th>
+                  <th scope="col">WEIGHT</th>
+                  <th scope="col">SCORE</th>
+                  <th scope="col">CONFIDENCE</th>
+                  <th scope="col">NOTES</th>
+                </tr>
+              </thead>
+              <tbody id="dimensionsBody"></tbody>
+            </table>
+          </div>
+
+          <div class="inlineHelp">
+            <div class="tag">NOTE — CONFIDENCE</div>
+            <div class="inlineHelp__text">
+              Confidence reduces impact. A “9” with low confidence behaves like a “6”.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">OUTPUT</div>
+            <h2 class="card__title">Decision-ready verdict</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn" id="btnCopySummary" type="button">Copy summary</button>
+          </div>
+        </div>
+
+        <div class="output grid2">
+          <div class="outputBlock">
+            <div class="label">VERDICT</div>
+            <div class="outputBlock__big" id="verdictText">STRONG CANDIDATE</div>
+            <div class="outputBlock__sub" id="verdictRationale">Clear pain + strong differentiation; biggest risk is pricing power.</div>
+          </div>
+
+          <div class="outputBlock">
+            <div class="label">TOP 3 FRAGILE ASSUMPTIONS</div>
+            <ol class="list" id="fragileList"></ol>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" data-view-panel="assumptions">
+      <header class="view__header">
+        <div class="label">PRIMARY TAKEAWAY</div>
+        <div class="hero hero--compact">
+          <div class="hero__metric">
+            <div class="hero__number" id="assumpCount">7</div>
+            <div class="hero__meta">
+              <div class="hero__verdict">ASSUMPTIONS LOG</div>
+              <div class="hero__sub">Track what must be true, and how you’ll test it</div>
+            </div>
+          </div>
+          <div class="hero__key">
+            <div class="label">ONE NUMBER THAT MATTERS MOST</div>
+            <div class="keyline">
+              <div class="keyline__value" id="untestedCount">UNTESTED: 4</div>
+              <div class="keyline__note">Assumptions without evidence are debt</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">ADD</div>
+            <h2 class="card__title">New assumption</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn btn--primary" id="btnAddAssumption" type="button">Add</button>
+          </div>
+        </div>
+
+        <div class="form grid2">
+          <div class="field field--full">
+            <label class="field__label" for="assumpText">Assumption statement</label>
+            <input class="input" id="assumpText" type="text" autocomplete="off" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="assumpType">Type</label>
+            <select class="input" id="assumpType">
+              <option value="desirability">Desirability</option>
+              <option value="viability">Viability</option>
+              <option value="feasibility">Feasibility</option>
+              <option value="compliance">Compliance</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="assumpCriticality">Criticality (1–5)</label>
+            <input class="input" id="assumpCriticality" type="number" min="1" max="5" value="4" />
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="assumpConfidence">Confidence</label>
+            <select class="input" id="assumpConfidence">
+              <option value="low">Low</option>
+              <option value="med">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+
+          <div class="field field--full">
+            <label class="field__label" for="assumpEvidence">Current evidence (optional)</label>
+            <textarea class="input input--area" id="assumpEvidence" rows="2"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">TABLE</div>
+            <h2 class="card__title">Assumptions and evidence</h2>
+          </div>
+          <div class="card__actions">
+            <div class="filters">
+              <label class="filters__label" for="assumpFilter">Filter</label>
+              <select class="input input--compact" id="assumpFilter">
+                <option value="all">All</option>
+                <option value="untested">Untested</option>
+                <option value="low-confidence">Low confidence</option>
+                <option value="high-criticality">High criticality</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="tableWrap" role="region" aria-label="Assumptions table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">ASSUMPTION</th>
+                <th scope="col">TYPE</th>
+                <th scope="col">CRIT.</th>
+                <th scope="col">CONF.</th>
+                <th scope="col">EVIDENCE</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="assumptionsBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" data-view-panel="plan">
+      <header class="view__header">
+        <div class="label">PRIMARY TAKEAWAY</div>
+        <div class="hero hero--compact">
+          <div class="hero__metric">
+            <div class="hero__number" id="nextActionsCount">5</div>
+            <div class="hero__meta">
+              <div class="hero__verdict">NEXT ACTIONS</div>
+              <div class="hero__sub">A concrete 3–5 step plan to de-risk the idea</div>
+            </div>
+          </div>
+          <div class="hero__key">
+            <div class="label">ONE NUMBER THAT MATTERS MOST</div>
+            <div class="keyline">
+              <div class="keyline__value" id="planETA">ETA: 10 DAYS</div>
+              <div class="keyline__note">Estimated to reach an invest / don’t invest decision</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">GENERATE</div>
+            <h2 class="card__title">Validation plan</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn btn--primary" id="btnGeneratePlan" type="button">Regenerate</button>
+            <button class="btn" id="btnCopyPlan" type="button">Copy plan</button>
+          </div>
+        </div>
+
+        <div class="planLayout">
+          <div class="planLeft">
+            <div class="label">INPUTS</div>
+            <div class="form grid2">
+              <div class="field">
+                <label class="field__label" for="planHorizon">Time horizon</label>
+                <select class="input" id="planHorizon">
+                  <option value="7">7 days</option>
+                  <option value="10" selected>10 days</option>
+                  <option value="14">14 days</option>
+                  <option value="21">21 days</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label class="field__label" for="planTeam">Team capacity</label>
+                <select class="input" id="planTeam">
+                  <option value="solo">Solo PM</option>
+                  <option value="pm-design">PM + design</option>
+                  <option value="pod">Cross-functional pod</option>
+                </select>
+              </div>
+
+              <div class="field field--full">
+                <label class="field__label" for="planConstraint">Constraint (optional)</label>
+                <input class="input" id="planConstraint" type="text" autocomplete="off" placeholder="e.g., no user data leaves EU; sales-led only; must reuse current infra" />
+              </div>
+            </div>
+
+            <div class="inlineHelp">
+              <div class="tag">NOTE — PLAN LOGIC</div>
+              <div class="inlineHelp__text">
+                Steps are derived from your lowest-confidence, highest-criticality assumptions.
+              </div>
+            </div>
+          </div>
+
+          <div class="planRight">
+            <div class="label">OUTPUT</div>
+            <div class="tableWrap" role="region" aria-label="Validation plan table">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">STEP</th>
+                    <th scope="col">ACTION</th>
+                    <th scope="col">SUCCESS SIGNAL</th>
+                    <th scope="col">DURATION</th>
+                    <th scope="col">OWNER</th>
+                  </tr>
+                </thead>
+                <tbody id="planBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" data-view-panel="library">
+      <header class="view__header">
+        <div class="label">PRIMARY TAKEAWAY</div>
+        <div class="hero hero--compact">
+          <div class="hero__metric">
+            <div class="hero__number" id="libraryCount">1</div>
+            <div class="hero__meta">
+              <div class="hero__verdict">IDEA LIBRARY</div>
+              <div class="hero__sub">Save versions; compare changes; restore anytime</div>
+            </div>
+          </div>
+          <div class="hero__key">
+            <div class="label">ONE NUMBER THAT MATTERS MOST</div>
+            <div class="keyline">
+              <div class="keyline__value" id="libraryActive">ACTIVE: V3</div>
+              <div class="keyline__note">The current working version</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="rule" aria-hidden="true"></div>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">SAVED</div>
+            <h2 class="card__title">Versions</h2>
+          </div>
+          <div class="card__actions">
+            <button class="btn" id="btnNewVersion" type="button">Save new version</button>
+            <button class="btn" id="btnDeleteAll" type="button">Delete all</button>
+          </div>
+        </div>
+
+        <div class="tableWrap" role="region" aria-label="Saved versions table">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">VERSION</th>
+                <th scope="col">NAME</th>
+                <th scope="col">VERDICT</th>
+                <th scope="col">SCORE</th>
+                <th scope="col">UPDATED</th>
+                <th scope="col">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="versionsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card__head">
+          <div>
+            <div class="label">COMPARE</div>
+            <h2 class="card__title">Two-version delta</h2>
+          </div>
+          <div class="card__actions">
+            <div class="filters">
+              <label class="filters__label" for="compareA">A</label>
+              <select class="input input--compact" id="compareA"></select>
+            </div>
+            <div class="filters">
+              <label class="filters__label" for="compareB">B</label>
+              <select class="input input--compact" id="compareB"></select>
+            </div>
+            <button class="btn btn--primary" id="btnCompare" type="button">Compare</button>
+          </div>
+        </div>
+
+        <div class="compare" id="comparePanel" aria-live="polite">
+          <div class="compare__empty muted" id="compareEmpty">Select two versions to see what changed.</div>
+
+          <div class="compare__grid" id="compareGrid" hidden>
+            <div class="compareBlock">
+              <div class="label">SCORE</div>
+              <div class="compareBlock__big" id="deltaScore">+0</div>
+              <div class="compareBlock__sub" id="deltaVerdict">No change in verdict</div>
+            </div>
+            <div class="compareBlock">
+              <div class="label">BIGGEST CHANGE</div>
+              <div class="compareBlock__text" id="deltaBiggest">—</div>
+              <div class="compareBlock__sub">Dimension score difference (confidence-adjusted)</div>
+            </div>
+            <div class="compareBlock compareBlock--full">
+              <div class="label">FIELD DELTAS</div>
+              <ul class="deltaList" id="deltaFields"></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <div class="toast__inner" id="toastInner">Saved</div>
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
