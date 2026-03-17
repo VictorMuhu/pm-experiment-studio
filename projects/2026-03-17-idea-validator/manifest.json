@@ -1,0 +1,27 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "decision simulators",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company preparing for roadmap review and needing a fast, defensible go/no-go on a new idea without a strategy team",
+  "problem_statement": "Senior product leaders commit roadmap time to persuasive but underspecified ideas because assumptions, differentiation, and time-to-value aren’t pressure-tested in a single decision-ready view",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with progressive sections, live scoring, and a persistent verdict side panel",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "product-strategy",
+    "roadmap-triage",
+    "idea-evaluation",
+    "assumptions",
+    "scoring-rubric",
+    "decision-support",
+    "leadership-review"
+  ]
+}
