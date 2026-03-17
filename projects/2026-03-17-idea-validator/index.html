@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:opsz,wght@5..120,300;5..120,400&family=Source+Sans+3:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="masthead" role="banner">
+    <div class="masthead__inner">
+      <div class="brand">
+        <div class="brand__kicker">Decision Support</div>
+        <div class="brand__title">Idea Validator</div>
+      </div>
+
+      <nav class="topnav" aria-label="Primary">
+        <a class="topnav__link" href="#workspace" data-route="workspace" aria-current="page">Workspace</a>
+        <a class="topnav__link" href="#scorecard" data-route="scorecard">Scorecard</a>
+        <a class="topnav__link" href="#assumptions" data-route="assumptions">Assumptions</a>
+        <a class="topnav__link" href="#next-steps" data-route="next-steps">Next steps</a>
+        <a class="topnav__link" href="#library" data-route="library">Library</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="page" role="main">
+    <section class="lede" aria-labelledby="ledeTitle">
+      <h1 id="ledeTitle" class="lede__title">A real-time pressure test for product ideas</h1>
+      <p class="lede__dek">
+        Turn an exciting but underspecified concept into a decision-ready view: what’s strong, what’s fragile, what must be true,
+        and the smallest next validation steps before allocating roadmap time.
+      </p>
+
+      <div class="lede__meta">
+        <div class="meta-line">
+          <span class="meta-label">Current</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-value" id="metaIdeaTitle">—</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-value" id="metaLastSaved">Not saved yet</span>
+        </div>
+        <div class="lede__actions">
+          <button class="btn btn--ghost" id="btnNewDraft" type="button">New draft</button>
+          <button class="btn btn--ghost" id="btnDuplicate" type="button">Duplicate</button>
+          <button class="btn btn--ghost" id="btnResetDemo" type="button">Restore demo</button>
+          <span class="lede__spacer"></span>
+          <button class="btn btn--ghost btn--danger" id="btnDeleteDraft" type="button">Delete</button>
+          <button class="btn btn--ghost btn--accent" id="btnSaveDraft" type="button">Save</button>
+        </div>
+      </div>
+
+      <blockquote class="pullquote" aria-label="Guiding principle">
+        <p class="pullquote__text">
+          The goal isn’t to “prove” an idea. It’s to find the earliest, cheapest way it could be wrong.
+        </p>
+        <footer class="pullquote__byline">— Validation rule of thumb</footer>
+      </blockquote>
+    </section>
+
+    <section class="content" id="workspace" data-view="workspace" aria-labelledby="workspaceTitle">
+      <header class="section-head">
+        <div>
+          <div class="section-kicker">Workspace</div>
+          <h2 id="workspaceTitle" class="section-title">Draft the idea in plain language</h2>
+          <p class="section-subtitle">
+            Keep it short. The validator rewards clarity over ambition.
+          </p>
+        </div>
+        <div class="section-head__aside">
+          <div class="mini-score" aria-label="Current verdict">
+            <div class="mini-score__label">Verdict</div>
+            <div class="mini-score__value" id="miniVerdict">—</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="form">
+        <div class="field">
+          <label class="label" for="ideaTitle">Idea title</label>
+          <input class="input" id="ideaTitle" name="ideaTitle" type="text" placeholder="e.g., Cancel-proof schedule suggestions for clinics" autocomplete="off" />
+          <div class="help" id="helpTitle">A short headline you’d be willing to put in a roadmap doc.</div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="ideaStage">Company stage</label>
+          <select class="select" id="ideaStage" name="ideaStage">
+            <option value="seed">Seed / pre-PMF</option>
+            <option value="series-a">Series A / early growth</option>
+            <option value="scale-up">Scale-up</option>
+            <option value="enterprise">Enterprise product org</option>
+          </select>
+          <div class="help">Scoring adapts slightly: early-stage favors learning velocity; later-stage favors integration and defensibility.</div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="problem">Problem (who, when, what breaks)</label>
+          <textarea class="textarea" id="problem" name="problem" rows="4" placeholder="Describe the moment and consequence. Avoid solutions."></textarea>
+          <div class="help"><span class="inline-status" id="qualityProblem">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="target">Target user</label>
+          <input class="input" id="target" name="target" type="text" placeholder="Role + context (not a market segment)" autocomplete="off" />
+          <div class="help"><span class="inline-status" id="qualityTarget">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="valueProp">Value proposition (why they would switch)</label>
+          <textarea class="textarea" id="valueProp" name="valueProp" rows="3" placeholder="One or two sentences. What changes for the user?"></textarea>
+          <div class="help"><span class="inline-status" id="qualityValueProp">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="solution">Solution sketch (what it does, not how)</label>
+          <textarea class="textarea" id="solution" name="solution" rows="3" placeholder="What would the user experience? Keep it tangible."></textarea>
+          <div class="help"><span class="inline-status" id="qualitySolution">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="differentiation">Differentiation (compared to the default option)</label>
+          <textarea class="textarea" id="differentiation" name="differentiation" rows="3" placeholder="The default is usually: spreadsheets, status quo tools, or doing nothing."></textarea>
+          <div class="help"><span class="inline-status" id="qualityDifferentiation">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="competitors">Known competitors / substitutes (comma-separated)</label>
+          <input class="input" id="competitors" name="competitors" type="text" placeholder="e.g., Notion, Excel, vendor portals, in-house ops scripts" autocomplete="off" />
+          <div class="help">Substitutes count (manual workarounds, internal processes).</div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="channels">Distribution channel (how it reaches users)</label>
+          <textarea class="textarea" id="channels" name="channels" rows="2" placeholder="Where will it be discovered or sold?"></textarea>
+          <div class="help"><span class="inline-status" id="qualityChannels">—</span></div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="successMetric">Success metric (first measurable win)</label>
+          <input class="input" id="successMetric" name="successMetric" type="text" placeholder="e.g., reduce no-show rate by 10% in 8 weeks" autocomplete="off" />
+          <div class="help"><span class="inline-status" id="qualityMetric">—</span></div>
+        </div>
+
+        <div class="field field--compact">
+          <label class="label" for="constraints">Constraints & risks (optional)</label>
+          <textarea class="textarea" id="constraints" name="constraints" rows="2" placeholder="Regulatory, data availability, integration, procurement, reliability…"></textarea>
+          <div class="help">Used to flag execution risk — not to punish ambitious ideas.</div>
+        </div>
+
+        <div class="field">
+          <div class="inline-actions">
+            <button class="btn btn--ghost btn--accent" id="btnRunCheck" type="button">Run check</button>
+            <button class="btn btn--ghost" id="btnExport" type="button">Export summary</button>
+          </div>
+          <div class="help">“Run check” updates the scorecard, assumptions, and next steps based on what you’ve written.</div>
+        </div>
+      </div>
+
+      <section class="results" aria-label="Instant feedback">
+        <div class="results__header">
+          <div>
+            <div class="section-kicker">Instant read</div>
+            <h3 class="section-title section-title--small">What looks strong & what looks fragile</h3>
+          </div>
+        </div>
+
+        <div class="readout">
+          <div class="readout__col">
+            <h4 class="readout__title">Strongest signals</h4>
+            <ul class="list" id="signalsStrong" aria-live="polite"></ul>
+          </div>
+          <div class="readout__col">
+            <h4 class="readout__title">Weakest assumptions</h4>
+            <ul class="list" id="signalsWeak" aria-live="polite"></ul>
+          </div>
+        </div>
+
+        <div class="rules" aria-label="Reasoning hints">
+          <details class="details">
+            <summary class="details__summary">How the validator thinks</summary>
+            <div class="details__body">
+              <p>
+                Scores are derived from clarity checks (specificity, falsifiability), decision readiness (metric + channel),
+                risk adjustments (competition density, constraints), and stage-specific weighting.
+              </p>
+              <p>
+                It does not “invent” market facts. It flags what you didn’t specify and suggests validation steps that fit the missing pieces.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+    </section>
+
+    <section class="content" id="scorecard" data-view="scorecard" aria-labelledby="scorecardTitle" hidden>
+      <header class="section-head">
+        <div>
+          <div class="section-kicker">Scorecard</div>
+          <h2 id="scorecardTitle" class="section-title">Decision-ready signals</h2>
+          <p class="section-subtitle">A structured readout with weighted dimensions and what moved the score.</p>
+        </div>
+      </header>
+
+      <div class="scorecard">
+        <div class="verdict">
+          <div class="verdict__kicker">Overall</div>
+          <div class="verdict__row">
+            <div class="verdict__score">
+              <div class="verdict__number" id="overallScore">—</div>
+              <div class="verdict__outof">/ 100</div>
+            </div>
+            <div class="verdict__summary">
+              <div class="verdict__label" id="verdictLabel">—</div>
+              <div class="verdict__reason" id="verdictReason">Run a check to see what’s driving the result.</div>
+              <div class="verdict__tags" id="verdictTags" aria-label="Verdict tags"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Dimension table" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Dimension</th>
+                <th scope="col">Score</th>
+                <th scope="col">Why it’s this score</th>
+                <th scope="col">What would raise it</th>
+              </tr>
+            </thead>
+            <tbody id="dimensionRows"></tbody>
+          </table>
+        </div>
+
+        <div class="chapter-break" aria-hidden="true">
+          <span class="chapter-break__rule"></span>
+          <span class="chapter-break__text">Notes</span>
+          <span class="chapter-break__rule"></span>
+        </div>
+
+        <div class="notes">
+          <p class="notes__p" id="notesBlurb"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="content" id="assumptions" data-view="assumptions" aria-labelledby="assumptionsTitle" hidden>
+      <header class="section-head">
+        <div>
+          <div class="section-kicker">Assumptions</div>
+          <h2 id="assumptionsTitle" class="section-title">What must be true</h2>
+          <p class="section-subtitle">
+            The tool extracts the most fragile assumptions from the draft and pairs each with a validation method.
+          </p>
+        </div>
+        <div class="section-head__aside">
+          <button class="btn btn--ghost" id="btnAddAssumption" type="button">Add an assumption</button>
+        </div>
+      </header>
+
+      <div class="assumptions">
+        <div class="assumptions__list" id="assumptionList" aria-live="polite"></div>
+
+        <aside class="aside">
+          <div class="aside__kicker">Focus</div>
+          <h3 class="aside__title">Assumption editor</h3>
+          <p class="aside__text">Select an assumption to refine wording, evidence, and confidence. Your edits persist.</p>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpStatement">Assumption statement</label>
+            <textarea class="textarea" id="assumpStatement" rows="3" placeholder="Write it so it could be wrong."></textarea>
+          </div>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpWhy">Why it’s fragile</label>
+            <textarea class="textarea" id="assumpWhy" rows="3" placeholder="What would make this untrue?"></textarea>
+          </div>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpEvidence">Current evidence (what you actually know)</label>
+            <textarea class="textarea" id="assumpEvidence" rows="3" placeholder="Links, numbers, interviews, anecdotes — label confidence."></textarea>
+          </div>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpConfidence">Confidence</label>
+            <input class="range" id="assumpConfidence" type="range" min="0" max="100" step="5" />
+            <div class="range__meta">
+              <span class="meta-label">Low</span>
+              <span class="meta-value" id="assumpConfidenceValue">—</span>
+              <span class="meta-label">High</span>
+            </div>
+          </div>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpTest">Best validation method</label>
+            <select class="select" id="assumpTest">
+              <option value="interviews">User interviews</option>
+              <option value="landing">Landing page / waitlist</option>
+              <option value="concierge">Concierge pilot</option>
+              <option value="prototype">Clickable prototype test</option>
+              <option value="data">Data pull / log analysis</option>
+              <option value="pricing">Pricing / willingness-to-pay</option>
+              <option value="sales">Sales calls / procurement test</option>
+              <option value="tech">Technical spike</option>
+            </select>
+          </div>
+
+          <div class="field field--tight">
+            <label class="label" for="assumpOwner">Owner</label>
+            <input class="input" id="assumpOwner" type="text" placeholder="e.g., PM (you), Design, Eng, Sales" autocomplete="off" />
+          </div>
+
+          <div class="inline-actions">
+            <button class="btn btn--ghost btn--accent" id="btnSaveAssumption" type="button">Save assumption</button>
+            <button class="btn btn--ghost btn--danger" id="btnDeleteAssumption" type="button">Delete</button>
+          </div>
+
+          <div class="help" id="assumpHelp">No assumption selected.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="content" id="next-steps" data-view="next-steps" aria-labelledby="nextStepsTitle" hidden>
+      <header class="section-head">
+        <div>
+          <div class="section-kicker">Next steps</div>
+          <h2 id="nextStepsTitle" class="section-title">A small validation plan</h2>
+          <p class="section-subtitle">
+            Suggested steps are derived from the weakest assumptions. Reorder them into your actual plan.
+          </p>
+        </div>
+        <div class="section-head__aside">
+          <button class="btn btn--ghost" id="btnAddStep" type="button">Add a step</button>
+        </div>
+      </header>
+
+      <div class="steps">
+        <div class="table-wrap" role="region" aria-label="Validation plan" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Order</th>
+                <th scope="col">Step</th>
+                <th scope="col">Method</th>
+                <th scope="col">Effort</th>
+                <th scope="col">Signal</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Done</th>
+              </tr>
+            </thead>
+            <tbody id="stepRows"></tbody>
+          </table>
+        </div>
+
+        <div class="inline-actions">
+          <button class="btn btn--ghost" id="btnMoveUp" type="button">Move up</button>
+          <button class="btn btn--ghost" id="btnMoveDown" type="button">Move down</button>
+          <button class="btn btn--ghost" id="btnToggleDone" type="button">Toggle done</button>
+        </div>
+
+        <div class="help" id="stepHelp">Select a row to reorder or mark done.</div>
+      </div>
+    </section>
+
+    <section class="content" id="library" data-view="library" aria-labelledby="libraryTitle" hidden>
+      <header class="section-head">
+        <div>
+          <div class="section-kicker">Library</div>
+          <h2 id="libraryTitle" class="section-title">Saved drafts</h2>
+          <p class="section-subtitle">Keep a small archive of ideas you’ve pressure-tested. Everything is stored locally in your browser.</p>
+        </div>
+        <div class="section-head__aside">
+          <div class="field field--tight">
+            <label class="label" for="searchLibrary">Search</label>
+            <input class="input" id="searchLibrary" type="text" placeholder="Title, target, keyword…" autocomplete="off" />
+          </div>
+        </div>
+      </header>
+
+      <div class="library">
+        <div class="table-wrap" role="region" aria-label="Draft library" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Verdict</th>
+                <th scope="col">Score</th>
+                <th scope="col">Last updated</th>
+                <th scope="col">Tags</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="libraryRows"></tbody>
+          </table>
+        </div>
+        <p class="help">Tip: Duplicate a draft before you make a risky change, so you can compare verdicts.</p>
+      </div>
+    </section>
+
+    <footer class="footer" role="contentinfo">
+      <div class="footer__rule"></div>
+      <div class="footer__inner">
+        <div class="footer__meta">
+          <span class="meta-label">Local-only</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-value">No network calls</span>
+          <span class="meta-dot">·</span>
+          <span class="meta-value">Autosaves on explicit Save</span>
+        </div>
+        <div class="footer__meta">
+          <a class="text-link" href="#workspace" data-route="workspace">Back to workspace</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true" hidden>
+    <div class="toast__inner">
+      <div class="toast__message" id="toastMessage">Saved.</div>
+      <button class="btn btn--ghost toast__close" id="toastClose" type="button">Close</button>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
