@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PM Vibe Agent Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app" class="app" aria-label="PM Vibe Agent Run">
+    <header class="topbar">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">PM</div>
+          <div class="brand__text">
+            <div class="brand__title">Vibe Agent Run</div>
+            <div class="brand__subtitle">Decision simulator • 10-minute memo under pressure</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar__center">
+        <div class="timer" role="group" aria-label="Timer">
+          <div class="label">TIME LEFT</div>
+          <div class="timer__row">
+            <div class="timer__value" id="timerValue">10:00</div>
+            <div class="timer__bar" aria-hidden="true">
+              <div class="timer__barFill" id="timerBarFill"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpis" aria-label="Key metrics">
+          <div class="kpi">
+            <div class="label">CONSISTENCY</div>
+            <div class="kpi__row">
+              <div class="ring" id="consistencyRing" aria-hidden="true">
+                <div class="ring__inner">
+                  <div class="ring__value" id="consistencyScore">—</div>
+                  <div class="ring__caption">/100</div>
+                </div>
+              </div>
+              <div class="kpi__meta">
+                <div class="kpi__big" id="gradeLabel">—</div>
+                <div class="kpi__small" id="contradictionCount">0 contradictions</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi">
+            <div class="label">RISK BALANCE</div>
+            <div class="kpi__row">
+              <div class="kpi__big mono" id="riskBalance">—</div>
+              <div class="kpi__meta">
+                <div class="kpi__small">Reliability vs Growth signal</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kpi">
+            <div class="label">MEMO COMPLETION</div>
+            <div class="kpi__row">
+              <div class="kpi__big mono" id="memoCompletion">—</div>
+              <div class="kpi__meta">
+                <div class="kpi__small">Required fields coverage</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar__right">
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Mode toggle">
+            <button class="seg__btn is-active" data-mode="run" id="modeRunBtn" type="button">RUN</button>
+            <button class="seg__btn" data-mode="review" id="modeReviewBtn" type="button">REVIEW</button>
+          </div>
+
+          <button class="btn btn--ghost" id="stressToggleBtn" type="button" aria-pressed="false" title="Toggle stress test mode">
+            <span class="btn__icon" aria-hidden="true">⚙</span>
+            <span class="btn__label">STRESS</span>
+          </button>
+
+          <button class="btn btn--outline" id="resetBtn" type="button" title="Reset run">
+            <span class="btn__icon" aria-hidden="true">↻</span>
+            <span class="btn__label">RESET</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="layout">
+      <aside class="sidebar" aria-label="Scenario sidebar">
+        <div class="panel panel--tight">
+          <div class="panel__header">
+            <div class="panel__titleRow">
+              <div class="panel__title">SCENARIOS</div>
+              <div class="panel__hint">Click a row</div>
+            </div>
+            <div class="panel__actions">
+              <input id="scenarioSearch" class="input input--search" type="search" placeholder="Search scenarios…" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="tableWrap" role="region" aria-label="Scenario list">
+            <table class="table table--dense" aria-describedby="scenarioTableHelp">
+              <thead>
+                <tr>
+                  <th style="width: 38%">TITLE</th>
+                  <th style="width: 18%">TYPE</th>
+                  <th style="width: 18%">SEVERITY</th>
+                  <th style="width: 26%">CONTEXT</th>
+                </tr>
+              </thead>
+              <tbody id="scenarioTbody"></tbody>
+            </table>
+            <div id="scenarioTableHelp" class="srOnly">Select a scenario to load context and signals.</div>
+          </div>
+        </div>
+
+        <div class="panel panel--tight">
+          <div class="panel__header">
+            <div class="panel__titleRow">
+              <div class="panel__title">SIGNALS</div>
+              <div class="panel__hint" id="signalsHint">Click to inspect</div>
+            </div>
+            <div class="panel__actions">
+              <div class="seg seg--small" role="group" aria-label="Signal filter">
+                <button class="seg__btn is-active" data-signal-filter="all" type="button">ALL</button>
+                <button class="seg__btn" data-signal-filter="revenue" type="button">REV</button>
+                <button class="seg__btn" data-signal-filter="support" type="button">SUPPORT</button>
+                <button class="seg__btn" data-signal-filter="eng" type="button">ENG</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="list" id="signalsList" role="list"></div>
+        </div>
+      </aside>
+
+      <section class="main" aria-label="Decision workspace">
+        <div class="panel panel--tight">
+          <div class="panel__header">
+            <div class="panel__titleRow">
+              <div class="panel__title">WORKSPACE</div>
+              <div class="panel__hint" id="workspaceHint">Constraint → action → memo</div>
+            </div>
+
+            <div class="panel__actions">
+              <button class="btn btn--ghost" id="startPauseBtn" type="button">
+                <span class="btn__icon" aria-hidden="true">⏱</span>
+                <span class="btn__label" id="startPauseLabel">START</span>
+              </button>
+              <button class="btn btn--outline" id="lockDecisionBtn" type="button" disabled>
+                <span class="btn__icon" aria-hidden="true">✓</span>
+                <span class="btn__label">LOCK DECISION</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="workspaceGrid">
+            <section class="subpanel" aria-label="Constraints">
+              <div class="subpanel__header">
+                <div class="subpanel__title">CONSTRAINTS (CLAIMED)</div>
+                <div class="subpanel__meta">
+                  <span class="pill pill--muted mono" id="constraintsCount">0 selected</span>
+                  <span class="pill pill--accent mono" id="constraintWeightSum">0 pts</span>
+                </div>
+              </div>
+              <div class="subpanel__body">
+                <div class="helpText">Pick up to 3. These become the rubric your decision is graded against.</div>
+                <div class="chips" id="constraintsChips" aria-label="Constraints list"></div>
+              </div>
+            </section>
+
+            <section class="subpanel" aria-label="Action choice">
+              <div class="subpanel__header">
+                <div class="subpanel__title">ACTION (WHAT YOU’LL DO)</div>
+                <div class="subpanel__meta">
+                  <span class="pill pill--muted mono" id="actionsCount">0 selected</span>
+                  <span class="pill pill--warning mono" id="actionRisk">risk: —</span>
+                </div>
+              </div>
+              <div class="subpanel__body">
+                <div class="helpText">Choose one. Trade-offs are baked in. Inspector will show conflicts.</div>
+                <div class="actionList" id="actionsList" role="list"></div>
+              </div>
+            </section>
+
+            <section class="subpanel subpanel--memo" aria-label="Decision memo">
+              <div class="subpanel__header">
+                <div class="subpanel__title">DECISION MEMO</div>
+                <div class="subpanel__meta">
+                  <span class="pill pill--positive mono" id="memoStatus">editable</span>
+                  <span class="pill pill--muted mono" id="wordCount">0 words</span>
+                </div>
+              </div>
+              <div class="subpanel__body">
+                <div class="memo">
+                  <div class="memo__row">
+                    <label class="label" for="memoCall">THE CALL</label>
+                    <input class="input input--mono" id="memoCall" type="text" maxlength="120" autocomplete="off" />
+                    <div class="caption" id="memoCallHint">One sentence. Be specific about scope and timing.</div>
+                  </div>
+
+                  <div class="memo__grid">
+                    <div class="memo__cell">
+                      <label class="label" for="memoRationale">RATIONALE</label>
+                      <textarea class="input input--mono" id="memoRationale" rows="5"></textarea>
+                      <div class="caption">2–5 bullets preferred. Tie to signals + constraints.</div>
+                    </div>
+
+                    <div class="memo__cell">
+                      <label class="label" for="memoRisks">RISKS</label>
+                      <textarea class="input input--mono" id="memoRisks" rows="5"></textarea>
+                      <div class="caption">Name what could break + who is impacted.</div>
+                    </div>
+
+                    <div class="memo__cell">
+                      <label class="label" for="memoNextSteps">NEXT STEPS (48H)</label>
+                      <textarea class="input input--mono" id="memoNextSteps" rows="5"></textarea>
+                      <div class="caption">Concrete owners + checks. No “investigate” without a plan.</div>
+                    </div>
+
+                    <div class="memo__cell">
+                      <label class="label" for="memoNonGoals">NON-GOALS</label>
+                      <textarea class="input input--mono" id="memoNonGoals" rows="5"></textarea>
+                      <div class="caption">What you’re explicitly not doing to stay coherent.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="Inspector panel">
+        <div class="panel panel--tight">
+          <div class="panel__header">
+            <div class="panel__titleRow">
+              <div class="panel__title">INSPECTOR</div>
+              <div class="panel__hint" id="inspectorHint">Selected item details</div>
+            </div>
+            <div class="panel__actions">
+              <button class="btn btn--ghost" id="copySummaryBtn" type="button" title="Copy summary to clipboard">
+                <span class="btn__icon" aria-hidden="true">⎘</span>
+                <span class="btn__label">COPY</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="inspectorBody">
+            <div class="inspectorBlock">
+              <div class="label">FOCUS</div>
+              <div class="inspectorTitle" id="inspectorTitle">—</div>
+              <div class="inspectorSub" id="inspectorSub">Select a scenario, signal, or action</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="inspectorBlock">
+              <div class="label">CONSTRAINT FIT</div>
+              <div class="fit" id="fitBlock">
+                <div class="fit__row">
+                  <div class="fit__label">GOOD</div>
+                  <div class="fit__items" id="fitGood"></div>
+                </div>
+                <div class="fit__row">
+                  <div class="fit__label">RISK</div>
+                  <div class="fit__items" id="fitRisk"></div>
+                </div>
+                <div class="fit__row">
+                  <div class="fit__label">CONTRADICTION</div>
+                  <div class="fit__items" id="fitBad"></div>
+                </div>
+              </div>
+              <div class="caption" id="fitCaption">Select constraints and an action to see evaluation.</div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="inspectorBlock">
+              <div class="label">FLAGS</div>
+              <div class="flags" id="flagsList"></div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="inspectorBlock">
+              <div class="label">RUN LOG</div>
+              <div class="log" id="runLog" role="log" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer class="footer">
+      <div class="footer__left mono">v1 prototype • local-only • seeded demo state</div>
+      <div class="footer__right mono" id="footerContext">—</div>
+    </footer>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
