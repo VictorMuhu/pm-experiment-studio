@@ -1,0 +1,26 @@
+{
+  "name": "Design Coach",
+  "slug": "design-coach",
+  "date_created": "2026-03-17",
+  "bucket": "GTM workflow tools",
+  "persona": "A PM or product designer at a 30–300 person SaaS company preparing a design review and needing to pressure-test a user flow for edge cases without QA support",
+  "problem_statement": "Teams map happy-path user flows and only discover missing edge cases, recovery paths, and failure handling during review, causing rework and shipped gaps",
+  "complexity": "Simple",
+  "artifact_type": "single-page web app with flow canvas + node inspector + rubric-based scoring",
+  "style_direction": "mobile-ambient",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "design-review",
+    "user-flows",
+    "edge-cases",
+    "failure-modes",
+    "product-design",
+    "ux"
+  ]
+}
