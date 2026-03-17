@@ -1,0 +1,27 @@
+{
+  "name": "Sprint Retro Diff",
+  "slug": "sprint-retro-diff",
+  "date_created": "2026-03-17",
+  "bucket": "analytics/debugging tools",
+  "persona": "A delivery-focused product manager at a 30–150 person org running two-week sprints who needs a credible sprint-to-sprint retro narrative without BI support",
+  "problem_statement": "Retrospectives often turn sprint performance into a vibes-based story because velocity, scope churn, and blockers live in separate artifacts with no consistent attribution rubric",
+  "complexity": "Intermediate",
+  "artifact_type": "multi-step wizard that generates a retro-ready comparison report (Markdown + JSON export)",
+  "style_direction": "playful-consumer",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "retrospective",
+    "agile",
+    "delivery",
+    "velocity",
+    "scope-churn",
+    "blockers",
+    "attribution"
+  ]
+}
