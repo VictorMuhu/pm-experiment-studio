@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OKR Bet Scorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand__title">OKR BET SCORER</div>
+        <div class="brand__meta">
+          <span class="pill pill--muted">Q2</span>
+          <span class="pill pill--muted">Customer Experience</span>
+          <span class="pill pill--muted">Worksheet</span>
+        </div>
+      </div>
+
+      <div class="topbar__actions">
+        <div class="search">
+          <span class="search__icon" aria-hidden="true">⌕</span>
+          <input id="searchInput" class="search__input" type="search" spellcheck="false" autocomplete="off" placeholder="Search bets / owners / OKRs…" />
+          <button id="clearSearchBtn" class="btn btn--ghost btn--icon" type="button" aria-label="Clear search" title="Clear search">✕</button>
+        </div>
+
+        <div class="action-group">
+          <button id="addBetBtn" class="btn btn--outline" type="button" title="Add a bet">＋ ADD BET</button>
+          <button id="addOkrBtn" class="btn btn--outline" type="button" title="Add an OKR">＋ ADD OKR</button>
+          <button id="exportBtn" class="btn btn--ghost" type="button" title="Copy results as TSV">⎘ COPY TSV</button>
+          <button id="resetBtn" class="btn btn--ghost" type="button" title="Reset demo data">↺ RESET</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="pane pane--sidebar" aria-label="OKR coverage pane">
+        <div class="pane__header">
+          <div class="pane__title">OKR COVERAGE</div>
+          <div class="pane__sub" id="okrSummarySub">—</div>
+        </div>
+
+        <div class="sidebar__controls">
+          <label class="field">
+            <div class="field__label">PLANNING THRESHOLDS</div>
+            <div class="field__help">Use these cut lines for “ship / hold / cut” discussions.</div>
+            <div class="thresholds">
+              <div class="threshold">
+                <div class="threshold__label">STRONG ≥</div>
+                <input id="strongThreshold" class="input input--num" type="number" min="0" max="100" step="1" />
+              </div>
+              <div class="threshold">
+                <div class="threshold__label">WEAK ≥</div>
+                <input id="weakThreshold" class="input input--num" type="number" min="0" max="100" step="1" />
+              </div>
+            </div>
+          </label>
+
+          <label class="field">
+            <div class="field__label">RISK PENALTY</div>
+            <div class="field__help">Subtract from the fit score based on risk level.</div>
+            <div class="risk-penalties">
+              <div class="risk-penalty">
+                <div class="risk-penalty__label">LOW</div>
+                <input id="penLow" class="input input--num" type="number" min="0" max="40" step="1" />
+              </div>
+              <div class="risk-penalty">
+                <div class="risk-penalty__label">MED</div>
+                <input id="penMed" class="input input--num" type="number" min="0" max="40" step="1" />
+              </div>
+              <div class="risk-penalty">
+                <div class="risk-penalty__label">HIGH</div>
+                <input id="penHigh" class="input input--num" type="number" min="0" max="40" step="1" />
+              </div>
+            </div>
+          </label>
+
+          <label class="field">
+            <div class="field__label">SORT</div>
+            <select id="sortMode" class="select">
+              <option value="score-desc">SCORE (DESC)</option>
+              <option value="score-asc">SCORE (ASC)</option>
+              <option value="title-asc">BET NAME (A→Z)</option>
+              <option value="owner-asc">OWNER (A→Z)</option>
+              <option value="coverage-asc">OKR COVERAGE (LOW→HIGH)</option>
+            </select>
+          </label>
+
+          <div class="toggle-row">
+            <label class="toggle">
+              <input id="toggleHideBelowWeak" type="checkbox" />
+              <span class="toggle__box" aria-hidden="true"></span>
+              <span class="toggle__label">HIDE &lt; WEAK</span>
+            </label>
+            <label class="toggle">
+              <input id="toggleOnlyOrphans" type="checkbox" />
+              <span class="toggle__box" aria-hidden="true"></span>
+              <span class="toggle__label">ONLY ORPHANS</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="sidebar__tablewrap">
+          <table class="table table--dense" id="okrTable">
+            <thead>
+              <tr>
+                <th style="width: 56%">OKR</th>
+                <th style="width: 16%" class="th-num">COV</th>
+                <th style="width: 14%" class="th-num">BETS</th>
+                <th style="width: 14%" class="th-num">GAP</th>
+              </tr>
+            </thead>
+            <tbody id="okrTbody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="sidebar__footer">
+          <div class="minihelp">
+            <div class="minihelp__title">HOW TO USE</div>
+            <div class="minihelp__body">
+              Click a bet row to edit its OKR mapping. Coverage shows whether each OKR has meaningful weight across the roadmap.
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="pane pane--main" aria-label="Bets pane">
+        <div class="pane__header pane__header--sticky">
+          <div class="pane__title">ROADMAP BETS</div>
+          <div class="pane__right">
+            <div class="kpis" id="kpiStrip">
+              <!-- populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <div class="main__tablewrap">
+          <table class="table table--dense table--bets" id="betsTable">
+            <thead>
+              <tr>
+                <th style="width: 30%">BET</th>
+                <th style="width: 12%">OWNER</th>
+                <th style="width: 10%">RISK</th>
+                <th style="width: 10%" class="th-num">EFFORT</th>
+                <th style="width: 12%" class="th-num">FIT</th>
+                <th style="width: 10%" class="th-num">FINAL</th>
+                <th style="width: 16%">SIGNAL</th>
+              </tr>
+            </thead>
+            <tbody id="betsTbody">
+              <!-- populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="main__footer">
+          <div class="legend">
+            <div class="legend__item"><span class="chip chip--pos">STRONG</span><span class="legend__text">clear OKR support</span></div>
+            <div class="legend__item"><span class="chip chip--warn">WEAK</span><span class="legend__text">needs tighter narrative or scope</span></div>
+            <div class="legend__item"><span class="chip chip--neg">ORPHAN</span><span class="legend__text">no meaningful OKR mapping</span></div>
+          </div>
+          <div class="hint" id="hintArea">Select a bet to view/edit its OKR mapping.</div>
+        </div>
+      </main>
+
+      <section class="pane pane--detail" aria-label="Detail pane">
+        <div class="pane__header">
+          <div class="pane__title">BET DETAILS</div>
+          <div class="pane__sub" id="detailSub">No bet selected</div>
+        </div>
+
+        <div class="detail__body">
+          <div class="detail__empty" id="detailEmpty">
+            <div class="empty__title">SELECT A BET</div>
+            <div class="empty__text">Pick a row from the bets table. You’ll edit mapping weights and see the score breakdown.</div>
+          </div>
+
+          <div class="detail__content" id="detailContent" hidden>
+            <div class="detail__section">
+              <div class="section__header">
+                <div class="section__title">META</div>
+                <div class="section__actions">
+                  <button id="deleteBetBtn" class="btn btn--ghost btn--danger" type="button">🗑 DELETE</button>
+                </div>
+              </div>
+
+              <div class="formgrid">
+                <label class="field">
+                  <div class="field__label">BET NAME</div>
+                  <input id="detailTitle" class="input" type="text" spellcheck="false" />
+                </label>
+
+                <label class="field">
+                  <div class="field__label">OWNER</div>
+                  <input id="detailOwner" class="input" type="text" spellcheck="false" />
+                </label>
+
+                <label class="field">
+                  <div class="field__label">RISK</div>
+                  <select id="detailRisk" class="select">
+                    <option value="low">LOW</option>
+                    <option value="med">MED</option>
+                    <option value="high">HIGH</option>
+                  </select>
+                </label>
+
+                <label class="field">
+                  <div class="field__label">EFFORT (1–10)</div>
+                  <input id="detailEffort" class="input input--num" type="number" min="1" max="10" step="1" />
+                </label>
+
+                <label class="field field--span2">
+                  <div class="field__label">NOTES (OPTIONAL)</div>
+                  <textarea id="detailNotes" class="textarea" rows="3" spellcheck="false"></textarea>
+                </label>
+              </div>
+            </div>
+
+            <div class="detail__section">
+              <div class="section__header">
+                <div class="section__title">OKR MAPPING (WEIGHTS)</div>
+                <div class="section__meta" id="mappingMeta">—</div>
+              </div>
+
+              <div class="mapping__tablewrap">
+                <table class="table table--dense" id="mappingTable">
+                  <thead>
+                    <tr>
+                      <th style="width: 62%">OKR</th>
+                      <th style="width: 20%" class="th-num">WEIGHT</th>
+                      <th style="width: 18%" class="th-num">CONTRIB</th>
+                    </tr>
+                  </thead>
+                  <tbody id="mappingTbody">
+                    <!-- populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+              <div class="mapping__footer">
+                <div class="mapping__note">Weights are per-bet and don’t need to sum to 100. Use 0 to indicate “not supported.”</div>
+              </div>
+            </div>
+
+            <div class="detail__section">
+              <div class="section__header">
+                <div class="section__title">SCORE BREAKDOWN</div>
+                <div class="section__meta" id="scoreMeta">—</div>
+              </div>
+
+              <div class="breakdown">
+                <div class="breakdown__row">
+                  <div class="breakdown__label">RAW FIT (OKR IMPORTANCE × WEIGHT)</div>
+                  <div class="breakdown__value" id="bdRaw">—</div>
+                </div>
+                <div class="breakdown__row">
+                  <div class="breakdown__label">RISK PENALTY</div>
+                  <div class="breakdown__value" id="bdRisk">—</div>
+                </div>
+                <div class="breakdown__row">
+                  <div class="breakdown__label">EFFORT PENALTY</div>
+                  <div class="breakdown__value" id="bdEffort">—</div>
+                </div>
+                <div class="breakdown__row breakdown__row--total">
+                  <div class="breakdown__label">FINAL SCORE</div>
+                  <div class="breakdown__value" id="bdFinal">—</div>
+                </div>
+              </div>
+
+              <div class="signals" id="signalList">
+                <!-- populated by JS -->
+              </div>
+            </div>
+
+            <div class="detail__section detail__section--tight">
+              <div class="section__header">
+                <div class="section__title">EXPORT</div>
+                <div class="section__meta">Share in planning docs</div>
+              </div>
+              <div class="export-row">
+                <button id="copyBetSummaryBtn" class="btn btn--outline" type="button">⎘ COPY BET SUMMARY</button>
+                <button id="copyCoverageBtn" class="btn btn--outline" type="button">⎘ COPY OKR COVERAGE</button>
+              </div>
+              <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
