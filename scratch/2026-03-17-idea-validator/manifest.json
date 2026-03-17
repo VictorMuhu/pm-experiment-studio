@@ -1,0 +1,27 @@
+{
+  "name": "Idea Validator",
+  "slug": "idea-validator",
+  "date_created": "2026-03-17",
+  "bucket": "customer experience tools",
+  "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company deciding whether a customer-facing idea deserves roadmap time without a dedicated research or strategy team",
+  "problem_statement": "Teams commit to product ideas based on intuition and enthusiasm, then discover vague pain, weak differentiation, and hidden complexity only after roadmap time is already spent",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app with live scoring, weakness flags, assumption breakdown, and a persistent verdict panel",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "idea-evaluation",
+    "product-strategy",
+    "assumptions",
+    "decision-support",
+    "roadmap-intake",
+    "validation-plan",
+    "scoring-rubric"
+  ]
+}
