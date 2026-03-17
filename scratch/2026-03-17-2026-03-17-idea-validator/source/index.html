@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idea Validator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar__left">
+      <div class="brand">
+        <div class="brand__mark" aria-hidden="true">
+          <span class="led led--accent" aria-hidden="true"></span>
+        </div>
+        <div class="brand__text">
+          <div class="brand__title">IDEA VALIDATOR</div>
+          <div class="brand__subtitle">Live-scoring pressure test • verdict + assumptions + next actions</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="tabs" aria-label="Panels">
+      <button class="tab is-active" data-panel="panel-brief" type="button" aria-current="page">
+        <span class="tab__cap" aria-hidden="true"></span>
+        <span class="tab__label">BRIEF</span>
+      </button>
+      <button class="tab" data-panel="panel-controls" type="button">
+        <span class="tab__cap" aria-hidden="true"></span>
+        <span class="tab__label">CONTROLS</span>
+      </button>
+      <button class="tab" data-panel="panel-report" type="button">
+        <span class="tab__cap" aria-hidden="true"></span>
+        <span class="tab__label">REPORT</span>
+      </button>
+    </nav>
+
+    <div class="topbar__right">
+      <div class="topbar__actions">
+        <button id="btn-ledRisk" class="led-toggle" type="button" aria-pressed="false" title="Toggle Risk LEDs">
+          <span class="led-toggle__ring" aria-hidden="true"></span>
+          <span class="led-toggle__dot" aria-hidden="true"></span>
+          <span class="led-toggle__label">RISK LEDS</span>
+        </button>
+        <button id="btn-reset" class="led-toggle led-toggle--danger" type="button" aria-pressed="false" title="Reset to demo idea">
+          <span class="led-toggle__ring" aria-hidden="true"></span>
+          <span class="led-toggle__dot" aria-hidden="true"></span>
+          <span class="led-toggle__label">RESET</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="grid" aria-label="Idea Validator dashboard">
+      <!-- LEFT COLUMN -->
+      <div class="col col--left">
+        <section id="panel-brief" class="panel is-active" aria-label="Brief">
+          <header class="panel__header">
+            <div class="panel__titleblock">
+              <div class="panel__kicker">IDEA INPUT</div>
+              <h1 class="panel__title">Concept Brief</h1>
+            </div>
+            <div class="panel__meta">
+              <span class="badge"><span class="badge__dot badge__dot--accent"></span><span class="badge__text">DEMO LOADED</span></span>
+              <span class="badge"><span class="badge__dot badge__dot--accent2"></span><span class="badge__text">10 MIN FLOW</span></span>
+            </div>
+          </header>
+
+          <div class="panel__body">
+            <div class="formgrid">
+              <label class="field">
+                <div class="field__label">IDEA NAME</div>
+                <input id="ideaName" class="input" type="text" autocomplete="off" />
+                <div class="field__hint">Short handle used in the report header</div>
+              </label>
+
+              <label class="field">
+                <div class="field__label">TARGET USER</div>
+                <input id="targetUser" class="input" type="text" autocomplete="off" />
+                <div class="field__hint">Be specific (role + context)</div>
+              </label>
+
+              <label class="field field--span2">
+                <div class="field__label">PROBLEM (ONE SENTENCE)</div>
+                <textarea id="problemStatement" class="textarea" rows="3"></textarea>
+                <div class="field__hint">Describe the failure mode you keep seeing</div>
+              </label>
+
+              <label class="field field--span2">
+                <div class="field__label">SOLUTION (WHAT YOU’LL SHIP)</div>
+                <textarea id="solutionStatement" class="textarea" rows="3"></textarea>
+                <div class="field__hint">Focus on the smallest shippable artifact</div>
+              </label>
+
+              <label class="field field--span2">
+                <div class="field__label">DIFFERENTIATOR (WHY YOU WIN)</div>
+                <textarea id="differentiator" class="textarea" rows="2"></textarea>
+                <div class="field__hint">What you can do faster / cheaper / better than alternatives</div>
+              </label>
+            </div>
+
+            <div class="panel__footer">
+              <div class="footer__left">
+                <div class="stamp">
+                  <div class="stamp__value" id="stampUpdated">—</div>
+                  <div class="stamp__label">LAST UPDATE</div>
+                </div>
+              </div>
+              <div class="footer__right">
+                <button id="btn-copy" class="btn-press" type="button">
+                  <span class="btn-press__cap" aria-hidden="true"></span>
+                  <span class="btn-press__text">COPY REPORT</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="panel-controls" class="panel" aria-label="Controls">
+          <header class="panel__header">
+            <div class="panel__titleblock">
+              <div class="panel__kicker">SCORING INPUTS</div>
+              <h2 class="panel__title">Validation Controls</h2>
+            </div>
+            <div class="panel__meta">
+              <span class="badge"><span class="badge__dot badge__dot--pos"></span><span class="badge__text">LIVE UPDATE</span></span>
+              <span class="badge"><span class="badge__dot badge__dot--border"></span><span class="badge__text">0–5 DIALS</span></span>
+            </div>
+          </header>
+
+          <div class="panel__body">
+            <div class="controls">
+              <div class="control" data-metric="pain">
+                <div class="control__head">
+                  <div class="control__label">PROBLEM INTENSITY</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-pain">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-pain" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">Does the user feel this weekly?</div>
+              </div>
+
+              <div class="control" data-metric="reach">
+                <div class="control__head">
+                  <div class="control__label">REACH / TAM FIT</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-reach">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-reach" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">Can you name 100+ buyers like this?</div>
+              </div>
+
+              <div class="control" data-metric="differentiation">
+                <div class="control__head">
+                  <div class="control__label">DIFFERENTIATION</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-differentiation">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-differentiation" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">Is it hard to copy in 3 months?</div>
+              </div>
+
+              <div class="control" data-metric="speed">
+                <div class="control__head">
+                  <div class="control__label">TIME-TO-FIRST-VALUE</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-speed">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-speed" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">Can a buyer get value in week one?</div>
+              </div>
+
+              <div class="control" data-metric="complexity">
+                <div class="control__head">
+                  <div class="control__label">DELIVERY COMPLEXITY</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-complexity">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-complexity" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">High score = complicated build & dependencies</div>
+              </div>
+
+              <div class="control" data-metric="evidence">
+                <div class="control__head">
+                  <div class="control__label">EXISTING EVIDENCE</div>
+                  <div class="control__readout">
+                    <span class="control__value" id="v-evidence">0</span>
+                    <span class="control__unit">/ 5</span>
+                  </div>
+                </div>
+                <div class="slider">
+                  <input id="s-evidence" class="slider__input" type="range" min="0" max="5" step="1" />
+                  <div class="slider__ticks" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                </div>
+                <div class="control__sub">Calls, pilots, LOIs, usage proof</div>
+              </div>
+            </div>
+
+            <div class="inline-actions">
+              <button id="btn-demoAlt" class="btn-press btn-press--alt" type="button">
+                <span class="btn-press__cap" aria-hidden="true"></span>
+                <span class="btn-press__text">LOAD ALT DEMO</span>
+              </button>
+              <div class="microhint">Tip: adjust only 2–3 dials, then read “Assumptions” first.</div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="col col--right">
+        <section id="panel-report" class="panel is-active" aria-label="Report">
+          <header class="panel__header">
+            <div class="panel__titleblock">
+              <div class="panel__kicker">OUTPUT</div>
+              <h2 class="panel__title">Risk Profile + Verdict</h2>
+            </div>
+            <div class="panel__meta">
+              <span class="badge"><span class="badge__dot badge__dot--warn"></span><span class="badge__text" id="badgeVerdict">—</span></span>
+              <span class="badge"><span class="badge__dot badge__dot--border"></span><span class="badge__text" id="badgeScore">—</span></span>
+            </div>
+          </header>
+
+          <div class="panel__body">
+            <div class="cluster">
+              <div class="gauge panel-inset" aria-label="Confidence gauge">
+                <div class="gauge__top">
+                  <div class="gauge__label">CONFIDENCE</div>
+                  <div class="gauge__readout">
+                    <span class="gauge__value" id="gConfidence">0</span>
+                    <span class="gauge__unit">/ 100</span>
+                  </div>
+                </div>
+
+                <div class="dial">
+                  <div class="dial__ring" aria-hidden="true"></div>
+                  <div class="dial__face" aria-hidden="true"></div>
+                  <div class="dial__ticks" aria-hidden="true"></div>
+                  <div class="dial__needle" id="needle" aria-hidden="true"></div>
+                  <div class="dial__hub" aria-hidden="true"></div>
+                </div>
+
+                <div class="gauge__bottom">
+                  <div class="ledrow" aria-label="Risk LEDs">
+                    <div class="ledchip" id="led-market">
+                      <span class="led led--off" aria-hidden="true"></span>
+                      <span class="ledchip__label">MARKET RISK</span>
+                    </div>
+                    <div class="ledchip" id="led-solution">
+                      <span class="led led--off" aria-hidden="true"></span>
+                      <span class="ledchip__label">SOLUTION RISK</span>
+                    </div>
+                    <div class="ledchip" id="led-delivery">
+                      <span class="led led--off" aria-hidden="true"></span>
+                      <span class="ledchip__label">DELIVERY RISK</span>
+                    </div>
+                  </div>
+
+                  <div class="bars" aria-label="Risk bar indicators">
+                    <div class="bar">
+                      <div class="bar__label">MARKET</div>
+                      <div class="bar__track"><div class="bar__fill" id="bar-market"></div></div>
+                      <div class="bar__readout"><span id="r-market">0</span><span class="bar__unit">/ 100</span></div>
+                    </div>
+                    <div class="bar">
+                      <div class="bar__label">SOLUTION</div>
+                      <div class="bar__track"><div class="bar__fill" id="bar-solution"></div></div>
+                      <div class="bar__readout"><span id="r-solution">0</span><span class="bar__unit">/ 100</span></div>
+                    </div>
+                    <div class="bar">
+                      <div class="bar__label">DELIVERY</div>
+                      <div class="bar__track"><div class="bar__fill" id="bar-delivery"></div></div>
+                      <div class="bar__readout"><span id="r-delivery">0</span><span class="bar__unit">/ 100</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="report panel-inset" aria-label="Report summary">
+                <div class="report__head">
+                  <div class="report__title">VERDICT</div>
+                  <div class="verdict" id="verdictText">—</div>
+                </div>
+
+                <div class="report__section">
+                  <div class="report__label">WHY</div>
+                  <ul class="bullets" id="whyList"></ul>
+                </div>
+
+                <div class="report__section">
+                  <div class="report__label">TOP ASSUMPTIONS TO PROVE</div>
+                  <ol class="assumptions" id="assumptionList"></ol>
+                </div>
+
+                <div class="report__section">
+                  <div class="report__label">NEXT VALIDATION ACTIONS (THIS WEEK)</div>
+                  <ul class="actions" id="actionList"></ul>
+                </div>
+
+                <div class="report__footer">
+                  <div class="mini">
+                    <div class="mini__value" id="miniScore">—</div>
+                    <div class="mini__label">SCORE</div>
+                  </div>
+                  <div class="mini">
+                    <div class="mini__value" id="miniRisk">—</div>
+                    <div class="mini__label">RISK</div>
+                  </div>
+                  <div class="mini">
+                    <div class="mini__value" id="miniMode">LED OFF</div>
+                    <div class="mini__label">PANEL</div>
+                  </div>
+                </div>
+
+                <div class="copytoast" id="copyToast" role="status" aria-live="polite" aria-atomic="true"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" aria-label="Calibration legend">
+          <header class="panel__header">
+            <div class="panel__titleblock">
+              <div class="panel__kicker">CALIBRATION</div>
+              <h2 class="panel__title">How to Read It</h2>
+            </div>
+          </header>
+          <div class="panel__body">
+            <div class="legend">
+              <div class="legend__row">
+                <span class="badge"><span class="badge__dot badge__dot--pos"></span><span class="badge__text">PURSUE</span></span>
+                <div class="legend__text">High confidence, risks bounded, evidence present</div>
+              </div>
+              <div class="legend__row">
+                <span class="badge"><span class="badge__dot badge__dot--warn"></span><span class="badge__text">REFINE</span></span>
+                <div class="legend__text">Some promise, but assumptions need quick tests</div>
+              </div>
+              <div class="legend__row">
+                <span class="badge"><span class="badge__dot badge__dot--danger"></span><span class="badge__text">DROP</span></span>
+                <div class="legend__text">High risk with low evidence; avoid building now</div>
+              </div>
+              <div class="legend__row">
+                <span class="badge"><span class="badge__dot badge__dot--accent2"></span><span class="badge__text">NOTE</span></span>
+                <div class="legend__text">Complexity dial is inverted (higher = worse)</div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottombar" aria-label="Status bar">
+    <div class="bottombar__left">
+      <span class="statusdot" aria-hidden="true"></span>
+      <span class="statusline" id="statusLine">READY</span>
+    </div>
+    <div class="bottombar__right">
+      <span class="fineprint">All scoring is heuristic • use it to choose tests, not to “prove” certainty</span>
+    </div>
+  </footer>
+
+  <script src="./app.js"></script>
+</body>
+</html>
