@@ -1,0 +1,30 @@
+{
+  "name": "Design Coach",
+  "slug": "design-coach",
+  "date_created": "2026-03-17",
+  "bucket": "PM productivity",
+  "persona": "A PM or technical lead who owns a feature flow end-to-end and needs to validate edge-case coverage, tradeoff documentation, and design completeness before engineering handoff",
+  "problem_statement": "Product flows are sketched in ad-hoc tools with no systematic way to track edge-case coverage, tradeoff positions, or failure mode handling — gaps surface late in code review or production when they're expensive to fix",
+  "complexity": "Complex",
+  "artifact_type": "interactive web app with pannable flow canvas, structured inspector panel, clarity scoring engine, and stress-test mode",
+  "style_direction": "machined-dark",
+  "stack": [
+    "react",
+    "typescript",
+    "vite",
+    "tailwind",
+    "shadcn-ui",
+    "framer-motion"
+  ],
+  "status": "published",
+  "publish_recommendation": "yes",
+  "tags": [
+    "flow-mapping",
+    "edge-case-tracking",
+    "tradeoff-analysis",
+    "clarity-score",
+    "product-design",
+    "stress-testing",
+    "canvas-interaction"
+  ]
+}
