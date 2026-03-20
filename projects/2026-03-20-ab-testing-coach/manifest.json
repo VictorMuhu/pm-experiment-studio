@@ -1,0 +1,26 @@
+{
+  "name": "Empirical Ledger — A/B Testing Coach",
+  "slug": "ab-testing-coach",
+  "date_created": "2026-03-20",
+  "bucket": "decision simulators",
+  "persona": "Growth PM / Experimentation Lead running A/B tests without a dedicated statistician",
+  "problem_statement": "A PM reading an experiment result alone will misinterpret an underpowered test as a win — this tool surfaces the statistical reasoning at the point of decision.",
+  "complexity": "Complex",
+  "artifact_type": "single-page web app",
+  "style_direction": "premium-saas",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "ab-testing",
+    "experimentation",
+    "statistics",
+    "decision-support",
+    "pm-tools",
+    "dashboard"
+  ]
+}
