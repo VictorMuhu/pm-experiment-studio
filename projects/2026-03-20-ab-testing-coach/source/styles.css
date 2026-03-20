@@ -1,0 +1,69 @@
+/* ── Material Design 3 color tokens are configured via Tailwind ── */
+/* ── This stylesheet adds behavioral/layout rules Tailwind doesn't cover ── */
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+body { font-family: 'Inter', sans-serif; }
+.tabular { font-variant-numeric: tabular-nums; }
+
+.glass-effect {
+  background: rgba(218, 226, 253, 0.7);
+  backdrop-filter: blur(12px);
+}
+.glass-panel {
+  background: rgba(218, 226, 253, 0.7);
+  backdrop-filter: blur(12px);
+}
+.primary-gradient {
+  background: linear-gradient(135deg, #0040e0 0%, #2e5bff 100%);
+}
+
+/* Range slider cross-browser reset */
+input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
+input[type=range]:focus { outline: none; }
+input[type=range]::-webkit-slider-runnable-track { background: #eaedff; height: 4px; border-radius: 2px; }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; height: 16px; width: 16px;
+  border-radius: 2px; background: #0040e0; cursor: pointer; margin-top: -6px;
+}
+input[type=range].error-thumb::-webkit-slider-thumb { background: #ba1a1a; }
+input[type=range].tertiary-thumb::-webkit-slider-thumb { background: #006242; }
+
+/* Screen visibility — JS-controlled */
+.screen { display: none; }
+.screen.active { display: block; }
+.screen-flex { display: none; }
+.screen-flex.active { display: flex; }
+
+/* Modal visibility */
+#modal-overlay { display: none; }
+#modal-overlay.open { display: flex; }
+
+/* Sidebar navigation active state */
+.nav-link { cursor: pointer; }
+.nav-link.active {
+  color: #1d4ed8;
+  font-weight: 700;
+  border-right: 4px solid #1d4ed8;
+  background: white;
+}
+.nav-link:not(.active) { color: #64748b; }
+.nav-link:not(.active):hover { background: rgba(148, 163, 184, 0.2); }
+
+/* Audience segment pill toggle state */
+.segment-pill.selected {
+  border-color: #0040e0 !important;
+  background: rgba(221, 225, 255, 0.4) !important;
+  color: #0040e0 !important;
+  font-weight: 600;
+}
+
+/* Completed step */
+.step-item.done { opacity: 0.45; }
+.step-item.done .step-badge { background: #006242; color: white; }
+
+/* Toast transition */
+#toast { transition: opacity 0.3s ease; }
