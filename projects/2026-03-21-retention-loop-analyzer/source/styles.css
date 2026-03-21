@@ -1,0 +1,30 @@
+.material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.flow-path {
+    background: linear-gradient(90deg, transparent 0%, rgba(0, 229, 255, 0.2) 50%, transparent 100%);
+}
+.kinetic-orb-glow {
+    box-shadow: 0 0 40px rgba(0, 218, 243, 0.15);
+}
+.kinetic-orb {
+    background: radial-gradient(circle at center, #c3f5ff10 0%, #00e5ff05 50%, transparent 100%);
+    border: 1px solid rgba(59, 73, 76, 0.15);
+}
+.glass-panel {
+    background: rgba(53, 53, 52, 0.6);
+    backdrop-filter: blur(20px);
+}
+.loop-line {
+    background: linear-gradient(90deg, transparent, #9cf0ff, transparent);
+    background-size: 200% 100%;
+}
+.kinetic-bg-orb {
+    background: conic-gradient(from 180deg at 50% 50%, #c3f5ff 0deg, #fe00fe 120deg, #cdff13 240deg, #c3f5ff 360deg);
+    filter: blur(60px);
+    opacity: 0.15;
+}
+/* Screen visibility */
+.screen { display: none; }
+.screen.active { display: block; }
+#screen-loop-builder.active { display: flex; flex-direction: column; }
