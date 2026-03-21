@@ -23,21 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Build design-coach
-        working-directory: projects/2026-03-17-design-coach
-        env:
-          VITE_BASE_PATH: /pm-experiment-studio/projects/2026-03-17-design-coach/
-        run: npm install --legacy-peer-deps && npm run build
-
       - name: Assemble site
         run: |
-          mkdir -p _site/projects/2026-03-17-design-coach
-          cp -r projects/2026-03-17-design-coach/dist/. _site/projects/2026-03-17-design-coach/
-          printf '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=projects/2026-03-17-design-coach/"></head><body>Redirecting...</body></html>\n' > _site/index.html
+          mkdir -p _site/projects/2026-03-17-idea-validator
+          cp -r projects/2026-03-17-idea-validator/. _site/projects/2026-03-17-idea-validator/
+          printf '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=projects/2026-03-17-idea-validator/"></head><body>Redirecting...</body></html>\n' > _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
