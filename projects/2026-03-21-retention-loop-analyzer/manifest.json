@@ -1,0 +1,17 @@
+{
+  "slug": "retention-loop-analyzer",
+  "title": "Retention Loop Analyzer",
+  "bucket": "analytics-debugging",
+  "style_direction": "dense-analyst-console",
+  "persona": "Senior Growth PM, Series B–D B2C SaaS",
+  "problem_statement": "A Growth PM who has just received a Week-1 retention report showing a 40% drop-off and needs to identify the friction point and model an intervention before a Friday leadership review — currently requires 3 separate tools.",
+  "tags": [
+    "retention",
+    "behavioral-loop",
+    "funnel-analysis",
+    "simulation",
+    "analytics",
+    "dark-theme"
+  ],
+  "status": "draft"
+}
