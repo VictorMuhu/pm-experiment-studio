@@ -1,0 +1,59 @@
+name: Trigger Replit Scheduled Run
+
+on:
+  # Run every Friday at 9PM Central Time.
+  # GitHub cron uses UTC, so this is 02:00 UTC Saturday.
+  #   - During Central Standard Time (CST, UTC-6): 02:00 UTC = 8PM Friday CST
+  #     → Adjust to 03:00 UTC Saturday for exact 9PM CST if needed.
+  #   - During Central Daylight Time (CDT, UTC-5): 02:00 UTC = 9PM Friday CDT ✓
+  # This schedule targets CDT exactly. In CST (Nov–Mar), it fires at 8PM.
+  # Adjust to 03:00 UTC Saturday to shift to 9PM CST during standard time.
+  schedule:
+    - cron: "0 2 * * 6" # 02:00 UTC Saturday = 9PM Friday CDT / 8PM Friday CST
+
+  # Also supports manual triggering from the GitHub Actions UI.
+  # Go to: Actions → Trigger Replit Scheduled Run → Run workflow
+  workflow_dispatch:
+
+jobs:
+  trigger-scheduled-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Send POST request to Replit scheduled run endpoint
+        run: |
+          echo "Triggering Replit scheduled run..."
+
+          # Send the POST request and capture HTTP status + response body separately.
+          RESPONSE=$(curl --silent --write-out "\n%{http_code}" \
+            --request POST \
+            --header "Content-Type: application/json" \
+            --header "x-schedule-secret: ${{ secrets.REPLIT_SCHEDULE_SECRET }}" \
+            --header "x-scheduler-source: github-actions" \
+            --data '{"cadence":"weekly"}' \
+            "${{ secrets.REPLIT_SCHEDULE_URL }}")
+
+          # Split response body and HTTP status code.
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "HTTP status: $HTTP_STATUS"
+          echo "Response body: $BODY"
+
+          # 409 means a run is already active — treat as a successful no-op.
+          # The endpoint returns: { "status": "run_already_active", "activeRunIds": [...] }
+          # This is not an error; the scheduler is working as intended.
+          if [ "$HTTP_STATUS" -eq 409 ]; then
+            echo "A run is already active. No new run started (this is expected)."
+            exit 0
+          fi
+
+          # Any 2xx status is a success.
+          if [ "$HTTP_STATUS" -ge 200 ] && [ "$HTTP_STATUS" -lt 300 ]; then
+            echo "Scheduled run triggered successfully."
+            exit 0
+          fi
+
+          # All other non-2xx responses are unexpected failures.
+          echo "Unexpected HTTP status $HTTP_STATUS. Marking workflow as failed."
+          exit 1
