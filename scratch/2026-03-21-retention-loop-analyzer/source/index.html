@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Retention Loop Analyzer</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="app-header">
+    <div class="app-header__top">
+      <div>
+        <h1>Retention Loop Analyzer</h1>
+        <p class="subtitle">Map a retention loop, see where it breaks, and simulate interventions</p>
+      </div>
+
+      <div class="kpis" aria-label="Key metrics">
+        <div class="kpi">
+          <div class="kpi__label">Loop strength</div>
+          <div class="kpi__value-row">
+            <div class="score-gauge" aria-label="Loop strength gauge">
+              <div class="score-gauge__fill" id="gaugeFill" style="width: 0%"></div>
+            </div>
+            <div class="kpi__value">
+              <span id="loopScoreValue">—</span><span class="kpi__unit">/100</span>
+            </div>
+          </div>
+          <div class="kpi__meta">
+            <span class="badge badge--neutral" id="loopScoreBadge">—</span>
+            <span class="muted" id="loopScoreHint">Select a loop</span>
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi__label">Weakest transition</div>
+          <div class="kpi__value">
+            <span id="weakestTransition">—</span>
+          </div>
+          <div class="kpi__meta">
+            <span class="badge badge--warning" id="weakestBadge">—</span>
+            <span class="muted" id="weakestDropoff">—</span>
+          </div>
+        </div>
+
+        <div class="kpi">
+          <div class="kpi__label">Projected D7</div>
+          <div class="kpi__value">
+            <span id="projectedD7">—</span><span class="kpi__unit">%</span>
+          </div>
+          <div class="kpi__meta">
+            <span class="badge badge--neutral" id="projectionBadge">baseline</span>
+            <span class="muted" id="projectionDelta">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr />
+
+    <nav class="nav" aria-label="Primary">
+      <ul class="nav__list">
+        <li><a href="#view=map" data-view="map" class="nav__link is-active" id="navMap">Loop map</a></li>
+        <li><a href="#view=transitions" data-view="transitions" class="nav__link" id="navTransitions">Transitions table</a></li>
+        <li><a href="#view=interventions" data-view="interventions" class="nav__link" id="navInterventions">Intervention library</a></li>
+        <li><a href="#view=scenario" data-view="scenario" class="nav__link" id="navScenario">Scenario simulator</a></li>
+        <li><a href="#view=notes" data-view="notes" class="nav__link" id="navNotes">Notes & export</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main" class="app-main">
+    <section class="layout">
+      <aside class="sidebar" aria-label="Controls">
+        <div class="sidebar__section">
+          <div class="section-title">Loop</div>
+
+          <label class="field">
+            <span class="field__label">Choose loop</span>
+            <select id="loopSelect" class="input">
+              <!-- populated by JS -->
+            </select>
+          </label>
+
+          <div class="hint">
+            <div class="hint__title">Demo context</div>
+            <div class="hint__body" id="loopContext">
+              —
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="sidebar__section">
+          <div class="section-title">Mode</div>
+
+          <div class="segmented" role="group" aria-label="Display mode">
+            <button type="button" class="segmented__btn is-active" data-mode="observed" id="modeObserved">
+              Observed
+            </button>
+            <button type="button" class="segmented__btn" data-mode="simulated" id="modeSimulated">
+              Simulated
+            </button>
+          </div>
+
+          <label class="field">
+            <span class="field__label">Metric</span>
+            <select id="metricSelect" class="input">
+              <option value="conversion">Conversion</option>
+              <option value="dropoff">Drop-off</option>
+              <option value="timeToNext">Time to next (median)</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field__label">Risk lens</span>
+            <select id="riskSelect" class="input">
+              <option value="balanced">Balanced</option>
+              <option value="speed">Speed-sensitive</option>
+              <option value="quality">Quality-sensitive</option>
+            </select>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" id="showBenchmarks" />
+            <span>Show benchmarks</span>
+          </label>
+
+          <label class="check">
+            <input type="checkbox" id="lockSelection" />
+            <span>Lock selection (don’t auto-jump)</span>
+          </label>
+        </div>
+
+        <hr />
+
+        <div class="sidebar__section">
+          <div class="section-title">What-if knobs</div>
+
+          <div class="knob-grid">
+            <label class="field">
+              <span class="field__label">Action friction</span>
+              <input id="knobFriction" class="input" type="range" min="-30" max="30" step="1" value="0" />
+              <div class="field__meta"><span id="knobFrictionValue">0</span>% conversion delta on action step</div>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Reward strength</span>
+              <input id="knobReward" class="input" type="range" min="-30" max="30" step="1" value="0" />
+              <div class="field__meta"><span id="knobRewardValue">0</span>% conversion delta on reward step</div>
+            </label>
+
+            <label class="field">
+              <span class="field__label">Return trigger speed</span>
+              <input id="knobSpeed" class="input" type="range" min="-30" max="30" step="1" value="0" />
+              <div class="field__meta"><span id="knobSpeedValue">0</span>% conversion delta on return step</div>
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn--primary" id="applyScenario">Apply to simulation</button>
+            <button type="button" class="btn" id="resetScenario">Reset</button>
+          </div>
+
+          <div class="micro">
+            Tip: Switch to <span class="mono">Simulated</span> mode to see projected impact on the map and score.
+          </div>
+        </div>
+      </aside>
+
+      <section class="workspace" aria-label="Main content">
+        <div class="view is-active" data-view="map" id="viewMap">
+          <div class="view__header">
+            <div>
+              <h2>Loop map</h2>
+              <p class="muted">Click a step or transition to inspect it. Values update based on mode and knobs.</p>
+            </div>
+            <div class="view__actions">
+              <button type="button" class="btn" id="autoFocusWeakest">Focus weakest</button>
+              <button type="button" class="btn" id="clearSelection">Clear selection</button>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="canvas-wrap">
+            <div class="canvas" id="loopCanvas" aria-label="Loop diagram" role="application">
+              <!-- Nodes/edges rendered by JS -->
+            </div>
+
+            <div class="benchmarks is-hidden" id="benchmarksBox" aria-label="Benchmarks">
+              <div class="section-title">Benchmarks (typical B2C apps)</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Transition</th>
+                    <th>Healthy conversion</th>
+                    <th>Warning</th>
+                    <th>Critical</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmarksTableBody"></tbody>
+              </table>
+              <div class="micro">These are directional. Use them to triage, not to declare victory.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="view" data-view="transitions" id="viewTransitions">
+          <div class="view__header">
+            <div>
+              <h2>Transitions table</h2>
+              <p class="muted">Spreadsheet-like view for fast comparison. Click a row to inspect.</p>
+            </div>
+            <div class="view__actions">
+              <label class="field field--inline">
+                <span class="field__label">Sort</span>
+                <select id="sortSelect" class="input">
+                  <option value="riskDesc">Risk (high → low)</option>
+                  <option value="dropoffDesc">Drop-off (high → low)</option>
+                  <option value="conversionAsc">Conversion (low → high)</option>
+                  <option value="timeDesc">Time to next (slow → fast)</option>
+                </select>
+              </label>
+
+              <label class="field field--inline">
+                <span class="field__label">Filter</span>
+                <select id="filterSelect" class="input">
+                  <option value="all">All</option>
+                  <option value="critical">Critical only</option>
+                  <option value="warning">Warning+critical</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <hr />
+
+          <table class="table" id="transitionsTable">
+            <thead>
+              <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Conversion</th>
+                <th>Drop-off</th>
+                <th>Median time</th>
+                <th>Risk</th>
+                <th>Signals</th>
+              </tr>
+            </thead>
+            <tbody id="transitionsTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="view" data-view="interventions" id="viewInterventions">
+          <div class="view__header">
+            <div>
+              <h2>Intervention library</h2>
+              <p class="muted">Pick an intervention tied to the selected transition, then send it to the scenario simulator.</p>
+            </div>
+
+            <div class="view__actions">
+              <label class="field field--inline">
+                <span class="field__label">Target step</span>
+                <select id="interventionTarget" class="input">
+                  <option value="auto">Auto (selected)</option>
+                  <option value="trigger">Trigger</option>
+                  <option value="action">Action</option>
+                  <option value="reward">Reward</option>
+                  <option value="return">Return</option>
+                </select>
+              </label>
+              <label class="field field--inline">
+                <span class="field__label">Type</span>
+                <select id="interventionType" class="input">
+                  <option value="all">All</option>
+                  <option value="reduce-friction">Reduce friction</option>
+                  <option value="increase-reward">Increase reward</option>
+                  <option value="accelerate-return">Accelerate return</option>
+                  <option value="quality-guardrails">Quality guardrails</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="library" id="interventionList" aria-label="Intervention list">
+            <!-- rendered by JS -->
+          </div>
+        </div>
+
+        <div class="view" data-view="scenario" id="viewScenario">
+          <div class="view__header">
+            <div>
+              <h2>Scenario simulator</h2>
+              <p class="muted">Build a small set of interventions. The simulated mode uses these deltas.</p>
+            </div>
+            <div class="view__actions">
+              <button type="button" class="btn btn--primary" id="useScenarioInSim">Use scenario in simulated mode</button>
+              <button type="button" class="btn" id="clearScenario">Clear scenario</button>
+            </div>
+          </div>
+
+          <hr />
+
+          <div class="scenario-grid">
+            <section class="scenario-panel">
+              <div class="section-title">Scenario items</div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Intervention</th>
+                    <th>Targets</th>
+                    <th>Effect</th>
+                    <th>Owner</th>
+                    <th>Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="scenarioTbody"></tbody>
+              </table>
+              <div class="micro">Effects compound gently; this is a planning tool, not a forecast.</div>
+            </section>
+
+            <section class="scenario-panel">
+              <div class="section-title">Projected impact</div>
+              <div class="impact">
+                <div class="impact__row">
+                  <div class="impact__label">Loop score</div>
+                  <div class="impact__value"><span id="impactScore">—</span>/100</div>
+                </div>
+                <div class="impact__row">
+                  <div class="impact__label">Projected D7</div>
+                  <div class="impact__value"><span id="impactD7">—</span>%</div>
+                </div>
+                <div class="impact__row">
+                  <div class="impact__label">Primary lift driver</div>
+                  <div class="impact__value"><span id="impactDriver">—</span></div>
+                </div>
+
+                <hr />
+
+                <div class="section-title">Assumptions</div>
+                <ul class="bullets" id="assumptionsList"></ul>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <div class="view" data-view="notes" id="viewNotes">
+          <div class="view__header">
+            <div>
+              <h2>Notes & export</h2>
+              <p class="muted">Capture meeting-ready output. Copy as Markdown.</p>
+            </div>
+            <div class="view__actions">
+              <button type="button" class="btn btn--primary" id="copyMarkdown">Copy markdown</button>
+              <button type="button" class="btn" id="downloadMarkdown">Download .md</button>
+            </div>
+          </div>
+
+          <hr />
+
+          <label class="field">
+            <span class="field__label">Working notes</span>
+            <textarea id="notesBox" class="input textarea" rows="8"></textarea>
+            <div class="field__meta">Stored locally in this browser.</div>
+          </label>
+
+          <hr />
+
+          <div class="export">
+            <div class="section-title">Generated summary</div>
+            <pre class="pre" id="markdownPreview" aria-label="Markdown preview"></pre>
+          </div>
+        </div>
+      </section>
+
+      <aside class="inspector" aria-label="Inspector">
+        <div class="inspector__header">
+          <div>
+            <div class="section-title">Inspector</div>
+            <div class="muted" id="inspectorSubtitle">Click a step or transition</div>
+          </div>
+          <div class="inspector__actions">
+            <button type="button" class="btn" id="pinSelection">Pin</button>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="inspector__body" id="inspectorBody">
+          <div class="empty">
+            <div class="empty__title">Nothing selected</div>
+            <div class="empty__body">Use the loop map or transitions table to select a step or transition.</div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="inspector__footer">
+          <div class="section-title">Quick add</div>
+          <div class="micro">Add an intervention aligned to the selected weak spot.</div>
+          <div class="btn-row">
+            <button type="button" class="btn btn--primary" id="quickAddBest">Add best-fit intervention</button>
+            <button type="button" class="btn" id="quickAddAlt">Add alternative</button>
+          </div>
+          <div class="micro muted" id="quickAddHint">Tip: pick a transition first to get better suggestions.</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
