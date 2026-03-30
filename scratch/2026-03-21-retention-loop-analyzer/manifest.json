@@ -1,0 +1,26 @@
+{
+  "name": "Retention Loop Analyzer",
+  "slug": "retention-loop-analyzer",
+  "date_created": "2026-03-21",
+  "bucket": "customer experience tools",
+  "persona": "A Growth PM at a 50–500 person product who needs to explain where a retention loop breaks and test interventions without BI support in the room",
+  "problem_statement": "Retention reviews rely on cohort charts that hide the behavioral loop mechanics, so teams fix the wrong step and waste cycles without moving retention",
+  "complexity": "Complex",
+  "artifact_type": "single-page interactive systems diagram with live scoring and an intervention simulator",
+  "style_direction": "brutalist-utility",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "retention",
+    "growth",
+    "systems-thinking",
+    "behavior-loops",
+    "product-analytics",
+    "simulation"
+  ]
+}
