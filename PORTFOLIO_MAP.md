@@ -57,7 +57,7 @@ scratch → weekly-builds → projects → pm-ai-demo
 
 ### Application Products
 - Project 01: Customer Support Copilot (PROMOTED TO pm-ai-demo)
-- Project 02: Product Brief Generator (PLANNED)
+- Project 02: Product Brief Generator (IN PROGRESS — lab phase, Phase 1 active)
 
 ### Platform Tools
 - Eval Harness (PLANNED)
@@ -69,11 +69,7 @@ scratch → weekly-builds → projects → pm-ai-demo
 
 ## Weekly Builds
 
-Use this section to track active and recent weekly builds.
-
-Example format:
-- 2026-W01: RAG retrieval prototype
-- 2026-W02: evaluation rubric experiment
+- 2026-W01: Product Brief Input Normalizer — input normalization layer for Project #02 (`weekly-builds/2026-w01-product-brief-input-normalizer/`)
 
 ---
 

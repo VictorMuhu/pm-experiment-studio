@@ -1,0 +1,26 @@
+[
+  {
+    "metric_name": "weekly_active_users",
+    "current_value": 8420,
+    "previous_value": 9105,
+    "trend": "down"
+  },
+  {
+    "metric_name": "onboarding_completion_rate",
+    "current_value": 0.54,
+    "previous_value": 0.61,
+    "trend": "down"
+  },
+  {
+    "metric_name": "average_session_duration_minutes",
+    "current_value": 14.2,
+    "previous_value": 14.0,
+    "trend": "flat"
+  },
+  {
+    "metric_name": "paid_conversion_rate",
+    "current_value": 0.082,
+    "previous_value": 0.071,
+    "trend": "up"
+  }
+]
