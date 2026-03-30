@@ -1,63 +1,71 @@
 # PM Experiment Studio
 
-A curated collection of product experiments — each one designed, scoped, and shipped as a standalone artifact.
+This is the working lab for PM AI work — not a polished portfolio showroom.
 
-This is not a portfolio of work done at companies. It's a record of how I think about products: what problems are worth solving, what trade-offs get made in early-stage design, and what it looks like to move from a fuzzy idea to something testable.
-
----
-
-## Thesis
-
-Most product thinking lives in slide decks, Notion pages, or people's heads. It rarely ships as something you can actually look at, use, or critique.
-
-This repo is my attempt to change that ratio. Each project here starts with a real problem, goes through explicit design and scoping decisions, and ends as a working (or nearly working) artifact — a tool, a prototype, a micro-app, or a structured experiment.
-
-The standard isn't "production-ready." It's "would I be able to explain every decision I made, and would those decisions hold up to scrutiny?"
+It is intentionally structured to support fast experimentation, progressive refinement, and a clear promotion path into the demo layer. Some work here is rough. That is by design.
 
 ---
 
-## What Lives Here
+## What This Repo Is
 
-### `/projects`
+`pm-experiment-studio` is where ideas are tested, prototypes are built, and systems are explored. Work at every stage of maturity lives here — from raw scratch files to near-complete builds that are close to promotion.
 
-Published experiments. These have:
-- A clear problem statement
-- A documented set of design decisions
-- A working implementation or high-fidelity prototype
-- A manifest with metadata
-- A decision log that captures what was considered and why things landed where they did
-
-Each project folder is self-contained. You can read the README and understand what it is, why it exists, and what it's not trying to be.
-
-### `/scratch`
-
-Work in progress, abandoned ideas, and rough explorations. No quality bar. The rule for scratch is that something exists — it's not just an idea. If there's nothing to look at, it doesn't belong here either.
-
-Scratch exists so that the bar for starting something is low, and the bar for moving it to `/projects` is meaningful.
+The polished, demo-ready, externally presentable layer is a separate repo: `pm-ai-demo`.
 
 ---
 
-## The Quality Bar
+## Repository Workflow
 
-A project graduates from `/scratch` to `/projects` when it meets all of the following:
+```
+scratch → weekly-builds → projects → pm-ai-demo
+```
 
-- [ ] The problem is clearly stated in one paragraph
-- [ ] The core design decisions are documented in `decision-log.md`
-- [ ] There is something to see or use (not just a description)
-- [ ] The `manifest.json` is complete
-- [ ] A screenshot or demo link exists
+| Stage | What It Means |
+|---|---|
+| `scratch/` | Raw, messy, fast. No quality bar. The point is that something exists. |
+| `weekly-builds/` | Structured short builds, one concept at a time, scoped to a week. |
+| `projects/` | Larger, multi-component efforts. More complete. Still evolving. |
+| `pm-ai-demo` | Only polished, demo-ready, externally presentable work. Separate repo. |
 
-Work that's "mostly done" stays in scratch until it clears the bar. The point is that `/projects` should be something you'd actually share with someone.
+Work does not have to move through every stage. A scratch idea might jump straight to a project, or never leave scratch at all. The pipeline is a guide, not a rule.
 
 ---
 
-## The PM Angle
+## Folder Structure
 
-Product management is fundamentally about deciding what to build, why, and in what order — under uncertainty and with real constraints. Most PM artifacts (PRDs, roadmaps, OKRs) are internal documents that don't translate well to public work.
+```
+pm-experiment-studio/
+├── scratch/           # Raw exploration and in-progress ideas
+├── weekly-builds/     # Structured weekly experiments and micro-builds
+├── projects/          # Promoted builds with multiple components
+├── experiments/       # Focused technical investigations (RAG, evals, models, cost)
+├── prompts/           # Reusable prompts and prompt assets
+├── schemas/           # Structured data definitions and schemas
+├── scripts/           # Utility scripts and helpers
+├── templates/         # Repeatable project and documentation templates
+├── docs/              # Process documentation and meta-notes
+├── PORTFOLIO_MAP.md   # Control center: what is in progress, what is promoted
+└── README.md
+```
 
-These experiments are a way to make that thinking visible. Each one is a small bet: here is a problem I found interesting, here is how I scoped it to be tractable, here is what I learned building it.
+See `PORTFOLIO_MAP.md` for the current state of active work and what has been promoted.
 
-If the thinking is sharp, it should show in the decisions — not in how the README is written.
+---
+
+## Promotion Criteria
+
+A project moves to `pm-ai-demo` only when it has:
+
+- a working system
+- a clean README
+- architecture documentation
+- AI flow documentation
+- evaluation or quality bar
+- clear trade-offs and failure modes
+- a Loom demo link
+- a stable demo path
+
+If it does not meet this bar, it stays here.
 
 ---
 
@@ -73,29 +81,10 @@ Run `node scripts/scaffold.js` to start one, or see `prompts/idea-matrix.yaml` f
 
 ---
 
-## Stack Notes
+## Working Rules
 
-Projects here span tools and tech depending on what fits the problem. There's no house stack. Decisions about tooling are documented in each project's manifest.
-
----
-
-## Structure
-
-```
-pm-experiment-studio/
-├── projects/          # Published experiments (quality bar cleared)
-├── scratch/           # In-progress and exploratory work
-├── prompts/           # Reusable LLM prompts used in project generation
-├── styles/            # Shared design tokens, CSS, or theme files
-├── schemas/           # JSON schemas for manifests and structured data
-├── scripts/           # Automation: scaffolding, validation, index generation
-├── docs/              # Process documentation, ADRs, meta-notes
-├── templates/         # Starter templates for new projects
-└── README.md
-```
-
----
-
-## License
-
-MIT. See [LICENSE](./LICENSE).
+- rough ideas start in `scratch/`
+- repeatable weekly work belongs in `weekly-builds/`
+- larger evolving efforts belong in `projects/`
+- focused technical investigations belong in `experiments/`
+- only polished, demo-ready work should move to `pm-ai-demo`
