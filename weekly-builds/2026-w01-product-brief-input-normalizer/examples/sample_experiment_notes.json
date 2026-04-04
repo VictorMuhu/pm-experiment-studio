@@ -1,0 +1,20 @@
+[
+  {
+    "experiment_name": "simplified_onboarding_checklist",
+    "hypothesis": "Reducing the onboarding checklist from 8 steps to 4 steps will increase completion rate by at least 10 percentage points.",
+    "result": "Onboarding completion rate increased from 54% to 63% in the treatment group over 14 days.",
+    "interpretation": "Reducing cognitive load at signup has a measurable positive effect. The removed steps (team invite, integration setup, notification preferences) can be deferred to in-product prompts without hurting activation."
+  },
+  {
+    "experiment_name": "export_column_presets",
+    "hypothesis": "Offering three pre-configured export column presets will reduce support tickets related to reporting by 20%.",
+    "result": "Support ticket volume for reporting dropped 11% over 3 weeks. Not statistically significant at current traffic.",
+    "interpretation": "Directionally positive but inconclusive. The preset approach may be right but the specific presets chosen do not match what users actually need. Requires follow-up qualitative research to identify the right default columns."
+  },
+  {
+    "experiment_name": "proactive_search_suggestions",
+    "hypothesis": "Showing recent and related project suggestions when the search bar is focused will reduce failed searches.",
+    "result": "No significant change in failed search rate. Click-through on suggestions was under 4%.",
+    "interpretation": "Users do not want suggestions — they want better result matching. The problem is query matching quality, not discoverability. Suggestions may add noise rather than value. Consider improving fuzzy match logic instead."
+  }
+]

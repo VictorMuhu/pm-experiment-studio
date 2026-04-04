@@ -1,0 +1,32 @@
+[
+  {
+    "channel": "support_ticket",
+    "theme": "onboarding_friction",
+    "evidence": "User could not find the project settings page after signup. Spent 12 minutes before submitting ticket. Quoted: 'I had no idea where to start.'",
+    "severity": "high"
+  },
+  {
+    "channel": "nps_survey",
+    "theme": "reporting_gaps",
+    "evidence": "Detractor score of 4. Comment: 'The export feature is missing the columns I actually need. I end up rebuilding reports in Excel every week.'",
+    "severity": "high"
+  },
+  {
+    "channel": "sales_call",
+    "theme": "pricing_clarity",
+    "evidence": "Prospect asked three separate times what is included in the Pro tier versus the Team tier. Confusion about seat limits.",
+    "severity": "medium"
+  },
+  {
+    "channel": "in_app_feedback",
+    "theme": "notification_overload",
+    "evidence": "Multiple users requested a way to batch or mute notifications. One user said: 'I have turned off all emails because there are too many.'",
+    "severity": "medium"
+  },
+  {
+    "channel": "user_interview",
+    "theme": "search_quality",
+    "evidence": "Power user with 400+ projects reported that search returns irrelevant results when project names are similar. Has resorted to manual scrolling.",
+    "severity": "low"
+  }
+]
