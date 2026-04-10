@@ -1,0 +1,27 @@
+{
+  "name": "Roadmap Tradeoff Engine",
+  "slug": "roadmap-tradeoff-engine",
+  "date_created": "2026-04-10",
+  "bucket": "customer experience tools",
+  "persona": "A Head of Product at a 50–300 person B2B SaaS company running a quarterly roadmap tradeoff meeting with fixed engineering capacity and imperfect estimates",
+  "problem_statement": "In roadmap planning, leaders must choose a set of initiatives under tight capacity but can’t clearly explain what gets cut and why when constraints change",
+  "complexity": "Intermediate",
+  "artifact_type": "single-page web app with a three-column layout and live scenario A/B comparison driven by a constraint-based selection engine",
+  "style_direction": "executive-monochrome",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "yes",
+  "tags": [
+    "roadmap",
+    "tradeoffs",
+    "capacity-planning",
+    "decision-support",
+    "optimization",
+    "scenario-comparison",
+    "explainability"
+  ]
+}
