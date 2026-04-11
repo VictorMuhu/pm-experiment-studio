@@ -2,19 +2,21 @@
   "name": "Empirical Ledger — A/B Testing Coach",
   "slug": "ab-testing-coach",
   "date_created": "2026-03-20",
-  "bucket": "decision simulators",
-  "persona": "Growth PM / Experimentation Lead running A/B tests without a dedicated statistician",
-  "problem_statement": "A PM reading an experiment result alone will misinterpret an underpowered test as a win — this tool surfaces the statistical reasoning at the point of decision.",
-  "complexity": "Complex",
-  "artifact_type": "single-page web app",
+  "date_updated": "2026-04-11",
+  "bucket": "decision-support",
+  "persona": "Growth PM or Experimentation Lead running A/B tests without a dedicated statistician",
+  "problem_statement": "A PM reading an experiment result alone will misinterpret an underpowered test as a win — this tool surfaces the statistical reasoning at the point of decision",
+  "complexity": "complex",
+  "artifact_type": "single-page web app with experiment input form, statistical analysis panel, and interpretation guide",
   "style_direction": "premium-saas",
   "stack": [
     "html",
     "css",
     "js"
   ],
-  "status": "draft",
-  "publish_recommendation": "yes",
+  "status": "published",
+  "publish_recommendation": "publish",
+  "description": "Single-page web app that surfaces statistical reasoning for PMs reading A/B test results without a dedicated statistician",
   "tags": [
     "ab-testing",
     "experimentation",
@@ -22,5 +24,9 @@
     "decision-support",
     "pm-tools",
     "dashboard"
-  ]
+  ],
+  "has_demo": true,
+  "demo_url": "https://stitch.withgoogle.com/projects/12573959645612719899",
+  "screenshot": null,
+  "notes": "Hosted on Google Stitch — not on GitHub Pages. Decision log lives in this repo."
 }

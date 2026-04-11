@@ -83,6 +83,18 @@ a{color:inherit}
   align-items:flex-end;
   justify-content:space-between;
 }
+.brand__back{
+  display:block;
+  font-size:11px;
+  letter-spacing:0.06em;
+  color:var(--muted);
+  margin-bottom:5px;
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:color var(--t), border-color var(--t);
+}
+.brand__back:hover{color:var(--accent); border-bottom-color:rgba(200,16,46,0.35)}
+.brand__back:focus{outline:var(--focus); outline-offset:3px}
 .brand__kicker{
   font-size:12px;
   letter-spacing:0.08em;
