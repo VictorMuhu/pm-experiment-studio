@@ -1,5 +1,15 @@
 # Notes — 2026-W02
 
+## Latest Findings — Post W02 Test Run
+
+**Strongest success:** Top-1 retrieval was correct for all 5 sample tickets. The hypothesis held — off-the-shelf embeddings on a well-structured KB are sufficient for accurate primary retrieval without tuning.
+
+**Biggest weakness:** Rank 2 and rank 3 results showed ranking noise. The clearest case: a permissions ticket returned the billing portal article at rank 2 because both reference "Admin." Word overlap was enough to pull the article into the context window even though the content is not relevant to the ticket. This is the main thing to fix before adding a generation layer.
+
+**Next iteration priority:** Before building the W03 generation layer, improve retrieval precision at ranks 2 and 3. Options to test: filtering by distance threshold before returning results, re-ranking with a cross-encoder, or experimenting with chunk granularity. Once secondary results are consistently relevant, the generation layer will have cleaner input to reason from.
+
+---
+
 ## What I Am Testing This Week
 
 Whether embedding-based retrieval on a small, well-structured knowledge base produces semantically meaningful results without any tuning.

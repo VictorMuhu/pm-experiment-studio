@@ -96,6 +96,32 @@ Distance scores from Chroma are not always intuitive. A lower distance means hig
 
 Chroma's `PersistentClient` is straightforward for a local prototype but requires a full rebuild when the KB changes. A production system would need incremental ingestion rather than full re-embed on every update.
 
+## Results from Initial Retrieval Test
+
+The prototype was run against all 5 sample support tickets using `run_demo.py`.
+
+**Top-1 retrieval accuracy: 5/5.** Every ticket returned the correct KB article in the first position. Login errors retrieved the login guide. Permission questions retrieved the permissions article. Billing queries retrieved billing articles. The semantic matching worked without any tuning or threshold adjustment.
+
+**Secondary retrieval was less precise.** Rank 2 and rank 3 results varied in quality. Some were genuinely useful — the billing ticket surfaced both invoice timing and the billing portal, both of which are relevant to a user who cannot find their invoice. Others were noise — a permissions ticket returned the billing portal article at rank 2 because both reference "Admin." The distance gap between rank 1 and the noise was visible in the scores, but the noise was still technically retrieved.
+
+This is a useful result. The retrieval foundation is strong enough to build on, and the failure mode is clearly scoped: ranking precision at positions 2 and 3, not top-1 accuracy.
+
+## What Broke / What I Learned
+
+**What worked:** Rank-1 retrieval was correct across all 5 tickets. The embedding model handled semantic variation well — tickets that described a problem in plain, conversational language matched KB articles written in structured documentation language without any overlap in exact words.
+
+**What did not work as expected:** Rank 2 and rank 3 were sometimes pulled by surface-level word overlap rather than genuine relevance. The clearest example: a permissions ticket returned the billing portal article at rank 2 because the word "Admin" appears in both. A human reader would not consider these related, but cosine similarity does not know that.
+
+**Why this matters:** Grounded generation quality depends on the full context window passed to the model, not just the top result. If rank 2 or rank 3 contain irrelevant content, that content enters the prompt. A well-designed generation layer can partially compensate, but it cannot reliably ignore bad context it was given. Retrieval precision is therefore a system-level concern, not just a retrieval-layer concern.
+
+**What this reinforces:** The decision to validate retrieval in isolation before adding generation was correct. Had generation been added first, ranking noise would have been invisible inside the response — harder to isolate, harder to fix.
+
+## Why Not Agents Yet
+
+The test results confirm this position. The flow is still enumerable — given a ticket, retrieve KB entries, pass to generation. There is one path, one decision, one output shape.
+
+The main bottleneck exposed by this test is retrieval ranking precision, not orchestration complexity. Adding agentic tool selection now would not improve rank 2 and rank 3 quality — it would add a new failure surface on top of an existing one. The correct next step is to improve retrieval precision first, then evaluate whether the generation layer needs more flexibility to act on that context.
+
 ## What This Unlocks for Month 1
 
 With retrieval working, W03 can focus on the generation layer: taking the retrieved KB entries as context and using an LLM to draft a grounded response to the ticket. That step is meaningfully simpler now because the input contract is clear — a ticket plus a set of retrieved KB entries — and retrieval quality has been validated independently before generation is added.
