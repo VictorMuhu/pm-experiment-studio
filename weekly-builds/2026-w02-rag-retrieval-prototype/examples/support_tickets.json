@@ -1,0 +1,27 @@
+[
+  {
+    "id": "ticket-001",
+    "subject": "Cannot log in to my account",
+    "body": "I have been trying to log in for the past hour and keep getting an error that says my password is incorrect. I am sure the password is right because I just changed it last week. I tried clearing my cache already. Not sure what else to do."
+  },
+  {
+    "id": "ticket-002",
+    "subject": "Why can I not edit anything?",
+    "body": "I was added to a workspace by my manager last week but every time I try to make a change it says I do not have permission. My colleague who joined at the same time can edit things fine. I do not understand the difference and my manager is not available to help right now."
+  },
+  {
+    "id": "ticket-003",
+    "subject": "I stopped getting email alerts",
+    "body": "For the past three days I have not been getting any of the comment notifications I used to receive. I checked my settings and they all look the same as before. The notifications still appear in the app but nothing is coming through on email. Our IT team says nothing has changed on their end."
+  },
+  {
+    "id": "ticket-004",
+    "subject": "Session link is not working",
+    "body": "I registered for the live session this morning and received a confirmation with the join link. When I click it I get a message saying the session was not found. The session was supposed to start 20 minutes ago and I cannot reach the host. Is there another way to join?"
+  },
+  {
+    "id": "ticket-005",
+    "subject": "Where is my invoice for this month?",
+    "body": "We are on a monthly plan and our invoice is usually available on the 1st. It is now the 4th and I cannot find anything in the billing section or in my email. We need it for our finance team by end of week. Can you tell me when it will be ready or how I can download it?"
+  }
+]

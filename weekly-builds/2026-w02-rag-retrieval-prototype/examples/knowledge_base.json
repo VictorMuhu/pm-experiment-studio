@@ -1,0 +1,50 @@
+[
+  {
+    "id": "kb-001",
+    "title": "How to Reset Your Password",
+    "category": "account-access",
+    "content": "If you have forgotten your password or are locked out of your account, you can reset it from the login page. Click 'Forgot password?' and enter the email address associated with your account. You will receive a reset link within 5 minutes. The link expires after 30 minutes. If you do not receive the email, check your spam folder or contact support. You cannot reuse your last three passwords. After resetting, you will be logged out of all active sessions automatically."
+  },
+  {
+    "id": "kb-002",
+    "title": "Login Troubleshooting Guide",
+    "category": "account-access",
+    "content": "If you are unable to log in, try the following steps in order: (1) Confirm you are using the correct email address. (2) Clear your browser cache and cookies and try again. (3) Try a different browser or incognito mode. (4) Check that Caps Lock is off when entering your password. (5) If your account uses SSO, ensure your identity provider session is active. (6) If you see an 'Account locked' message, wait 15 minutes before retrying or contact support to unlock it manually. Repeated failed login attempts trigger a temporary lockout after 5 tries."
+  },
+  {
+    "id": "kb-003",
+    "title": "Understanding User Permissions and Roles",
+    "category": "permissions",
+    "content": "The platform has three roles: Viewer, Editor, and Admin. Viewers can read content but cannot make changes. Editors can create, edit, and delete their own content. Admins can manage all content, invite users, and change role assignments. Roles are assigned per workspace. A user can be an Editor in one workspace and a Viewer in another. Only Admins can change another user's role. If you believe your permissions are incorrect, contact your workspace Admin. Admins cannot demote themselves — another Admin must make that change."
+  },
+  {
+    "id": "kb-004",
+    "title": "Notification Settings and Delivery",
+    "category": "notifications",
+    "content": "Notifications are sent by email and optionally by in-app alert. You can manage notification preferences under Account Settings > Notifications. Available notification types include: new comments, mention alerts, task assignments, and weekly digest. Email notifications are typically delivered within 2 minutes of the triggering event. If you are not receiving notifications, check that your email address is confirmed, that notifications are enabled for the relevant type, and that our sending domain is not blocked by your email provider. Bulk notification sends (e.g. digest emails) may be delayed during high-volume periods."
+  },
+  {
+    "id": "kb-005",
+    "title": "Joining a Live Interpreter Session",
+    "category": "sessions",
+    "content": "To join a live interpreter session, you must have a valid session link provided by the session host. Click the link and sign in if prompted. If you see an error saying the session is full, the host has set a participant limit. If you see 'Session not found', the session may have ended or the link may have expired — links expire 1 hour after the scheduled start time. If you are a registered participant and still cannot join, try refreshing the page or switching to a supported browser (Chrome or Firefox recommended). Contact the session host if the issue persists."
+  },
+  {
+    "id": "kb-006",
+    "title": "Browser Compatibility Requirements",
+    "category": "technical",
+    "content": "The platform is fully supported on the latest two major versions of Chrome, Firefox, Edge, and Safari. Internet Explorer is not supported. If you experience display issues, slow performance, or features that do not load, first check that your browser is up to date. Extensions (particularly ad blockers and privacy shields) can interfere with platform functionality — try disabling them or using an incognito window. JavaScript must be enabled. The platform requires a minimum screen resolution of 1280x720 for the full interface. Mobile browsers are supported for basic viewing but not for all editing features."
+  },
+  {
+    "id": "kb-007",
+    "title": "Accessing the Billing Portal",
+    "category": "billing",
+    "content": "The billing portal is accessible to workspace Admins only. To access it, go to Settings > Billing. From the billing portal you can view your current plan, update your payment method, download past invoices, and upgrade or downgrade your subscription. If you do not see the Billing option in Settings, your account does not have Admin permissions. Billing changes take effect at the start of the next billing cycle unless you are upgrading, in which case the change is prorated and applied immediately. For enterprise billing inquiries, contact your account manager directly."
+  },
+  {
+    "id": "kb-008",
+    "title": "Invoice Timing and Billing Cycles",
+    "category": "billing",
+    "content": "Invoices are generated on the first day of each billing cycle. If you are on a monthly plan, your billing cycle resets on the same date each month as your subscription start date. Annual plan invoices are issued once per year. Invoices are emailed to the billing contact on file and are also available in the billing portal under Invoice History. If an invoice is not visible in the portal within 24 hours of the expected date, check that your billing contact email address is correct. Payment failures trigger an automatic retry after 3 days, followed by a final retry after 7 days before the subscription is paused."
+  }
+]
