@@ -2,12 +2,13 @@
   "name": "Design Coach",
   "slug": "design-coach",
   "date_created": "2026-03-17",
-  "bucket": "PM productivity",
+  "date_updated": "2026-04-11",
+  "bucket": "pm-productivity",
   "persona": "A PM or technical lead who owns a feature flow end-to-end and needs to validate edge-case coverage, tradeoff documentation, and design completeness before engineering handoff",
   "problem_statement": "Product flows are sketched in ad-hoc tools with no systematic way to track edge-case coverage, tradeoff positions, or failure mode handling — gaps surface late in code review or production when they're expensive to fix",
-  "complexity": "Complex",
+  "complexity": "complex",
   "artifact_type": "interactive web app with pannable flow canvas, structured inspector panel, clarity scoring engine, and stress-test mode",
-  "style_direction": "machined-dark",
+  "style_direction": "dense-analyst-console",
   "stack": [
     "react",
     "typescript",
@@ -17,7 +18,8 @@
     "framer-motion"
   ],
   "status": "published",
-  "publish_recommendation": "yes",
+  "publish_recommendation": "publish",
+  "description": "Interactive web app with a pannable flow canvas and clarity scoring engine for validating product design completeness before engineering handoff",
   "tags": [
     "flow-mapping",
     "edge-case-tracking",
@@ -26,5 +28,9 @@
     "product-design",
     "stress-testing",
     "canvas-interaction"
-  ]
+  ],
+  "has_demo": true,
+  "demo_url": "https://product-logic-builder.lovable.app/",
+  "screenshot": "screenshots/screenshot.png",
+  "notes": "style_direction updated from 'machined-dark' (not a valid style) to 'dense-analyst-console' — closest match to the dark, analytical visual identity implemented"
 }

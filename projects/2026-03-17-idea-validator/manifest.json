@@ -2,10 +2,11 @@
   "name": "Idea Validator",
   "slug": "idea-validator",
   "date_created": "2026-03-17",
-  "bucket": "decision simulators",
+  "date_updated": "2026-04-11",
+  "bucket": "decision-support",
   "persona": "A Head of Product or founder at a 20–200 person B2B SaaS company preparing for roadmap review and needing a fast, defensible go/no-go on a new idea without a strategy team",
   "problem_statement": "Senior product leaders commit roadmap time to persuasive but underspecified ideas because assumptions, differentiation, and time-to-value aren’t pressure-tested in a single decision-ready view",
-  "complexity": "Complex",
+  "complexity": "complex",
   "artifact_type": "single-page web app with progressive sections, live scoring, and a persistent verdict side panel",
   "style_direction": "executive-monochrome",
   "stack": [
@@ -13,8 +14,9 @@
     "css",
     "js"
   ],
-  "status": "draft",
-  "publish_recommendation": "yes",
+  "status": "published",
+  "publish_recommendation": "publish",
+  "description": "Single-page web app that pressure-tests a new product idea against assumptions, differentiation, and time-to-value in a single decision-ready view",
   "tags": [
     "product-strategy",
     "roadmap-triage",
@@ -23,5 +25,9 @@
     "scoring-rubric",
     "decision-support",
     "leadership-review"
-  ]
+  ],
+  "has_demo": true,
+  "demo_url": "https://victormuhu.github.io/pm-experiment-studio/projects/2026-03-17-idea-validator/",
+  "screenshot": null,
+  "notes": null
 }
