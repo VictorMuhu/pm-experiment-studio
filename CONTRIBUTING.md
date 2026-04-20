@@ -51,7 +51,7 @@ Every project in `/projects` must have a `README.md` that covers:
 2. **Why it exists** — the problem it solves or the question it explores
 3. **How to use it** — enough detail that someone unfamiliar can try it
 4. **What was intentionally left out** — scope decisions, known limitations
-5. **Status** — `prototype`, `stable`, or `archived`
+5. **Status** — `draft`, `published`, or `archived`
 
 The README must not:
 - Open with "This is a project that..."
@@ -71,19 +71,21 @@ Required fields:
 | Field | Description |
 |-------|-------------|
 | `name` | Display name of the project |
-| `slug` | Matches the folder name exactly |
-| `status` | `prototype`, `stable`, or `archived` |
-| `category` | One of: `tool`, `ui-experiment`, `research`, `data`, `generator`, `other` |
-| `description` | One sentence. No period at the end. |
-| `problem` | The specific problem this addresses |
-| `created` | ISO 8601 date (`YYYY-MM-DD`) |
-| `updated` | ISO 8601 date (`YYYY-MM-DD`) |
-| `tags` | Array of lowercase strings |
-| `has_demo` | Boolean |
-| `demo_url` | URL string or `null` |
-| `screenshot` | Relative path to screenshot or `null` |
+| `slug` | Folder name without the date prefix (e.g., `funnel-drop-tool`) |
+| `date_created` | ISO 8601 date the folder was first created (`YYYY-MM-DD`) |
+| `bucket` | One of: `pm-productivity`, `gtm-workflow`, `analytics-debugging`, `customer-experience`, `internal-tooling`, `decision-support`, `other` |
+| `persona` | Specific target user — role, context, and what they are trying to do |
+| `problem_statement` | The specific failure mode this addresses — not a domain, a moment |
+| `complexity` | One of: `simple`, `intermediate`, `complex` |
+| `artifact_type` | Plain-language description of what the finished thing is |
+| `style_direction` | One of the 12 styles from `styles/style-matrix.yaml` |
+| `stack` | Array of specific technologies used |
+| `status` | One of: `published`, `draft`, `rejected` |
+| `publish_recommendation` | One of: `publish`, `hold`, `scratch` |
+| `description` | One sentence, no trailing period, under 160 characters |
+| `tags` | Array of lowercase hyphenated strings (1–8 tags) |
 
-The `schemas/manifest.schema.json` file defines the full schema. Run `scripts/validate.js` to check before opening a PR.
+The `schemas/project-manifest.schema.json` file defines the full schema. Run `python scripts/validate_repo.py` to check before opening a PR.
 
 ---
 

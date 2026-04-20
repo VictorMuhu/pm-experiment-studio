@@ -40,9 +40,9 @@ Understand what this repo is, what it values, and what already exists.
 
 Read every `manifest.json` in `/projects/*/manifest.json`. Extract and note:
 - The `slug` of each published project
-- The `category` of each
-- The `style` field if present (the visual identity used)
-- The `candidate_artifact_types` it represents (web app, CLI, etc.)
+- The `bucket` of each
+- The `style_direction` field (the visual identity used)
+- The `artifact_type` it represents (web app, CLI, etc.)
 - The interaction pattern (form-based, dashboard, text-in/text-out, etc.)
 
 Build a mental model of what already exists. You will use this to enforce diversity.
@@ -62,7 +62,7 @@ Using the inventory from Step 1, choose a concept from `prompts/idea-matrix.yaml
 **Concept diversity:**
 The concept must not meaningfully overlap with any published project. "Overlap" means: same target persona + same core action. Different personas doing similar things is acceptable. Same persona doing the same thing with a different UI is not.
 
-**Category diversity:**
+**Bucket diversity:**
 If the last two published projects share a `bucket` (e.g., both are `pm-productivity`), do not pick a third from that bucket. Rotate.
 
 **Artifact type diversity:**
@@ -80,7 +80,7 @@ Avoid repeating the same interaction model back-to-back. Patterns include:
 If the last project used "text in → structured output," pick a different model.
 
 **Style diversity:**
-Read `styles/style-matrix.yaml`. Note which `style_id` values have been used by existing projects. Select a style that has not been used, or that contrasts strongly with the most recent project. Record the selected `style_id`. You will implement the project using that style as the design specification.
+Read `styles/style-matrix.yaml`. Note which `style_direction` values have been used by existing projects (check the `style_direction` field in each manifest). Select a style that has not been used, or that contrasts strongly with the most recent project. Record the selected `style_direction`. You will implement the project using that style as the design specification.
 
 ### Commitment checkpoint
 
@@ -208,13 +208,17 @@ Follow the template in `templates/PROJECT_TEMPLATE/README.md`. Apply these addit
 
 ### manifest.json
 
-Fill every required field. Validate against `schemas/manifest.schema.json` before committing. Specific rules:
-- `slug` must exactly match the folder name (without the date prefix) — actually, use the full folder name minus the leading `projects/` path
+Fill every required field. Validate against `schemas/project-manifest.schema.json` before committing. Specific rules:
+- `slug` must match the folder name without the date prefix (e.g., folder `2026-03-14-funnel-drop-tool` → slug `funnel-drop-tool`)
 - `description` is one sentence, no trailing period, under 160 characters
-- `problem` is specific — it names the actual failure mode, not just the domain
+- `problem_statement` is specific — it names the actual failure mode, not just the domain
+- `bucket` must be one of: `pm-productivity`, `gtm-workflow`, `analytics-debugging`, `customer-experience`, `internal-tooling`, `decision-support`, `other`
+- `complexity` must be one of: `simple`, `intermediate`, `complex` (lowercase)
+- `status` must be one of: `published`, `draft`, `rejected`
+- `publish_recommendation` must be one of: `publish`, `hold`, `scratch`
 - `tags` are lowercase, hyphenated, and meaningful — not `tool`, `utility`, `web`
 - `screenshot` should be `"screenshots/screenshot.png"` — update after screenshot is taken
-- `style` field: add this field with the `style_id` you selected from the style matrix
+- `style_direction` must be one of the 12 style IDs from `styles/style-matrix.yaml`
 
 ### decision-log.md
 

@@ -2,10 +2,11 @@
   "name": "PM Vibe Agent Run",
   "slug": "pm-vibe-agent-run",
   "date_created": "2026-03-17",
-  "bucket": "internal tools",
+  "date_updated": "2026-03-17",
+  "bucket": "internal-tooling",
   "persona": "A PM at a 30–200 person SaaS company who needs to convert scattered daily notes into a crisp, audience-ready status update before standup or leadership syncs",
   "problem_statement": "When a PM needs to post an update fast, messy notes turn into vague or overloaded summaries that hide decisions, miss asks, and recreate alignment churn",
-  "complexity": "Intermediate",
+  "complexity": "intermediate",
   "artifact_type": "single-page web app that converts pasted daily notes into a structured run snapshot with copy-ready outputs",
   "style_direction": "premium-saas",
   "stack": [
@@ -14,12 +15,17 @@
     "js"
   ],
   "status": "draft",
-  "publish_recommendation": "yes",
+  "publish_recommendation": "hold",
+  "description": "Single-page web app that converts pasted daily notes into a structured run snapshot with copy-ready standup and leadership sync outputs",
   "tags": [
     "status-updates",
     "execution",
     "internal-comms",
     "decision-tracking",
     "risk-tracking"
-  ]
+  ],
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+  "notes": null
 }

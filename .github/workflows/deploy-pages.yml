@@ -25,9 +25,61 @@ jobs:
 
       - name: Assemble site
         run: |
-          mkdir -p _site/projects/2026-03-17-idea-validator
-          cp -r projects/2026-03-17-idea-validator/. _site/projects/2026-03-17-idea-validator/
-          printf '<!doctype html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=projects/2026-03-17-idea-validator/"></head><body>Redirecting...</body></html>\n' > _site/index.html
+          mkdir -p _site/projects
+
+          # Copy every project directory into _site/projects/
+          for dir in projects/*/; do
+            if [ -d "$dir" ]; then
+              project=$(basename "$dir")
+              mkdir -p "_site/projects/$project"
+              cp -r "$dir." "_site/projects/$project/"
+            fi
+          done
+
+          # Generate a landing page that lists all projects
+          cat > _site/index.html << 'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>PM Experiment Studio</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 800px; margin: 60px auto; padding: 0 24px; color: #111; }
+              h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+              p.sub { color: #555; margin-top: 0; margin-bottom: 32px; font-size: 0.95rem; }
+              ul { list-style: none; padding: 0; margin: 0; }
+              li { border-top: 1px solid #e5e5e5; padding: 16px 0; }
+              li:last-child { border-bottom: 1px solid #e5e5e5; }
+              a { color: #0066cc; text-decoration: none; font-weight: 500; }
+              a:hover { text-decoration: underline; }
+            </style>
+          </head>
+          <body>
+            <h1>PM Experiment Studio</h1>
+            <p class="sub">A working lab for PM-led product experiments.</p>
+            <ul id="project-list"></ul>
+            <script>
+              // Dynamically list projects from the directory structure
+              const projects = [];
+              // Projects are injected at build time below
+              PROJECTS_PLACEHOLDER
+              const list = document.getElementById('project-list');
+              projects.forEach(p => {
+                const li = document.createElement('li');
+                li.innerHTML = '<a href="projects/' + p + '/">' + p + '</a>';
+                list.appendChild(li);
+              });
+            </script>
+          </body>
+          </html>
+          EOF
+
+          # Inject the actual project list into the placeholder
+          PROJECT_ARRAY=$(ls -d projects/*/ 2>/dev/null | xargs -I{} basename {} | \
+            awk 'BEGIN{printf "const projects = ["} {printf "\"%s\",",$0} END{printf "];"}' | \
+            sed 's/,];/];/')
+          sed -i "s|PROJECTS_PLACEHOLDER|$PROJECT_ARRAY|" _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

@@ -1,0 +1,32 @@
+{
+  "name": "Product Brief Generator",
+  "slug": "product-brief-generator",
+  "date_created": "2026-03-17",
+  "date_updated": "2026-03-17",
+  "bucket": "pm-productivity",
+  "persona": "A PM at a 20–200 person product team who needs to produce a structured product brief, architecture overview, and AI flow document before handing off to engineering",
+  "problem_statement": "PMs writing product briefs from scratch produce inconsistent documents that miss architecture constraints, AI flow considerations, and evaluation criteria — reviewers spend cycles filling in gaps instead of evaluating the proposal",
+  "complexity": "intermediate",
+  "artifact_type": "document generator that produces a structured product brief, architecture doc, AI flow specification, and evaluation rubric from structured product inputs",
+  "style_direction": "warm-productivity",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "hold",
+  "description": "Document generator that produces a structured product brief, architecture doc, AI flow, and evaluation rubric from a set of structured product inputs",
+  "tags": [
+    "product-brief",
+    "documentation",
+    "ai-flow",
+    "architecture",
+    "planning"
+  ],
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+  "idea_matrix_id": null,
+  "notes": "Folder does not follow the standard YYYY-MM-DD-slug naming convention. Slug set to 'product-brief-generator' rather than the full folder name."
+}

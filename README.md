@@ -73,9 +73,16 @@ If it does not meet this bar, it stays here.
 
 <!-- PROJECT_INDEX_START -->
 
-_No published projects yet._
-
-Run `node scripts/scaffold.js` to start one, or see `prompts/idea-matrix.yaml` for project seeds.
+| Project | Bucket | Complexity | Status | Date |
+|---------|--------|------------|--------|------|
+| [Fix Verification Run](projects/2026-03-16-fix-verification-run/) | pm-productivity | complex | published | 2026-03-16 |
+| [Dependency Risk Radar](projects/2026-03-17-dependency-risk-radar/) | pm-productivity | complex | draft | 2026-03-17 |
+| [Design Coach](projects/2026-03-17-design-coach/) | pm-productivity | complex | published | 2026-03-17 |
+| [Idea Validator](projects/2026-03-17-idea-validator/) | decision-support | complex | draft | 2026-03-17 |
+| [PM Vibe Agent Run](projects/2026-03-17-pm-vibe-agent-run/) | internal-tooling | intermediate | draft | 2026-03-17 |
+| [Empirical Ledger — A/B Testing Coach](projects/2026-03-20-ab-testing-coach/) | decision-support | complex | draft | 2026-03-20 |
+| [Retention Loop Analyzer](projects/2026-03-21-retention-loop-analyzer/) | analytics-debugging | complex | draft | 2026-03-21 |
+| [Product Brief Generator](projects/project-02-product-brief-generator/) | pm-productivity | intermediate | draft | 2026-03-17 |
 
 <!-- PROJECT_INDEX_END -->
 

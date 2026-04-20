@@ -2,10 +2,11 @@
   "name": "Fix Verification Run",
   "slug": "fix-verification-run",
   "date_created": "2026-03-16",
-  "bucket": "PM productivity",
+  "date_updated": "2026-03-16",
+  "bucket": "pm-productivity",
   "persona": "A PM/builder maintaining a portfolio experiment repo who needs repeatable, diagnosable generation runs that don’t truncate or degrade under token limits",
   "problem_statement": "Multi-file project generation can silently truncate or genericize content to stay under 8192 tokens, producing incomplete artifacts that look valid until review",
-  "complexity": "Complex",
+  "complexity": "complex",
   "artifact_type": "local web UI + Node runner that generates and validates a multi-file project pack with token-budget diagnostics",
   "style_direction": "retro-future",
   "stack": [
@@ -15,12 +16,17 @@
     "js"
   ],
   "status": "published",
-  "publish_recommendation": "yes",
+  "publish_recommendation": "publish",
+  "description": "Local web UI and Node runner for generating and validating multi-file project packs with token-budget diagnostics and completeness checks",
   "tags": [
     "token-budget",
     "generation-quality",
     "linting",
     "project-scaffolding",
     "style-matrix"
-  ]
+  ],
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+  "notes": null
 }

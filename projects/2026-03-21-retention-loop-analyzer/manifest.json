@@ -1,17 +1,31 @@
 {
+  "name": "Retention Loop Analyzer",
   "slug": "retention-loop-analyzer",
-  "title": "Retention Loop Analyzer",
+  "date_created": "2026-03-21",
+  "date_updated": "2026-03-21",
   "bucket": "analytics-debugging",
+  "persona": "Senior Growth PM at a Series B–D B2C SaaS company who has just received a Week-1 retention report showing a 40% drop-off and needs to identify the friction point before a Friday leadership review",
+  "problem_statement": "A Growth PM who receives a retention drop report currently needs 3 separate tools to identify friction points, model interventions, and present findings — the analysis is fragmented and the intervention modeling is manual",
+  "complexity": "complex",
+  "artifact_type": "single-page web app with cohort input, behavioral loop visualizer, and intervention simulator with projected outcome modeling",
   "style_direction": "dense-analyst-console",
-  "persona": "Senior Growth PM, Series B–D B2C SaaS",
-  "problem_statement": "A Growth PM who has just received a Week-1 retention report showing a 40% drop-off and needs to identify the friction point and model an intervention before a Friday leadership review — currently requires 3 separate tools.",
+  "stack": [
+    "html",
+    "css",
+    "js"
+  ],
+  "status": "draft",
+  "publish_recommendation": "hold",
+  "description": "Single-page web app for Growth PMs that identifies friction points in Week-1 retention and models interventions against a behavioral loop framework",
   "tags": [
     "retention",
     "behavioral-loop",
     "funnel-analysis",
     "simulation",
-    "analytics",
-    "dark-theme"
+    "analytics"
   ],
-  "status": "draft"
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+  "notes": "Original manifest used 'title' instead of 'name' and was missing required fields: slug, date_created, complexity, artifact_type, stack, publish_recommendation. Also removed non-schema tag 'dark-theme'."
 }

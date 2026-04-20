@@ -18,6 +18,7 @@
 **Status:** `draft` | `published` | `archived`
 **Complexity:** `simple` | `intermediate` | `complex`
 **Bucket:** `pm-productivity` | `gtm-workflow` | `analytics-debugging` | `customer-experience` | `internal-tooling` | `decision-support`
+**Skills applied:** See [SKILL_MAP.md](./SKILL_MAP.md)
 
 ---
 

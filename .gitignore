@@ -68,3 +68,7 @@ scratch/**/*.secret
 
 # Generated index (rebuilt by scripts)
 # projects/index.json  # Uncomment if you want to exclude generated index
+
+# Weekly build generated outputs (regenerated on each run, not source)
+weekly-builds/**/output/chroma_store/
+weekly-builds/**/output/*.json
