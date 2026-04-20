@@ -21,8 +21,8 @@ CASES_PATH = Path(__file__).parent.parent / "examples" / "evaluation_cases.json"
 
 SCORE_LABELS = {1: "Poor", 2: "Weak", 3: "Acceptable", 4: "Good", 5: "Excellent"}
 
-BAR = "─" * 60
-DOUBLE_BAR = "═" * 60
+BAR = "-" * 60
+DOUBLE_BAR = "=" * 60
 
 
 def section(title: str, body: str):
