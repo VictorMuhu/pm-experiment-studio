@@ -157,3 +157,11 @@ python code/run_demo.py 1
 # Run the module directly for a smoke test
 python code/evaluate_response.py
 ```
+
+---
+
+## Screenshots
+
+![Evaluation output — all three cases](./screenshots/screenshot.png)
+
+*Three evaluation cases scored: strong response (5.0), partially grounded (3.0), and generic/weak (2.25) — demonstrating the evaluator discriminates across quality levels.*
