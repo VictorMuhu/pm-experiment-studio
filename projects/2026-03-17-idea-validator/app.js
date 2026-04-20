@@ -346,13 +346,9 @@
       el.setAttribute('aria-current', el.dataset.route === route ? 'page' : 'false');
     });
     if (scroll) {
-      requestAnimationFrame(() => {
-        const section = document.querySelector(`[data-view="${route}"]`);
-        if (!section) return;
-        const masthead = document.querySelector('.masthead');
-        const offset = masthead ? masthead.offsetHeight + 8 : 8;
-        window.scrollTo({ top: Math.max(0, section.getBoundingClientRect().top + window.pageYOffset - offset), behavior: 'smooth' });
-      });
+      setTimeout(() => {
+        document.querySelector(`[data-view="${route}"]`)?.scrollIntoView({ block: 'start' });
+      }, 0);
     }
     if (route !== 'workspace') renderRoute(route);
   }
