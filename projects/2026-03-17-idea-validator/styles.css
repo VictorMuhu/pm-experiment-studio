@@ -543,8 +543,11 @@ a{color:inherit}
   .assumptions{grid-template-columns: 1fr; gap: var(--space-4)}
   .table{min-width: 640px}
 }
+html { scroll-behavior: smooth; }
+.content { scroll-margin-top: 96px; }
+
 @media (prefers-reduced-motion: reduce){
-  *{transition:none !important}
+  *, html { transition: none !important; scroll-behavior: auto !important; }
 }
 
 /* Minimal motion: view fade-in */
