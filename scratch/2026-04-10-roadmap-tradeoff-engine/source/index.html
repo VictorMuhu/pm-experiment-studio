@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roadmap Tradeoff Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topbar__left">
+        <div class="brand">
+          <div class="brand__kicker">Roadmap Tradeoff Engine</div>
+          <div class="brand__title">Constraint-driven selection with explicit displacement</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <button class="nav__item is-active" data-route="board" type="button">BOARD</button>
+        <button class="nav__item" data-route="scenario" type="button">SCENARIO</button>
+        <button class="nav__item" data-route="audit" type="button">AUDIT</button>
+        <button class="nav__item" data-route="about" type="button">ABOUT</button>
+      </nav>
+    </header>
+
+    <main class="main">
+      <section class="hero" aria-label="Executive summary">
+        <div class="hero__metric">
+          <div class="label">PRIMARY TAKEAWAY</div>
+          <div class="hero__value" id="primaryMetric">8</div>
+          <div class="hero__sub" id="primaryMetricSub">Initiatives selected under current constraints</div>
+        </div>
+
+        <div class="hero__stats" role="group" aria-label="Key metrics">
+          <div class="stat">
+            <div class="label">CAPACITY USED</div>
+            <div class="stat__value"><span id="capUsed">0</span>/<span id="capTotal">0</span></div>
+            <div class="stat__hint" id="capHint">0% utilization</div>
+          </div>
+
+          <div class="stat stat--accent">
+            <div class="label">EXPLAINABILITY SCORE</div>
+            <div class="stat__value"><span id="explainScore">0</span><span class="stat__unit">/100</span></div>
+            <div class="stat__hint">Higher = fewer “why not?” debates</div>
+          </div>
+
+          <div class="stat">
+            <div class="label">DISPLACED VALUE</div>
+            <div class="stat__value"><span id="displacedValue">0</span></div>
+            <div class="stat__hint" id="displacedHint">Value left on the table due to constraints</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="workarea" aria-label="Planning workspace">
+        <div class="panel panel--left">
+          <div class="panel__header">
+            <div class="panel__heading">
+              <div class="label">INITIATIVE BACKLOG</div>
+              <h2 class="h2">Candidates</h2>
+            </div>
+
+            <div class="controls">
+              <div class="control-group" role="group" aria-label="View mode">
+                <div class="label label--inline">MODE</div>
+                <div class="segmented" id="viewMode">
+                  <button class="segmented__btn is-active" type="button" data-mode="portfolio">PORTFOLIO</button>
+                  <button class="segmented__btn" type="button" data-mode="by-segment">BY SEGMENT</button>
+                </div>
+              </div>
+
+              <div class="control-group" role="group" aria-label="Selection policy">
+                <div class="label label--inline">SELECTION</div>
+                <div class="segmented" id="selectionPolicy">
+                  <button class="segmented__btn is-active" type="button" data-policy="optimize">OPTIMIZE</button>
+                  <button class="segmented__btn" type="button" data-policy="protect">PROTECT BASE</button>
+                </div>
+              </div>
+
+              <div class="control-group" role="group" aria-label="Filters">
+                <div class="label label--inline">FILTER</div>
+                <div class="chips" id="filterChips">
+                  <button class="chip is-active" type="button" data-filter="all">ALL</button>
+                  <button class="chip" type="button" data-filter="must-do">MUST-DO</button>
+                  <button class="chip" type="button" data-filter="risk">HIGH RISK</button>
+                  <button class="chip" type="button" data-filter="revenue">REVENUE</button>
+                  <button class="chip" type="button" data-filter="retention">RETENTION</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel__body">
+            <div class="table-wrap" role="region" aria-label="Initiatives table">
+              <table class="table" id="initiativeTable">
+                <thead>
+                  <tr>
+                    <th>INITIATIVE</th>
+                    <th>SEGMENT</th>
+                    <th>EFFORT</th>
+                    <th>VALUE</th>
+                    <th>RISK</th>
+                    <th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="initiativeRows">
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="panel__footer">
+            <div class="footnote" id="tableFootnote">Click a row to inspect. Selection updates automatically as constraints change.</div>
+          </div>
+        </div>
+
+        <aside class="panel panel--right" aria-label="Inspector and scenario controls">
+          <div class="panel__header">
+            <div class="panel__heading">
+              <div class="label">INSPECTOR</div>
+              <h2 class="h2" id="inspectorTitle">Select an initiative</h2>
+            </div>
+          </div>
+
+          <div class="panel__body inspector">
+            <div class="inspector__section">
+              <div class="label">STATUS</div>
+              <div class="badge-row">
+                <span class="badge badge--ok" id="badgeSelected">SELECTED</span>
+                <span class="badge badge--warn" id="badgeExcluded">EXCLUDED</span>
+                <span class="badge badge--danger" id="badgeDisplaced">DISPLACED</span>
+              </div>
+              <div class="caption" id="inspectorStatusText">Pick an item from the table to see why it makes (or misses) the cut.</div>
+            </div>
+
+            <div class="inspector__section">
+              <div class="label">SCORE INDICATOR</div>
+              <div class="score-grid">
+                <div class="gauge" aria-label="Risk-adjusted score gauge">
+                  <div class="gauge__ring" id="gaugeRing"></div>
+                  <div class="gauge__center">
+                    <div class="gauge__value" id="gaugeValue">—</div>
+                    <div class="gauge__label">RISK-ADJ</div>
+                  </div>
+                </div>
+                <div class="score-lines">
+                  <div class="score-line">
+                    <div class="label label--inline">VALUE</div>
+                    <div class="mono" id="insValue">—</div>
+                  </div>
+                  <div class="score-line">
+                    <div class="label label--inline">EFFORT</div>
+                    <div class="mono" id="insEffort">—</div>
+                  </div>
+                  <div class="score-line">
+                    <div class="label label--inline">RISK</div>
+                    <div class="mono" id="insRisk">—</div>
+                  </div>
+                  <div class="score-line">
+                    <div class="label label--inline">CONFIDENCE</div>
+                    <div class="mono" id="insConfidence">—</div>
+                  </div>
+                </div>
+              </div>
+              <div class="bar" aria-label="Effort vs capacity bar">
+                <div class="bar__label">
+                  <span class="label">EFFORT SHARE (IF SELECTED)</span>
+                  <span class="caption" id="effortShareText">—</span>
+                </div>
+                <div class="bar__track">
+                  <div class="bar__fill" id="effortShareFill"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="inspector__section">
+              <div class="label">RISK POSTURE EXPLANATION</div>
+              <div class="explain" id="insExplain">
+                Adjust capacity and posture below; the engine will re-select the set and show what got displaced.
+              </div>
+            </div>
+
+            <div class="rule"></div>
+
+            <div class="inspector__section">
+              <div class="label">SCENARIO CONTROLS</div>
+
+              <div class="form">
+                <div class="field">
+                  <label class="field__label" for="capacityRange">ENGINEERING CAPACITY (PERSON-WEEKS)</label>
+                  <div class="field__row">
+                    <input class="range" id="capacityRange" type="range" min="18" max="42" step="1" value="30" />
+                    <div class="field__value mono"><span id="capInput">30</span></div>
+                  </div>
+                  <div class="caption">Treat this as the total planned capacity for the quarter after BAU.</div>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="riskRange">RISK POSTURE</label>
+                  <div class="field__row">
+                    <input class="range" id="riskRange" type="range" min="0" max="100" step="1" value="55" />
+                    <div class="field__value mono"><span id="riskInput">55</span></div>
+                  </div>
+                  <div class="caption">Higher = penalize risk more aggressively; favors proven retention work.</div>
+                </div>
+
+                <div class="field">
+                  <label class="field__label" for="wipRange">WIP LIMIT (MAX INITIATIVES)</label>
+                  <div class="field__row">
+                    <input class="range" id="wipRange" type="range" min="4" max="10" step="1" value="8" />
+                    <div class="field__value mono"><span id="wipInput">8</span></div>
+                  </div>
+                  <div class="caption">Meeting-friendly constraint: fewer initiatives = clearer execution.</div>
+                </div>
+
+                <div class="actions">
+                  <button class="btn btn--primary" id="applyScenario" type="button">APPLY SCENARIO</button>
+                  <button class="btn btn--ghost" id="resetScenario" type="button">RESET TO BASELINE</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel__footer">
+            <div class="footnote" id="changeDigest">No changes yet. Move a constraint to generate a displacement digest.</div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="lower" aria-label="Explanation and audit trail">
+        <div class="panel panel--full">
+          <div class="panel__header">
+            <div class="panel__heading">
+              <div class="label">EXPLANATION LAYER</div>
+              <h2 class="h2">What changed, and why</h2>
+            </div>
+            <div class="meta">
+              <div class="meta__item"><span class="label label--inline">VIEW</span> <span class="mono" id="routeLabel">BOARD</span></div>
+              <div class="meta__item"><span class="label label--inline">LAST RUN</span> <span class="mono" id="lastRun">—</span></div>
+            </div>
+          </div>
+
+          <div class="panel__body">
+            <div class="grid-2">
+              <div class="stack">
+                <div class="label">SELECTED SET</div>
+                <div class="list" id="selectedList" aria-label="Selected initiatives list"></div>
+              </div>
+
+              <div class="stack">
+                <div class="label">DISPLACED / EXCLUDED</div>
+                <div class="list" id="excludedList" aria-label="Excluded initiatives list"></div>
+              </div>
+            </div>
+
+            <div class="rule"></div>
+
+            <div class="audit">
+              <div class="label">DISPLACEMENT DIGEST</div>
+              <div class="audit__cards" id="digestCards" aria-label="Digest cards"></div>
+            </div>
+          </div>
+
+          <div class="panel__footer">
+            <div class="footnote">Interpretation tip: “Displaced” means it was in the baseline set but fell out after constraint changes.</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>

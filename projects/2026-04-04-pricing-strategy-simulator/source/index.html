@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pricing Strategy Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar">
+      <div class="topbar__inner">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">💸</div>
+          <div class="brand__text">
+            <div class="brand__name">Pricing Strategy Simulator</div>
+            <div class="brand__meta">Compare two strategies against segment behavior — in minutes</div>
+          </div>
+        </div>
+
+        <div class="topbar__actions">
+          <button class="btn btn--ghost" id="btnReset" type="button" title="Reset edits">
+            <span class="btn__icon" aria-hidden="true">↺</span>
+            <span class="btn__label">Reset</span>
+          </button>
+          <button class="btn btn--primary" id="btnShuffle" type="button" title="Try a new scenario">
+            <span class="btn__icon" aria-hidden="true">🎲</span>
+            <span class="btn__label">New scenario</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="hero__inner">
+          <h1 class="hero__title">Pick a pricing direction you can defend in the room.</h1>
+          <p class="hero__subtitle">
+            Click a segment, tune how it reacts, and see revenue vs adoption tradeoffs update live.
+          </p>
+
+          <div class="hero__kpis" aria-label="Key metrics">
+            <div class="kpi kpi--accent">
+              <div class="kpi__label">Revenue delta</div>
+              <div class="kpi__value" id="kpiRevenueDelta">$0</div>
+              <div class="kpi__sub" id="kpiRevenueDeltaSub">vs current mix</div>
+            </div>
+
+            <div class="kpi kpi--accent2">
+              <div class="kpi__label">Adoption delta</div>
+              <div class="kpi__value" id="kpiAdoptionDelta">0%</div>
+              <div class="kpi__sub" id="kpiAdoptionDeltaSub">new customers / month</div>
+            </div>
+
+            <div class="kpi kpi--accent3">
+              <div class="kpi__label">Decision confidence</div>
+              <div class="kpi__value kpi__value--row">
+                <div class="ring" id="confidenceRing" role="img" aria-label="Confidence score ring">
+                  <svg viewBox="0 0 44 44" class="ring__svg" aria-hidden="true">
+                    <circle class="ring__track" cx="22" cy="22" r="18"></circle>
+                    <circle class="ring__progress" cx="22" cy="22" r="18"></circle>
+                  </svg>
+                  <div class="ring__text">
+                    <div class="ring__num" id="confidenceScore">0</div>
+                    <div class="ring__cap">/100</div>
+                  </div>
+                </div>
+                <div class="kpi__pillstack">
+                  <span class="badge badge--ok" id="badgeRisk">✅ Risk: Low</span>
+                  <span class="badge badge--warn" id="badgeVolatility">⚠️ Volatility: Medium</span>
+                </div>
+              </div>
+              <div class="kpi__sub" id="kpiConfidenceSub">balanced growth + predictable mix</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="main" role="main">
+      <div class="layout">
+        <section class="panel panel--main" aria-label="Workspace">
+          <div class="panel__header">
+            <div class="panel__titleblock">
+              <div class="label">Compare</div>
+              <h2 class="h2">Two strategies + one shared segment reality</h2>
+            </div>
+
+            <div class="mode">
+              <div class="label">View</div>
+              <div class="segmented" role="tablist" aria-label="View mode toggle">
+                <button class="segmented__btn" id="modeCompare" type="button" role="tab" aria-selected="true">
+                  <span aria-hidden="true">🆚</span> Compare
+                </button>
+                <button class="segmented__btn" id="modeRevenue" type="button" role="tab" aria-selected="false">
+                  <span aria-hidden="true">💰</span> Revenue
+                </button>
+                <button class="segmented__btn" id="modeAdoption" type="button" role="tab" aria-selected="false">
+                  <span aria-hidden="true">🚀</span> Adoption
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="sectionBreak sectionBreak--accent" aria-hidden="true"></div>
+
+          <div class="cards2" aria-label="Strategy cards">
+            <article class="strategyCard strategyCard--a" id="strategyA" aria-label="Strategy A">
+              <div class="strategyCard__head">
+                <div>
+                  <div class="tag tag--accent" id="tagA">🔥 Strategy A</div>
+                  <div class="strategyCard__name" id="nameA">Bundle for Teams</div>
+                </div>
+                <div class="miniBadges">
+                  <span class="badge badge--ok" id="badgeA">✅ Balanced</span>
+                </div>
+              </div>
+
+              <div class="strategyCard__body">
+                <div class="fieldGrid">
+                  <label class="field">
+                    <span class="field__label">Starter price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="aStarterPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Pro price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="aProPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Team price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="aTeamPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Free-to-paid uplift (all segments)</span>
+                    <div class="field__control">
+                      <input class="input" id="aFreeUplift" inputmode="numeric" type="number" min="-50" max="50" step="1" />
+                      <span class="field__suffix">%</span>
+                    </div>
+                    <span class="field__hint">How much the plan design changes paid conversion (not traffic).</span>
+                  </label>
+                </div>
+
+                <div class="strategyCard__footer">
+                  <div class="statPills">
+                    <div class="pill">
+                      <div class="pill__label">Monthly revenue</div>
+                      <div class="pill__value" id="aRevenue">$0</div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill__label">New customers</div>
+                      <div class="pill__value" id="aCustomers">0</div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill__label">Avg ARPA</div>
+                      <div class="pill__value" id="aArpa">$0</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="strategyCard strategyCard--b" id="strategyB" aria-label="Strategy B">
+              <div class="strategyCard__head">
+                <div>
+                  <div class="tag tag--accent2" id="tagB">🧠 Strategy B</div>
+                  <div class="strategyCard__name" id="nameB">Raise Pro, Keep Entry</div>
+                </div>
+                <div class="miniBadges">
+                  <span class="badge badge--warn" id="badgeB">⚠️ Risky</span>
+                </div>
+              </div>
+
+              <div class="strategyCard__body">
+                <div class="fieldGrid">
+                  <label class="field">
+                    <span class="field__label">Starter price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="bStarterPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Pro price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="bProPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Team price</span>
+                    <div class="field__control">
+                      <span class="field__prefix" aria-hidden="true">$</span>
+                      <input class="input" id="bTeamPrice" inputmode="numeric" type="number" min="0" step="1" />
+                      <span class="field__suffix">/mo</span>
+                    </div>
+                  </label>
+
+                  <label class="field">
+                    <span class="field__label">Free-to-paid uplift (all segments)</span>
+                    <div class="field__control">
+                      <input class="input" id="bFreeUplift" inputmode="numeric" type="number" min="-50" max="50" step="1" />
+                      <span class="field__suffix">%</span>
+                    </div>
+                    <span class="field__hint">How much the plan design changes paid conversion (not traffic).</span>
+                  </label>
+                </div>
+
+                <div class="strategyCard__footer">
+                  <div class="statPills">
+                    <div class="pill">
+                      <div class="pill__label">Monthly revenue</div>
+                      <div class="pill__value" id="bRevenue">$0</div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill__label">New customers</div>
+                      <div class="pill__value" id="bCustomers">0</div>
+                    </div>
+                    <div class="pill">
+                      <div class="pill__label">Avg ARPA</div>
+                      <div class="pill__value" id="bArpa">$0</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="sectionBreak sectionBreak--accent2" aria-hidden="true"></div>
+
+          <section class="segments" aria-label="Segments">
+            <div class="segments__head">
+              <div class="segments__titleblock">
+                <div class="label">Segments</div>
+                <h3 class="h3">Who’s buying?</h3>
+                <p class="muted">Click a segment to tune sensitivity and see the strategy mix shift.</p>
+              </div>
+
+              <div class="segments__toolbar">
+                <div class="label">Stress test</div>
+                <label class="toggle" for="toggleStress">
+                  <input id="toggleStress" class="toggle__input" type="checkbox" />
+                  <span class="toggle__track" aria-hidden="true"></span>
+                  <span class="toggle__text">Competitor undercuts Starter by 20%</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="segmentList" id="segmentList" role="listbox" aria-label="Segment list">
+              <!-- injected -->
+            </div>
+          </section>
+        </section>
+
+        <aside class="panel panel--inspector" aria-label="Inspector panel">
+          <div class="panel__header panel__header--sticky">
+            <div class="panel__titleblock">
+              <div class="label">Inspector</div>
+              <h2 class="h2">Segment details</h2>
+            </div>
+          </div>
+
+          <div class="inspector" id="inspector">
+            <div class="inspector__top">
+              <div class="inspector__titleRow">
+                <div class="inspector__emoji" id="inspectorEmoji" aria-hidden="true">👀</div>
+                <div>
+                  <div class="inspector__name" id="inspectorName">Mid-market Ops</div>
+                  <div class="inspector__desc" id="inspectorDesc">Teams buying for reporting + audit readiness</div>
+                </div>
+              </div>
+
+              <div class="badgeRow" id="inspectorBadges">
+                <!-- injected -->
+              </div>
+            </div>
+
+            <div class="sectionBreak sectionBreak--accent3" aria-hidden="true"></div>
+
+            <div class="inspector__grid">
+              <div class="miniCard">
+                <div class="miniCard__label">Monthly signups</div>
+                <div class="miniCard__value" id="inspectorSignups">0</div>
+                <div class="miniCard__cap">top-of-funnel for this segment</div>
+              </div>
+
+              <div class="miniCard">
+                <div class="miniCard__label">Base conversion</div>
+                <div class="miniCard__value" id="inspectorBaseConv">0%</div>
+                <div class="miniCard__cap">trial → paid baseline</div>
+              </div>
+
+              <div class="miniCard">
+                <div class="miniCard__label">Typical plan</div>
+                <div class="miniCard__value" id="inspectorPlan">—</div>
+                <div class="miniCard__cap">where they land today</div>
+              </div>
+
+              <div class="miniCard">
+                <div class="miniCard__label">Price sensitivity</div>
+                <div class="miniCard__value" id="inspectorSensitivity">—</div>
+                <div class="miniCard__cap">impact per $10 change</div>
+              </div>
+            </div>
+
+            <div class="inspector__controls">
+              <div class="controlBlock">
+                <div class="controlBlock__head">
+                  <div>
+                    <div class="label">Assumption</div>
+                    <h3 class="h3">Sensitivity tuning</h3>
+                  </div>
+                  <span class="badge badge--ok" id="inspectorHealthBadge">✅ Healthy</span>
+                </div>
+
+                <label class="field">
+                  <span class="field__label">Price sensitivity (conversion change per $10)</span>
+                  <div class="field__control">
+                    <input class="input" id="sensitivity" type="range" min="-8" max="2" step="0.5" />
+                  </div>
+                  <div class="rangeMeta">
+                    <span class="rangeMeta__min">More sensitive</span>
+                    <span class="rangeMeta__val" id="sensitivityVal">0.0%</span>
+                    <span class="rangeMeta__max">Less sensitive</span>
+                  </div>
+                  <span class="field__hint">Negative means price increases reduce conversion for this segment.</span>
+                </label>
+
+                <label class="field">
+                  <span class="field__label">Value bump for better packaging (conversion points)</span>
+                  <div class="field__control">
+                    <input class="input" id="valueBump" type="range" min="0" max="6" step="0.5" />
+                  </div>
+                  <div class="rangeMeta">
+                    <span class="rangeMeta__min">0.0</span>
+                    <span class="rangeMeta__val" id="valueBumpVal">0.0 pts</span>
+                    <span class="rangeMeta__max">6.0</span>
+                  </div>
+                  <span class="field__hint">Use when a tier redesign fits this segment better (not just price).</span>
+                </label>
+              </div>
+
+              <div class="controlBlock">
+                <div class="controlBlock__head">
+                  <div>
+                    <div class="label">Mix</div>
+                    <h3 class="h3">Plan preference</h3>
+                  </div>
+                  <span class="badge badge--warn" id="mixBadge">⚠️ Mix shift</span>
+                </div>
+
+                <div class="mixBars" id="mixBars">
+                  <!-- injected -->
+                </div>
+
+                <div class="hintBox">
+                  <div class="hintBox__title">What to watch</div>
+                  <ul class="hintBox__list" id="watchList">
+                    <!-- injected -->
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="inspector__bottom">
+              <button class="btn btn--primary btn--full" id="btnApplySuggestion" type="button">
+                <span class="btn__icon" aria-hidden="true">✨</span>
+                <span class="btn__label">Apply a “safe” tweak to Strategy B</span>
+              </button>
+              <p class="caption">
+                Applies a small price shift that improves confidence without optimizing for max revenue.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <nav class="bottomNav" aria-label="Bottom navigation">
+      <button class="bottomNav__item bottomNav__item--active" id="navSim" type="button" aria-current="page">
+        <span class="bottomNav__icon" aria-hidden="true">🧪</span>
+        <span class="bottomNav__label">Sim</span>
+      </button>
+      <button class="bottomNav__item" id="navSegments" type="button">
+        <span class="bottomNav__icon" aria-hidden="true">🧍‍♀️</span>
+        <span class="bottomNav__label">Segments</span>
+      </button>
+      <button class="bottomNav__item" id="navStrategies" type="button">
+        <span class="bottomNav__icon" aria-hidden="true">🏷️</span>
+        <span class="bottomNav__label">Strategies</span>
+      </button>
+      <button class="bottomNav__item" id="navNotes" type="button">
+        <span class="bottomNav__icon" aria-hidden="true">📝</span>
+        <span class="bottomNav__label">Notes</span>
+      </button>
+      <button class="bottomNav__item" id="navExport" type="button">
+        <span class="bottomNav__icon" aria-hidden="true">📤</span>
+        <span class="bottomNav__label">Export</span>
+      </button>
+    </nav>
+
+    <div class="toastWrap" id="toastWrap" aria-live="polite" aria-atomic="true"></div>
+
+    <dialog class="sheet" id="sheet" aria-label="Sheet">
+      <div class="sheet__handle" aria-hidden="true"></div>
+      <div class="sheet__header">
+        <div class="sheet__title" id="sheetTitle">Notes</div>
+        <button class="btn btn--ghost" id="btnCloseSheet" type="button">
+          <span class="btn__icon" aria-hidden="true">✕</span>
+          <span class="btn__label">Close</span>
+        </button>
+      </div>
+      <div class="sheet__content" id="sheetContent">
+        <!-- injected -->
+      </div>
+    </dialog>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
