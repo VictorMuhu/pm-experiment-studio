@@ -1,4 +1,4 @@
-# Empirical Ledger — A/B Testing Coach
+# A/B Testing Coach
 
 A PM reading an experiment result alone — no statistician, no data scientist — will misinterpret a p=0.04 on an underpowered test as a green light. This tool closes that gap by surfacing the exact statistical reasoning at the point of decision.
 
