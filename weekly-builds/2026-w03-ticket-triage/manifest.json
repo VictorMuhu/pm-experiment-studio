@@ -1,0 +1,32 @@
+{
+  "$schema": "../../schemas/project-manifest.schema.json",
+
+  "name": "Support Ticket Triage",
+  "slug": "2026-w03-ticket-triage",
+
+  "date_created": "2026-04-13",
+  "date_updated": "2026-04-20",
+
+  "bucket": "customer-experience",
+  "persona": "Support team lead at a B2B SaaS company managing a high-volume ticket queue who needs a consistent urgency and routing signal before tickets reach an agent.",
+  "problem_statement": "Support agents re-read full ticket text to determine urgency and routing category, producing inconsistent classifications at scale. There is no structured triage step between ticket submission and agent assignment.",
+
+  "complexity": "simple",
+  "artifact_type": "CLI script that accepts a raw support ticket and returns a structured JSON triage brief with urgency score, category, KB topic, and one-sentence agent summary.",
+  "style_direction": "premium-saas",
+  "stack": ["Python", "OpenAI", "gpt-4o-mini", "python-dotenv"],
+
+  "status": "draft",
+  "publish_recommendation": "hold",
+
+  "description": "A CLI tool that classifies a support ticket into urgency, category, KB topic, and a one-sentence agent brief — output is structured JSON ready for routing",
+  "tags": ["support", "triage", "classification", "customer-experience", "weekly-build"],
+
+  "idea_matrix_id": null,
+
+  "has_demo": false,
+  "demo_url": null,
+  "screenshot": null,
+
+  "notes": "W03 of the Customer Support Copilot monthly build. Triage layer sits between ticket intake (W01) and KB retrieval (W02). 5/5 offline evals passing after one prompt iteration."
+}
