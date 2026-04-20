@@ -336,7 +336,7 @@
   /* ─── router ─────────────────────────────────────────────────────────── */
   let activeRoute = 'workspace';
 
-  function navigate(route) {
+  function navigate(route, scroll = false) {
     if (!ROUTES.includes(route)) route = 'workspace';
     activeRoute = route;
     $$('[data-view]').forEach(el => {
@@ -345,6 +345,15 @@
     $$('[data-route]').forEach(el => {
       el.setAttribute('aria-current', el.dataset.route === route ? 'page' : 'false');
     });
+    if (scroll) {
+      requestAnimationFrame(() => {
+        const section = document.querySelector(`[data-view="${route}"]`);
+        if (!section) return;
+        const masthead = document.querySelector('.masthead');
+        const offset = masthead ? masthead.offsetHeight + 8 : 8;
+        window.scrollTo({ top: Math.max(0, section.getBoundingClientRect().top + window.pageYOffset - offset), behavior: 'smooth' });
+      });
+    }
     if (route !== 'workspace') renderRoute(route);
   }
 
@@ -717,7 +726,7 @@
     $$('[data-route]').forEach(el => {
       el.addEventListener('click', (e) => {
         e.preventDefault();
-        navigate(el.dataset.route);
+        navigate(el.dataset.route, true);
       });
     });
 
@@ -942,7 +951,7 @@
     // ── footer back link
     $$('[data-route="workspace"]').forEach(el => {
       if (el.tagName === 'A') el.addEventListener('click', (e) => {
-        e.preventDefault(); navigate('workspace');
+        e.preventDefault(); navigate('workspace', true);
       });
     });
   }
