@@ -120,7 +120,9 @@ python src/test_tickets.py
 
 ## Screenshots
 
-Screenshot pending — see screenshots/PENDING.md for capture instructions.
+![Eval results](./screenshots/screenshot.png)
+
+*Offline eval suite — 5/5 test cases passing across billing, account, product, technical, and low-urgency classification.*
 
 ---
 
