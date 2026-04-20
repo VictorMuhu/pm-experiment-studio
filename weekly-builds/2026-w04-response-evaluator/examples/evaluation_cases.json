@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "label": "Strong response — grounded, complete, actionable",
+    "ticket": "I reset my password yesterday but I still cannot log in. I keep getting 'invalid credentials' even though I am sure the password is correct. I have a client demo in 45 minutes and I need access urgently.",
+    "retrieved_context": "Post-password-reset login failures are most commonly caused by cached session tokens or browser-stored credentials that conflict with the new password. Resolution steps: (1) Clear all browser cookies and cache for the site. (2) Open a new private/incognito window and try logging in fresh. (3) If the issue persists after step 2, contact support with your account email address — a manual session reset can be completed in under 5 minutes. Note: password resets do not automatically expire active sessions on other devices.",
+    "generated_response": "This is most likely a cached session issue, not a problem with your new password. Please try the following steps in order: (1) Clear your browser cookies and cache for this site. (2) Open an incognito or private browsing window and log in fresh — do not use any saved credentials. If you are still blocked after step 2, reply here with your account email and we will reset your session manually. This takes under 5 minutes. Given your demo timeline, I would suggest trying step 2 first as it resolves most cases immediately."
+  },
+  {
+    "id": 2,
+    "label": "Partially grounded — relevant but incomplete, introduces unverified steps",
+    "ticket": "I was charged twice for my subscription this month. I have two identical charges on my credit card statement from the same date. I need a refund for the duplicate.",
+    "retrieved_context": "Duplicate billing charges occur when a payment is submitted more than once during a network timeout or browser refresh. To request a refund: (1) Locate the duplicate charge on your statement and note the transaction date and amount. (2) Submit a refund request through Settings > Billing > Request Refund and include the transaction date. (3) Refunds are processed within 5–7 business days and returned to the original payment method. Support cannot process refunds outside of this flow.",
+    "generated_response": "I'm sorry to hear about the duplicate charge. This does happen occasionally when a payment is processed twice due to a network issue. Please contact our billing team directly at billing@support.example.com with your transaction details and they will process a refund for you. Refunds typically take 5–10 business days to appear on your statement. Make sure to include your account email and the charge amount in your message."
+  },
+  {
+    "id": 3,
+    "label": "Weak response — generic, not grounded, no actionable steps",
+    "ticket": "Our webhook endpoint is only receiving about 60% of events. We have checked our server logs and the events are definitely not arriving. This has been happening for the past three days and is affecting our order processing pipeline.",
+    "retrieved_context": "Webhook delivery failures are commonly caused by one of three issues: (1) The endpoint URL has changed or is returning a non-2xx status code. (2) The webhook secret is mismatched, causing signature verification to fail silently. (3) The delivery retry window has expired — webhooks are retried for up to 24 hours after the first failure. To diagnose: check the webhook delivery log in Settings > Integrations > Webhooks, which shows per-event delivery status and response codes. If signature verification is the issue, regenerate the webhook secret and update it on your server.",
+    "generated_response": "Thank you for reaching out. I'm sorry to hear you're experiencing issues with your webhook integration. Our team is aware that webhook reliability can sometimes be affected by various factors. We recommend checking your server configuration and ensuring your endpoint is set up correctly. If the issue continues, please don't hesitate to reach out and we will do our best to help you resolve it."
+  }
+]
