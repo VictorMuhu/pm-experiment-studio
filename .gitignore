@@ -66,5 +66,8 @@ pnpm-lock.yaml
 *.bak
 scratch/**/*.secret
 
+# Git worktrees
+.worktrees/
+
 # Generated index (rebuilt by scripts)
 # projects/index.json  # Uncomment if you want to exclude generated index
