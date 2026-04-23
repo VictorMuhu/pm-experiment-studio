@@ -2,7 +2,10 @@
   "name": "idea-validator",
   "version": "2.0.0",
   "dependencies": {
-    "openai": "^4.47.0",
-    "@supabase/supabase-js": "^2.43.0"
+    "@supabase/supabase-js": "^2.43.0",
+    "openai": "^4.47.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2"
   }
 }
