@@ -219,6 +219,7 @@
       verdict: { label: apiResult.verdict || 'Refine', reason: apiResult.verdictReason || '' },
       tags:          apiResult.tags           || [],
       strongSignals: apiResult.strongSignals  || [],
+      // API field 'weakAssumptions' maps to internal 'weakSignals' used by renderSignals + exportMemo
       weakSignals:   apiResult.weakAssumptions || [],
       flags,
       feasPenalty:     0,
@@ -538,7 +539,10 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(d),
       });
-      if (!res.ok) throw new Error(res.statusText);
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `HTTP ${res.status}`);
+      }
 
       const apiResult = await res.json();
       const analysis  = transformApiResponse(apiResult, d);
