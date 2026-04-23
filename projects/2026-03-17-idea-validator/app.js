@@ -176,6 +176,56 @@
     };
   }
 
+  /* ─── AI response transformer ────────────────────────────────────────── */
+  function transformApiResponse(apiResult, draft) {
+    const dimMap = [
+      { key: 'problem_clarity',  label: 'Problem clarity',   apiKey: 'problemClarity'  },
+      { key: 'user_specificity', label: 'User specificity',  apiKey: 'userSpecificity' },
+      { key: 'value_clarity',    label: 'Value proposition', apiKey: 'valueClarity'    },
+      { key: 'differentiation',  label: 'Differentiation',   apiKey: 'differentiation' },
+      { key: 'distribution',     label: 'Distribution',      apiKey: 'distribution'    },
+      { key: 'metric',           label: 'Success metric',    apiKey: 'successMetric'   },
+      { key: 'feasibility',      label: 'Feasibility',       apiKey: 'feasibility'     },
+      { key: 'competition',      label: 'Competitive space', apiKey: 'competitiveSpace'},
+    ];
+
+    const dims = dimMap.map(({ key, label, apiKey }) => ({
+      key,
+      label,
+      score: apiResult.scores?.[apiKey] ?? 0,
+      why:   apiResult.dimensionNotes?.[apiKey]       || '',
+      raise: apiResult.dimensionImprovements?.[apiKey] || '',
+    }));
+
+    const s = apiResult.scores || {};
+    const flags = {
+      problemVague:    (s.problemClarity   ?? 0) < 45,
+      targetVague:     (s.userSpecificity  ?? 0) < 45,
+      metricMissing:   (s.successMetric    ?? 0) < 40,
+      channelMissing:  (s.distribution     ?? 0) < 40,
+      lowDiff:         (s.differentiation  ?? 0) < 45,
+      crowded:         (s.competitiveSpace ?? 0) < 50,
+      highConstraints: (s.feasibility      ?? 0) < 60,
+    };
+
+    const stage   = draft.ideaStage || 'series-a';
+    const weights = stageWeights(stage);
+    const baseScore = Math.round(
+      dims.reduce((acc, d) => acc + d.score * (weights[d.key] || 0.125), 0)
+    );
+
+    return {
+      stage, weights, score: baseScore, dims,
+      verdict: { label: apiResult.verdict || 'Refine', reason: apiResult.verdictReason || '' },
+      tags:          apiResult.tags           || [],
+      strongSignals: apiResult.strongSignals  || [],
+      weakSignals:   apiResult.weakAssumptions || [],
+      flags,
+      feasPenalty:     0,
+      competitorCount: commaCount(draft.competitors),
+    };
+  }
+
   /* ─── assumptions builder ───────────────────────────────────────────── */
   function buildAssumptions(draft, analysis) {
     const out  = [];
@@ -463,20 +513,51 @@
   }
 
   /* ─── run check ─────────────────────────────────────────────────────── */
-  function runCheck() {
+  function setRunCheckLoading(isLoading) {
+    const btn = $('#btnRunCheck');
+    if (!btn) return;
+    if (isLoading) {
+      btn.dataset.originalText = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>Analyzing…';
+      btn.disabled = true;
+    } else {
+      btn.textContent = btn.dataset.originalText || 'Run check';
+      btn.disabled = false;
+    }
+  }
+
+  async function runCheck() {
     syncDraftFromForm();
     const d = currentDraft();
     if (!d) return;
 
-    const analysis = analyzeDraft(d);
-    d.lastAnalysis  = analysis;
-    d.assumptions   = buildAssumptions(d, analysis);
-    d.steps         = buildNextSteps(d.assumptions);
-    d.lastCheckedAt = nowISO();
-    saveState();
+    setRunCheckLoading(true);
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(d),
+      });
+      if (!res.ok) throw new Error(res.statusText);
 
-    showToast('Analysis complete — check the Scorecard tab.');
-    navigate('scorecard');
+      const apiResult = await res.json();
+      const analysis  = transformApiResponse(apiResult, d);
+
+      d.lastAnalysis  = analysis;
+      d.lastApiResult = apiResult;
+      d.assumptions   = buildAssumptions(d, analysis);
+      d.steps         = buildNextSteps(d.assumptions);
+      d.lastCheckedAt = nowISO();
+      saveState();
+
+      showToast('Analysis complete — check the Scorecard tab.');
+      navigate('scorecard');
+    } catch (err) {
+      console.error('runCheck error:', err);
+      showToast('Analysis failed — check your connection and try again.');
+    } finally {
+      setRunCheckLoading(false);
+    }
   }
 
   /* ─── scorecard render ──────────────────────────────────────────────── */

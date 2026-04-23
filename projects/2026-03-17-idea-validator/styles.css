@@ -781,3 +781,29 @@ html { scroll-behavior: smooth; }
   .verdict-block{flex-direction: column}
   .assumption-card__head{flex-direction: column}
 }
+
+/* ── spinner (loading state for Run Check) ────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── scorecard header with action button ─────────────────────────── */
+.section-head--with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.section-head--with-action .btn {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
