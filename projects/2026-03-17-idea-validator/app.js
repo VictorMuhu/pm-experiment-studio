@@ -818,8 +818,12 @@
 
       const { id } = await res.json();
       const shareUrl = `${window.location.origin}/eval/${id}`;
-      await navigator.clipboard.writeText(shareUrl);
-      showToast('Link copied — share it with anyone');
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('Link copied — share it with anyone');
+      } catch (_) {
+        showToast(`Saved! Share this link: ${shareUrl}`);
+      }
     } catch (err) {
       console.error('saveAndShare error:', err);
       showToast('Save failed — try again');
