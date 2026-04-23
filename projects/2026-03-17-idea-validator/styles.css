@@ -781,3 +781,66 @@ html { scroll-behavior: smooth; }
   .verdict-block{flex-direction: column}
   .assumption-card__head{flex-direction: column}
 }
+
+/* ── spinner (loading state for Run Check) ────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── scorecard header with action button ─────────────────────────── */
+.section-head--with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+.section-head--with-action .btn {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* ── read-only share banner ──────────────────────────────────────── */
+.readonly-banner {
+  background: #1A1A1A;
+  color: #FAFAF8;
+  padding: 10px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.readonly-banner__inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.readonly-chip {
+  background: #C8102E;
+  color: #fff;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  font-weight: 700;
+}
+.readonly-banner__cta {
+  color: #FAFAF8;
+  font-size: 12px;
+  opacity: 0.7;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.readonly-banner__cta:hover { opacity: 1; }

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe 01 — Save & Share Button · Idea Validator Upgrade</title>
+<style>
+  /* ---- design tokens (matches app executive-monochrome) ---- */
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --accent: #C8102E;
+    --border: #E8E4DF;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* ---- wireframe meta header ---- */
+  .wf-meta {
+    background: #1A1A1A;
+    color: #FAFAF8;
+    padding: 12px 32px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wf-meta span { opacity: 0.5; }
+  .wf-badge {
+    background: var(--accent);
+    color: white;
+    padding: 2px 10px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  /* ---- app chrome simulation ---- */
+  .app-frame {
+    max-width: 960px;
+    margin: 32px auto;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  /* masthead */
+  .masthead {
+    border-bottom: 2px solid var(--text);
+    padding: 20px 32px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .masthead-left { display: flex; flex-direction: column; gap: 4px; }
+  .masthead-back { font-size: 12px; color: var(--muted); letter-spacing: 0.05em; }
+  .masthead-title { font-family: var(--font-serif); font-size: 22px; }
+  .masthead-nav { display: flex; gap: 0; }
+  .nav-tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-right: none;
+    color: var(--muted);
+    background: transparent;
+    cursor: pointer;
+  }
+  .nav-tab:last-child { border-right: 1px solid var(--border); }
+  .nav-tab.active {
+    color: var(--text);
+    border-bottom-color: var(--surface);
+    background: var(--surface);
+    font-weight: 600;
+  }
+
+  /* scorecard section */
+  .scorecard-header {
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .scorecard-header h2 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+  }
+
+  /* NEW: Save & Share button — this is the wireframe focus */
+  .btn-save-share {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: var(--text);
+    color: var(--surface);
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    position: relative;
+  }
+  .btn-save-share svg { width: 14px; height: 14px; fill: currentColor; }
+  .btn-save-share .annotation {
+    position: absolute;
+    top: -36px;
+    right: 0;
+    background: #FFF3CD;
+    border: 1px solid #F0C040;
+    color: #7A5800;
+    font-size: 11px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    letter-spacing: 0;
+    text-transform: none;
+    pointer-events: none;
+  }
+  .btn-save-share .annotation::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    right: 20px;
+    width: 10px;
+    height: 6px;
+    background: #FFF3CD;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    border-left: 1px solid #F0C040;
+    border-right: 1px solid #F0C040;
+  }
+
+  /* verdict panel */
+  .verdict-bar {
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+    background: #F5F3F0;
+  }
+  .verdict-chip {
+    padding: 6px 16px;
+    background: var(--text);
+    color: var(--surface);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .verdict-chip.pursue { background: #1A5C2A; }
+  .verdict-score { font-size: 28px; font-family: var(--font-serif); }
+  .verdict-reason { font-size: 14px; color: var(--muted); flex: 1; }
+
+  /* dimension table */
+  .dim-table { width: 100%; border-collapse: collapse; }
+  .dim-table th {
+    padding: 10px 32px;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: #F5F3F0;
+  }
+  .dim-table td {
+    padding: 14px 32px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .dim-table tr:last-child td { border-bottom: none; }
+  .score-cell { font-weight: 700; font-family: var(--font-serif); font-size: 18px; }
+  .score-bar-wrap { width: 80px; height: 4px; background: var(--border); display: inline-block; vertical-align: middle; margin-left: 8px; }
+  .score-bar-fill { height: 100%; background: var(--accent); }
+  .dim-note { color: var(--muted); font-size: 13px; }
+
+  /* annotation callout for new element */
+  .new-element-note {
+    margin: 0 32px 16px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    background: #FFF8F8;
+    font-size: 13px;
+    color: #7A0000;
+  }
+  .new-element-note strong { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* toast simulation */
+  .toast-sim {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text);
+    color: var(--surface);
+    padding: 12px 24px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .toast-sim .toast-icon { color: #4CAF50; font-size: 16px; }
+
+  /* wireframe section labels */
+  .wf-section-label {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 8px 32px 0;
+    font-weight: 700;
+  }
+
+  /* placeholder rows */
+  .placeholder-row { opacity: 0.35; }
+
+  /* loading state panel (second wireframe on same page) */
+  .divider {
+    margin: 48px 0;
+    border: none;
+    border-top: 2px dashed var(--border);
+    position: relative;
+  }
+  .divider-label {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg);
+    padding: 0 16px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* loading state */
+  .loading-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid var(--border);
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .skeleton {
+    background: linear-gradient(90deg, #EDEDEA 25%, #F5F3F0 50%, #EDEDEA 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 2px;
+  }
+  @keyframes shimmer { to { background-position: -200% 0; } }
+
+  .skeleton-row { display: flex; gap: 16px; padding: 14px 32px; border-bottom: 1px solid var(--border); align-items: center; }
+  .sk-label { width: 140px; height: 14px; }
+  .sk-score { width: 40px; height: 18px; }
+  .sk-bar { width: 80px; height: 4px; }
+  .sk-note { flex: 1; height: 13px; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- wireframe meta -->
+<div class="wf-meta">
+  <div>Idea Validator Upgrade · Wireframe 01 — Save &amp; Share + Loading State</div>
+  <div style="display:flex;gap:16px;align-items:center;">
+    <span>2026-04-22</span>
+    <div class="wf-badge">Design Artifact</div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:24px auto;padding:0 16px;">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:4px;letter-spacing:0.05em;text-transform:uppercase;">What this shows</p>
+  <p style="font-size:15px;margin-bottom:8px;"><strong>State A</strong> — Analysis complete: where the new "Save &amp; Share" button lives and how it behaves.</p>
+  <p style="font-size:15px;"><strong>State B</strong> — AI call in-flight: loading state on "Run Check" + skeleton scorecard.</p>
+</div>
+
+<!-- ===== STATE A: Analysis complete ===== -->
+<div class="app-frame">
+  <div class="masthead">
+    <div class="masthead-left">
+      <span class="masthead-back">← PM Experiment Studio</span>
+      <span class="masthead-title">Idea Validator</span>
+    </div>
+    <nav class="masthead-nav">
+      <div class="nav-tab">Workspace</div>
+      <div class="nav-tab active">Scorecard</div>
+      <div class="nav-tab">Assumptions</div>
+      <div class="nav-tab">Next Steps</div>
+      <div class="nav-tab">Library</div>
+    </nav>
+  </div>
+
+  <div class="scorecard-header">
+    <h2>Scorecard</h2>
+    <div style="position:relative;margin-top:24px;">
+      <button class="btn-save-share">
+        <svg viewBox="0 0 16 16"><path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5"/></svg>
+        Save &amp; Share
+        <div class="annotation">NEW — appears after analysis completes</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="new-element-note">
+    <strong>Design note — Save &amp; Share</strong>
+    One click: persists evaluation to Supabase → copies share URL to clipboard → shows toast below.
+    Button is hidden until a successful AI analysis has returned. No login required.
+  </div>
+
+  <div class="verdict-bar">
+    <div class="verdict-chip pursue">Pursue</div>
+    <div class="verdict-score">81</div>
+    <div class="verdict-reason">Clear problem, specific user, credible distribution path. Main risk: crowded market needs sharper differentiation story.</div>
+  </div>
+
+  <table class="dim-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Score</th>
+        <th>Why</th>
+        <th>What would raise it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Problem clarity</td>
+        <td class="score-cell">88 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:88%"></span></span></td>
+        <td class="dim-note">Concrete trigger event (appointment cancellation), quantified cost signal</td>
+        <td class="dim-note">Add frequency data — how often per week per clinic</td>
+      </tr>
+      <tr>
+        <td>User specificity</td>
+        <td class="score-cell">79 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:79%"></span></span></td>
+        <td class="dim-note">Role + company size defined (5–30 provider outpatient clinics)</td>
+        <td class="dim-note">Name the buyer vs. the user — office manager vs. medical director</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Value clarity</td>
+        <td class="score-cell">74 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:74%"></span></span></td>
+        <td class="dim-note">Revenue recovery angle is clear; ROI not quantified</td>
+        <td class="dim-note">Estimate dollar value per recovered slot</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Differentiation</td>
+        <td class="score-cell">61 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:61%"></span></span></td>
+        <td class="dim-note">3 competitors named but mechanism of difference is vague</td>
+        <td class="dim-note">State one thing you do that none of them do</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Distribution</td>
+        <td class="score-cell">83 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:83%"></span></span></td>
+        <td class="dim-note">EHR integration channel is specific and realistic</td>
+        <td class="dim-note">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- toast -->
+  <div style="padding:24px 32px;border-top:1px solid var(--border);display:flex;justify-content:center;">
+    <div class="toast-sim">
+      <span class="toast-icon">✓</span>
+      Link copied — share it with anyone
+      <span style="color:var(--muted);font-size:11px;margin-left:8px;">idea-validator.vercel.app/eval/f3a9bc12</span>
+    </div>
+  </div>
+</div>
+
+<!-- divider -->
+<hr class="divider"><span class="divider-label">State B — AI call in-flight</span>
+
+<!-- ===== STATE B: Loading ===== -->
+<div class="app-frame" style="margin-bottom:64px;">
+  <div class="masthead">
+    <div class="masthead-left">
+      <span class="masthead-back">← PM Experiment Studio</span>
+      <span class="masthead-title">Idea Validator</span>
+    </div>
+    <nav class="masthead-nav">
+      <div class="nav-tab">Workspace</div>
+      <div class="nav-tab active">Scorecard</div>
+      <div class="nav-tab">Assumptions</div>
+      <div class="nav-tab">Next Steps</div>
+      <div class="nav-tab">Library</div>
+    </nav>
+  </div>
+
+  <div class="scorecard-header">
+    <h2>Scorecard</h2>
+    <button class="loading-btn" disabled>
+      <span class="spinner"></span>
+      Analyzing…
+    </button>
+  </div>
+
+  <div class="new-element-note" style="background:#F0F4FF;border-color:#3B5BDB;color:#1A2A7A;">
+    <strong>Design note — Loading state</strong>
+    "Run Check" becomes "Analyzing…" with a spinner and disables. Scorecard shows skeleton rows.
+    Typical wait: 2–3 seconds. On failure: toast error, button re-enables, no data loss.
+  </div>
+
+  <div class="verdict-bar" style="opacity:0.3;">
+    <div class="verdict-chip">—</div>
+    <div class="verdict-score" style="font-size:16px;color:var(--muted);">Waiting for analysis…</div>
+  </div>
+
+  <table class="dim-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Score</th>
+        <th>Why</th>
+        <th>What would raise it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="skeleton-row"><div class="skeleton sk-label"></div><div class="skeleton sk-score"></div><div class="skeleton sk-note"></div><div class="skeleton sk-note" style="width:60%"></div></tr>
+      <tr class="skeleton-row"><div class="skeleton sk-label" style="width:110px"></div><div class="skeleton sk-score"></div><div class="skeleton sk-note" style="width:70%"></div><div class="skeleton sk-note" style="width:50%"></div></tr>
+      <tr class="skeleton-row"><div class="skeleton sk-label" style="width:90px"></div><div class="skeleton sk-score"></div><div class="skeleton sk-note"></div><div class="skeleton sk-note" style="width:65%"></div></tr>
+      <tr class="skeleton-row"><div class="skeleton sk-label" style="width:120px"></div><div class="skeleton sk-score"></div><div class="skeleton sk-note" style="width:55%"></div><div class="skeleton sk-note"></div></tr>
+      <tr class="skeleton-row"><div class="skeleton sk-label" style="width:100px"></div><div class="skeleton sk-score"></div><div class="skeleton sk-note" style="width:80%"></div><div class="skeleton sk-note" style="width:40%"></div></tr>
+    </tbody>
+  </table>
+</div>
+
+</body>
+</html>

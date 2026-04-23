@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wireframe 02 — Shared Evaluation View · Idea Validator Upgrade</title>
+<style>
+  :root {
+    --bg: #FAFAF8;
+    --surface: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --accent: #C8102E;
+    --border: #E8E4DF;
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Source Sans 3', 'Source Sans Pro', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .wf-meta {
+    background: #1A1A1A;
+    color: #FAFAF8;
+    padding: 12px 32px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .wf-badge {
+    background: var(--accent);
+    color: white;
+    padding: 2px 10px;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+  }
+
+  .app-frame {
+    max-width: 960px;
+    margin: 32px auto 64px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  /* READ-ONLY BANNER — the key new element */
+  .readonly-banner {
+    background: #1A1A1A;
+    color: #FAFAF8;
+    padding: 10px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+  .readonly-banner-left { display: flex; align-items: center; gap: 12px; }
+  .readonly-chip {
+    background: var(--accent);
+    color: white;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    font-weight: 700;
+  }
+  .readonly-banner a {
+    color: #FAFAF8;
+    font-size: 12px;
+    opacity: 0.6;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .masthead {
+    border-bottom: 2px solid var(--text);
+    padding: 20px 32px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .masthead-left { display: flex; flex-direction: column; gap: 4px; }
+  .masthead-back { font-size: 12px; color: var(--muted); letter-spacing: 0.05em; }
+  .masthead-title { font-family: var(--font-serif); font-size: 22px; }
+
+  /* Tabs — only 3 shown in share view, no Workspace or Library */
+  .masthead-nav { display: flex; gap: 0; }
+  .nav-tab {
+    padding: 8px 18px;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-right: none;
+    color: var(--muted);
+    background: transparent;
+  }
+  .nav-tab:last-child { border-right: 1px solid var(--border); }
+  .nav-tab.active { color: var(--text); font-weight: 600; }
+
+  .idea-header {
+    padding: 24px 32px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .idea-header-meta {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .idea-header h2 { font-family: var(--font-serif); font-size: 24px; margin-bottom: 4px; }
+  .idea-header-sub { font-size: 14px; color: var(--muted); }
+
+  .verdict-bar {
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    border-bottom: 1px solid var(--border);
+    background: #F5F3F0;
+  }
+  .verdict-chip {
+    padding: 6px 16px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .verdict-chip.pursue { background: #1A5C2A; color: white; }
+  .verdict-score { font-size: 28px; font-family: var(--font-serif); }
+  .verdict-reason { font-size: 14px; color: var(--muted); flex: 1; }
+
+  .dim-table { width: 100%; border-collapse: collapse; }
+  .dim-table th {
+    padding: 10px 32px;
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+    background: #F5F3F0;
+  }
+  .dim-table td { padding: 14px 32px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .dim-table tr:last-child td { border-bottom: none; }
+  .score-cell { font-weight: 700; font-family: var(--font-serif); font-size: 18px; }
+  .score-bar-wrap { width: 80px; height: 4px; background: var(--border); display: inline-block; vertical-align: middle; margin-left: 8px; }
+  .score-bar-fill { height: 100%; background: var(--accent); }
+  .dim-note { color: var(--muted); font-size: 13px; }
+
+  /* Disabled input fields to show read-only workspace */
+  .field-row { padding: 14px 32px; border-bottom: 1px solid var(--border); }
+  .field-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .field-value { font-size: 14px; color: var(--text); }
+
+  .new-element-note {
+    margin: 0 32px 16px;
+    padding: 12px 16px;
+    border-left: 3px solid var(--accent);
+    background: #FFF8F8;
+    font-size: 13px;
+    color: #7A0000;
+  }
+  .new-element-note strong { display: block; margin-bottom: 4px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .footer {
+    padding: 16px 32px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #F5F3F0;
+  }
+  .footer-meta { font-size: 12px; color: var(--muted); }
+  .btn-try {
+    padding: 8px 20px;
+    border: 1px solid var(--text);
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  /* annotation callout */
+  .callout {
+    position: relative;
+    display: inline-block;
+  }
+  .callout-note {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #FFF3CD;
+    border: 1px solid #F0C040;
+    color: #7A5800;
+    font-size: 11px;
+    padding: 4px 10px;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .callout-note::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 16px;
+    width: 10px; height: 6px;
+    background: #FFF3CD;
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+  }
+
+  .placeholder-row { opacity: 0.45; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="wf-meta">
+  <div>Idea Validator Upgrade · Wireframe 02 — Shared Evaluation View (Read-Only)</div>
+  <div style="display:flex;gap:16px;align-items:center;">
+    <span style="opacity:0.5;">2026-04-22</span>
+    <div class="wf-badge">Design Artifact</div>
+  </div>
+</div>
+
+<div style="max-width:960px;margin:24px auto;padding:0 16px;">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:4px;letter-spacing:0.05em;text-transform:uppercase;">What this shows</p>
+  <p style="font-size:15px;">What the recipient sees when they open a shared evaluation URL
+  (e.g. <code style="background:#F0F0EE;padding:2px 6px;font-size:13px;">idea-validator.vercel.app/eval/f3a9bc12</code>).
+  No edit controls. Three result tabs only. Clear "shared view" framing.</p>
+</div>
+
+<div class="app-frame">
+
+  <!-- READ-ONLY BANNER (new element) -->
+  <div style="position:relative;">
+    <div class="readonly-banner">
+      <div class="readonly-banner-left">
+        <div class="readonly-chip">Shared evaluation</div>
+        <span>Shared by Victor Muhu · Apr 22 2026</span>
+      </div>
+      <a>Evaluate your own idea →</a>
+    </div>
+    <div style="position:absolute;left:32px;bottom:-36px;z-index:10;">
+      <div style="background:#FFF3CD;border:1px solid #F0C040;color:#7A5800;font-size:11px;padding:4px 10px;white-space:nowrap;">
+        NEW — replaces masthead back-link in share mode. CTA drives new users to the tool.
+      </div>
+    </div>
+  </div>
+
+  <div style="height:36px;"></div><!-- spacer for annotation -->
+
+  <div class="masthead">
+    <div class="masthead-left">
+      <span class="masthead-back" style="opacity:0.3;">← PM Experiment Studio</span>
+      <span class="masthead-title">Cancel-Proof Schedule Suggestions</span>
+    </div>
+    <!-- Only 3 tabs visible in share mode -->
+    <nav class="masthead-nav">
+      <div class="nav-tab active">Scorecard</div>
+      <div class="nav-tab">Assumptions</div>
+      <div class="nav-tab">Next Steps</div>
+    </nav>
+  </div>
+
+  <div class="new-element-note" style="margin-top:16px;">
+    <strong>Design note — Tab visibility</strong>
+    Workspace and Library tabs are hidden in shared view. Recipient sees only the three result tabs.
+    The idea title becomes the masthead title (replaces "Idea Validator" in share mode).
+  </div>
+
+  <div class="idea-header">
+    <div class="idea-header-meta">Series A · Evaluated Apr 22 2026 · GPT-4o</div>
+    <h2>Cancel-Proof Schedule Suggestions</h2>
+    <div class="idea-header-sub">AI-powered scheduling gap fill for 5–30 provider outpatient clinics</div>
+  </div>
+
+  <div class="verdict-bar">
+    <div class="verdict-chip pursue">Pursue</div>
+    <div class="verdict-score">81</div>
+    <div class="verdict-reason">Clear problem, specific user, credible distribution path. Main risk: crowded market needs sharper differentiation story.</div>
+  </div>
+
+  <table class="dim-table">
+    <thead>
+      <tr>
+        <th>Dimension</th>
+        <th>Score</th>
+        <th>Why</th>
+        <th>What would raise it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Problem clarity</td>
+        <td class="score-cell">88 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:88%"></span></span></td>
+        <td class="dim-note">Concrete trigger event, quantified cost signal</td>
+        <td class="dim-note">Add frequency — how often per week per clinic</td>
+      </tr>
+      <tr>
+        <td>User specificity</td>
+        <td class="score-cell">79 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:79%"></span></span></td>
+        <td class="dim-note">Role + company size defined clearly</td>
+        <td class="dim-note">Separate buyer from user role</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Value clarity</td>
+        <td class="score-cell">74 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:74%"></span></span></td>
+        <td class="dim-note">Revenue recovery angle is clear</td>
+        <td class="dim-note">Quantify dollar value per recovered slot</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Differentiation</td>
+        <td class="score-cell">61 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:61%"></span></span></td>
+        <td class="dim-note">Mechanism of difference is vague vs. 3 named competitors</td>
+        <td class="dim-note">Name one thing none of them do</td>
+      </tr>
+      <tr class="placeholder-row">
+        <td>Distribution</td>
+        <td class="score-cell">83 <span class="score-bar-wrap"><span class="score-bar-fill" style="width:83%"></span></span></td>
+        <td class="dim-note">EHR integration channel is specific and realistic</td>
+        <td class="dim-note">—</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    <div class="footer-meta">
+      Built with <strong>PM Experiment Studio</strong> · idea-validator.vercel.app/eval/f3a9bc12
+    </div>
+    <button class="btn-try">Try it yourself →</button>
+  </div>
+
+</div>
+
+</body>
+</html>

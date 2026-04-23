@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Idea Validator</title>
   <meta name="description" content="A structured workspace for pressure-testing product ideas — live scoring across seven dimensions, explicit assumption tracking, and a prioritized validation plan before committing roadmap time." />
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="/styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:opsz,wght@5..120,300;5..120,400&family=Source+Sans+3:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap" rel="stylesheet">
@@ -200,12 +200,13 @@
     </section>
 
     <section class="content" id="scorecard" data-view="scorecard" aria-labelledby="scorecardTitle" hidden>
-      <header class="section-head">
+      <header class="section-head section-head--with-action">
         <div>
           <div class="section-kicker">Scorecard</div>
           <h2 id="scorecardTitle" class="section-title">Decision-ready signals</h2>
           <p class="section-subtitle">A structured readout with weighted dimensions and what moved the score.</p>
         </div>
+        <button class="btn btn--ghost" id="btnSaveShare" type="button" hidden>Save &amp; Share</button>
       </header>
 
       <div class="scorecard">
@@ -429,6 +430,6 @@
     </div>
   </div>
 
-  <script src="./app.js"></script>
+  <script src="/app.js"></script>
 </body>
 </html>

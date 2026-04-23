@@ -176,6 +176,57 @@
     };
   }
 
+  /* ─── AI response transformer ────────────────────────────────────────── */
+  function transformApiResponse(apiResult, draft) {
+    const dimMap = [
+      { key: 'problem_clarity',  label: 'Problem clarity',   apiKey: 'problemClarity'  },
+      { key: 'user_specificity', label: 'User specificity',  apiKey: 'userSpecificity' },
+      { key: 'value_clarity',    label: 'Value proposition', apiKey: 'valueClarity'    },
+      { key: 'differentiation',  label: 'Differentiation',   apiKey: 'differentiation' },
+      { key: 'distribution',     label: 'Distribution',      apiKey: 'distribution'    },
+      { key: 'metric',           label: 'Success metric',    apiKey: 'successMetric'   },
+      { key: 'feasibility',      label: 'Feasibility',       apiKey: 'feasibility'     },
+      { key: 'competition',      label: 'Competitive space', apiKey: 'competitiveSpace'},
+    ];
+
+    const dims = dimMap.map(({ key, label, apiKey }) => ({
+      key,
+      label,
+      score: apiResult.scores?.[apiKey] ?? 0,
+      why:   apiResult.dimensionNotes?.[apiKey]       || '',
+      raise: apiResult.dimensionImprovements?.[apiKey] || '',
+    }));
+
+    const s = apiResult.scores || {};
+    const flags = {
+      problemVague:    (s.problemClarity   ?? 0) < 45,
+      targetVague:     (s.userSpecificity  ?? 0) < 45,
+      metricMissing:   (s.successMetric    ?? 0) < 40,
+      channelMissing:  (s.distribution     ?? 0) < 40,
+      lowDiff:         (s.differentiation  ?? 0) < 45,
+      crowded:         (s.competitiveSpace ?? 0) < 50,
+      highConstraints: (s.feasibility      ?? 0) < 60,
+    };
+
+    const stage   = draft.ideaStage || 'series-a';
+    const weights = stageWeights(stage);
+    const baseScore = Math.round(
+      dims.reduce((acc, d) => acc + d.score * (weights[d.key] || 0.125), 0)
+    );
+
+    return {
+      stage, weights, score: baseScore, dims,
+      verdict: { label: apiResult.verdict || 'Refine', reason: apiResult.verdictReason || '' },
+      tags:          apiResult.tags           || [],
+      strongSignals: apiResult.strongSignals  || [],
+      // API field 'weakAssumptions' maps to internal 'weakSignals' used by renderSignals + exportMemo
+      weakSignals:   apiResult.weakAssumptions || [],
+      flags,
+      feasPenalty:     0,
+      competitorCount: commaCount(draft.competitors),
+    };
+  }
+
   /* ─── assumptions builder ───────────────────────────────────────────── */
   function buildAssumptions(draft, analysis) {
     const out  = [];
@@ -328,6 +379,7 @@
   }
 
   function saveState() {
+    if (state.currentId === 'shared') return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(_) {}
   }
 
@@ -463,20 +515,54 @@
   }
 
   /* ─── run check ─────────────────────────────────────────────────────── */
-  function runCheck() {
+  function setRunCheckLoading(isLoading) {
+    const btn = $('#btnRunCheck');
+    if (!btn) return;
+    if (isLoading) {
+      btn.dataset.originalText = btn.textContent;
+      btn.innerHTML = '<span class="spinner"></span>Analyzing…';
+      btn.disabled = true;
+    } else {
+      btn.textContent = btn.dataset.originalText || 'Run check';
+      btn.disabled = false;
+    }
+  }
+
+  async function runCheck() {
     syncDraftFromForm();
     const d = currentDraft();
     if (!d) return;
 
-    const analysis = analyzeDraft(d);
-    d.lastAnalysis  = analysis;
-    d.assumptions   = buildAssumptions(d, analysis);
-    d.steps         = buildNextSteps(d.assumptions);
-    d.lastCheckedAt = nowISO();
-    saveState();
+    setRunCheckLoading(true);
+    try {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(d),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `HTTP ${res.status}`);
+      }
 
-    showToast('Analysis complete — check the Scorecard tab.');
-    navigate('scorecard');
+      const apiResult = await res.json();
+      const analysis  = transformApiResponse(apiResult, d);
+
+      d.lastAnalysis  = analysis;
+      d.lastApiResult = apiResult;
+      d.assumptions   = buildAssumptions(d, analysis);
+      d.steps         = buildNextSteps(d.assumptions);
+      d.lastCheckedAt = nowISO();
+      saveState();
+
+      showToast('Analysis complete — check the Scorecard tab.');
+      navigate('scorecard');
+    } catch (err) {
+      console.error('runCheck error:', err);
+      showToast('Analysis failed — check your connection and try again.');
+    } finally {
+      setRunCheckLoading(false);
+    }
   }
 
   /* ─── scorecard render ──────────────────────────────────────────────── */
@@ -513,6 +599,9 @@
           <td class="td td--raise">${esc(dim.raise)}</td>
         </tr>`).join('');
     }
+
+    const saveShareBtn = $('#btnSaveShare');
+    if (saveShareBtn) saveShareBtn.hidden = !currentDraft()?.lastApiResult;
 
     const notesEl = $('#notesBlurb');
     if (notesEl) {
@@ -704,6 +793,47 @@
     showToast('Memo exported.');
   }
 
+  /* ─── save & share ──────────────────────────────────────────────────── */
+  async function saveAndShare() {
+    const d = currentDraft();
+    if (!d || !d.lastApiResult) return;
+
+    const btn = $('#btnSaveShare');
+    if (btn) { btn.textContent = 'Saving…'; btn.disabled = true; }
+
+    try {
+      const res = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          draft_data:  d,
+          analysis:    d.lastApiResult,
+          assumptions: d.assumptions || [],
+          steps:       d.steps       || [],
+        }),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `HTTP ${res.status}`);
+      }
+
+      const { id } = await res.json();
+      const shareUrl = `${window.location.origin}/eval/${id}`;
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast('Link copied — share it with anyone');
+      } catch (_) {
+        showToast(`Saved! Share this link: ${shareUrl}`);
+      }
+    } catch (err) {
+      console.error('saveAndShare error:', err);
+      showToast('Save failed — try again');
+    } finally {
+      const btn2 = $('#btnSaveShare');
+      if (btn2) { btn2.textContent = 'Save & Share'; btn2.disabled = false; }
+    }
+  }
+
   /* ─── toast ──────────────────────────────────────────────────────────── */
   let toastTimer;
   function showToast(msg) {
@@ -802,6 +932,7 @@
 
     // ── run check
     $('#btnRunCheck')?.addEventListener('click', runCheck);
+    $('#btnSaveShare')?.addEventListener('click', saveAndShare);
 
     // ── export
     $('#btnExport')?.addEventListener('click', exportMemo);
@@ -952,15 +1083,81 @@
     });
   }
 
+  /* ─── share view ─────────────────────────────────────────────────────── */
+  async function bootShareView(evalId) {
+    // Hide workspace and library tabs from nav
+    $$('[data-route="workspace"], [data-route="library"]').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    // Insert readonly banner at top of body
+    const banner = document.createElement('div');
+    banner.className = 'readonly-banner';
+    banner.innerHTML = `
+      <div class="readonly-banner__inner">
+        <span class="readonly-chip">Shared evaluation</span>
+        <span>View only</span>
+      </div>
+      <a class="readonly-banner__cta" href="/">Evaluate your own idea &rarr;</a>`;
+    document.body.insertBefore(banner, document.body.firstChild);
+
+    try {
+      const res = await fetch(`/api/eval/${evalId}`);
+      if (!res.ok) throw new Error('Not found');
+      const evalData = await res.json();
+
+      // Reconstruct analysis in the shape render functions expect
+      const analysis = transformApiResponse(evalData.analysis, evalData.draft_data || {});
+
+      // Point state at a synthetic read-only draft
+      state = {
+        currentId: 'shared',
+        drafts: {
+          shared: {
+            ...(evalData.draft_data || {}),
+            id:            'shared',
+            lastAnalysis:  analysis,
+            lastApiResult: evalData.analysis,
+            assumptions:   evalData.assumptions || [],
+            steps:         evalData.steps       || [],
+          },
+        },
+      };
+
+      // Update page title
+      const titleEl = document.querySelector('title');
+      if (titleEl && evalData.idea_title) {
+        titleEl.textContent = `${evalData.idea_title} — Idea Validator`;
+      }
+
+      navigate('scorecard');
+      renderScorecard();
+      renderAssumptions();
+      renderNextSteps();
+    } catch (_) {
+      document.body.innerHTML = `
+        <div style="padding:3rem;font-family:sans-serif;text-align:center;max-width:480px;margin:0 auto">
+          <h2 style="font-size:1.5rem;margin-bottom:1rem">Evaluation not found</h2>
+          <p style="color:#6B6B6B;margin-bottom:2rem">This link may have expired or the ID is incorrect.</p>
+          <a href="/" style="color:#C8102E">Try the Idea Validator &rarr;</a>
+        </div>`;
+    }
+  }
+
   /* ─── init ───────────────────────────────────────────────────────────── */
   function init() {
+    const shareMatch = window.location.pathname.match(/^\/eval\/([a-fA-F0-9-]{36})$/i);
+    if (shareMatch) {
+      bootShareView(shareMatch[1]);
+      return;
+    }
+
     loadState();
     syncFormFromDraft();
     liveUpdate();
     bindEvents();
     navigate('workspace');
 
-    // update lede meta
     const ms = $('#metaLastSaved');
     const d  = currentDraft();
     if (ms && d?.updatedAt) ms.textContent = `Last saved ${formatDT(d.updatedAt)}`;
