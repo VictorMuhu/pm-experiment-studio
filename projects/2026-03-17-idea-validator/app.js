@@ -379,6 +379,7 @@
   }
 
   function saveState() {
+    if (state.currentId === 'shared') return;
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(_) {}
   }
 
@@ -1145,7 +1146,7 @@
 
   /* ─── init ───────────────────────────────────────────────────────────── */
   function init() {
-    const shareMatch = window.location.pathname.match(/^\/eval\/([a-f0-9-]{36})$/);
+    const shareMatch = window.location.pathname.match(/^\/eval\/([a-fA-F0-9-]{36})$/i);
     if (shareMatch) {
       bootShareView(shareMatch[1]);
       return;
