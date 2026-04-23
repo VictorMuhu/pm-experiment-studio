@@ -599,6 +599,9 @@
         </tr>`).join('');
     }
 
+    const saveShareBtn = $('#btnSaveShare');
+    if (saveShareBtn) saveShareBtn.hidden = !currentDraft()?.lastApiResult;
+
     const notesEl = $('#notesBlurb');
     if (notesEl) {
       const sorted2 = [...analysis.dims].sort((a,b) => b.score - a.score);
@@ -789,6 +792,43 @@
     showToast('Memo exported.');
   }
 
+  /* ─── save & share ──────────────────────────────────────────────────── */
+  async function saveAndShare() {
+    const d = currentDraft();
+    if (!d || !d.lastApiResult) return;
+
+    const btn = $('#btnSaveShare');
+    if (btn) { btn.textContent = 'Saving…'; btn.disabled = true; }
+
+    try {
+      const res = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          draft_data:  d,
+          analysis:    d.lastApiResult,
+          assumptions: d.assumptions || [],
+          steps:       d.steps       || [],
+        }),
+      });
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        throw new Error(errBody.error || `HTTP ${res.status}`);
+      }
+
+      const { id } = await res.json();
+      const shareUrl = `${window.location.origin}/eval/${id}`;
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('Link copied — share it with anyone');
+    } catch (err) {
+      console.error('saveAndShare error:', err);
+      showToast('Save failed — try again');
+    } finally {
+      const btn2 = $('#btnSaveShare');
+      if (btn2) { btn2.textContent = 'Save & Share'; btn2.disabled = false; }
+    }
+  }
+
   /* ─── toast ──────────────────────────────────────────────────────────── */
   let toastTimer;
   function showToast(msg) {
@@ -887,6 +927,7 @@
 
     // ── run check
     $('#btnRunCheck')?.addEventListener('click', runCheck);
+    $('#btnSaveShare')?.addEventListener('click', saveAndShare);
 
     // ── export
     $('#btnExport')?.addEventListener('click', exportMemo);
