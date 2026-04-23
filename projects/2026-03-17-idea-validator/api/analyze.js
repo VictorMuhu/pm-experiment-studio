@@ -9,22 +9,24 @@ const STAGE_CONTEXT = {
   enterprise: 'enterprise organization with an established customer base',
 };
 
+const cap = (s, n = 500) => (s && s.length > n) ? s.slice(0, n) + '…' : (s || '(none)');
+
 function buildPrompt(draft) {
   return `You are a senior product strategy advisor evaluating a product idea for a ${STAGE_CONTEXT[draft.ideaStage] || 'B2B SaaS company'}.
 
 Evaluate this product idea across 8 dimensions. Score each 0–100. Be rigorous — scores above 80 require genuinely strong evidence in the brief. Scores below 40 indicate a critical gap.
 
 PRODUCT IDEA:
-Title: ${draft.ideaTitle || '(untitled)'}
-Problem: ${draft.problem || '(none)'}
-Target User: ${draft.target || '(none)'}
-Value Proposition: ${draft.valueProp || '(none)'}
-Solution Sketch: ${draft.solution || '(none)'}
-Differentiation: ${draft.differentiation || '(none)'}
-Known Competitors: ${draft.competitors || '(none)'}
-Distribution Channel: ${draft.channels || '(none)'}
-Success Metric: ${draft.successMetric || '(none)'}
-Constraints: ${draft.constraints || '(none)'}
+Title: ${cap(draft.ideaTitle, 120)}
+Problem: ${cap(draft.problem)}
+Target User: ${cap(draft.target)}
+Value Proposition: ${cap(draft.valueProp)}
+Solution Sketch: ${cap(draft.solution)}
+Differentiation: ${cap(draft.differentiation)}
+Known Competitors: ${cap(draft.competitors, 200)}
+Distribution Channel: ${cap(draft.channels)}
+Success Metric: ${cap(draft.successMetric)}
+Constraints: ${cap(draft.constraints)}
 
 SCORING DIMENSIONS:
 1. problemClarity (0–100): Is the problem specific, real, and tied to a moment? High: concrete trigger event + quantified cost + clear frequency. Low: vague theme.
@@ -102,6 +104,10 @@ module.exports = async function handler(req, res) {
     });
 
     const analysis = JSON.parse(completion.choices[0].message.content);
+    if (!analysis.scores || !analysis.verdict) {
+      console.error('Malformed OpenAI response:', JSON.stringify(analysis).slice(0, 200));
+      return res.status(500).json({ error: 'Analysis failed. Try again.' });
+    }
     return res.status(200).json(analysis);
   } catch (err) {
     console.error('OpenAI error:', err.message);
