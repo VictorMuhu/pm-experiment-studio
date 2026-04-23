@@ -1082,15 +1082,81 @@
     });
   }
 
+  /* ─── share view ─────────────────────────────────────────────────────── */
+  async function bootShareView(evalId) {
+    // Hide workspace and library tabs from nav
+    $$('[data-route="workspace"], [data-route="library"]').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    // Insert readonly banner at top of body
+    const banner = document.createElement('div');
+    banner.className = 'readonly-banner';
+    banner.innerHTML = `
+      <div class="readonly-banner__inner">
+        <span class="readonly-chip">Shared evaluation</span>
+        <span>View only</span>
+      </div>
+      <a class="readonly-banner__cta" href="/">Evaluate your own idea &rarr;</a>`;
+    document.body.insertBefore(banner, document.body.firstChild);
+
+    try {
+      const res = await fetch(`/api/eval/${evalId}`);
+      if (!res.ok) throw new Error('Not found');
+      const evalData = await res.json();
+
+      // Reconstruct analysis in the shape render functions expect
+      const analysis = transformApiResponse(evalData.analysis, evalData.draft_data || {});
+
+      // Point state at a synthetic read-only draft
+      state = {
+        currentId: 'shared',
+        drafts: {
+          shared: {
+            ...(evalData.draft_data || {}),
+            id:            'shared',
+            lastAnalysis:  analysis,
+            lastApiResult: evalData.analysis,
+            assumptions:   evalData.assumptions || [],
+            steps:         evalData.steps       || [],
+          },
+        },
+      };
+
+      // Update page title
+      const titleEl = document.querySelector('title');
+      if (titleEl && evalData.idea_title) {
+        titleEl.textContent = `${evalData.idea_title} — Idea Validator`;
+      }
+
+      navigate('scorecard');
+      renderScorecard();
+      renderAssumptions();
+      renderNextSteps();
+    } catch (_) {
+      document.body.innerHTML = `
+        <div style="padding:3rem;font-family:sans-serif;text-align:center;max-width:480px;margin:0 auto">
+          <h2 style="font-size:1.5rem;margin-bottom:1rem">Evaluation not found</h2>
+          <p style="color:#6B6B6B;margin-bottom:2rem">This link may have expired or the ID is incorrect.</p>
+          <a href="/" style="color:#C8102E">Try the Idea Validator &rarr;</a>
+        </div>`;
+    }
+  }
+
   /* ─── init ───────────────────────────────────────────────────────────── */
   function init() {
+    const shareMatch = window.location.pathname.match(/^\/eval\/([a-f0-9-]{36})$/);
+    if (shareMatch) {
+      bootShareView(shareMatch[1]);
+      return;
+    }
+
     loadState();
     syncFormFromDraft();
     liveUpdate();
     bindEvents();
     navigate('workspace');
 
-    // update lede meta
     const ms = $('#metaLastSaved');
     const d  = currentDraft();
     if (ms && d?.updatedAt) ms.textContent = `Last saved ${formatDT(d.updatedAt)}`;
