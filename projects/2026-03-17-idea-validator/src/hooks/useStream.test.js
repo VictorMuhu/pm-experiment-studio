@@ -92,6 +92,15 @@ describe('useStream', () => {
     expect(result.current.status).toBe('done');
   });
 
+  it('sets error status when server returns non-ok response', async () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: false, body: null });
+    const { result } = renderHook(() => useStream());
+    await act(async () => {
+      await result.current.startStream({ ideaTitle: 'Test' }, 'skeptic');
+    });
+    expect(result.current.status).toBe('error');
+  });
+
   it('resets thoughts and verdict on a new startStream call', async () => {
     mockFetch([
       'data: {"type":"thought","category":"concern","text":"Gap 1","quote":"q1"}',

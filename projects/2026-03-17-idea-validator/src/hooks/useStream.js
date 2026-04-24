@@ -1,10 +1,14 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export function useStream() {
   const [thoughts, setThoughts] = useState([]);
   const [verdict, setVerdict] = useState(null);
   const [status, setStatus] = useState('idle');
   const abortRef = useRef(null);
+
+  useEffect(() => {
+    return () => { if (abortRef.current) abortRef.current.abort(); };
+  }, []);
 
   async function startStream(draft, lens) {
     if (abortRef.current) abortRef.current.abort();
@@ -23,6 +27,11 @@ export function useStream() {
         body: JSON.stringify({ draft, lens }),
         signal: controller.signal,
       });
+
+      if (!res.ok || !res.body) {
+        setStatus('error');
+        return;
+      }
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
