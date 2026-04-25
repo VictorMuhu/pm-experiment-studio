@@ -67,6 +67,7 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
   const isDone = appState === 'done';
   const isEmpty = appState === 'empty';
   const hasContent = draft.ideaTitle.trim().length > 0;
+  const isDisabled = isEmpty || (appState === 'drafting' && !hasContent);
 
   function handleCTA() {
     if (isStreaming) onStop();
@@ -132,7 +133,7 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
         <button
           type="button"
           onClick={handleCTA}
-          disabled={isEmpty || (appState === 'drafting' && !hasContent)}
+          disabled={isDisabled}
           style={{
             fontFamily: 'var(--mono)', fontSize: '11px', fontWeight: 500,
             letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -141,8 +142,8 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
             borderRadius: 'var(--radius)',
             background: isStreaming ? 'oklch(0.58 0.15 30 / 0.08)' : 'oklch(0.55 0.15 250 / 0.08)',
             color: isStreaming ? 'var(--concern)' : 'var(--accent)',
-            cursor: (isEmpty || (appState === 'drafting' && !hasContent)) ? 'not-allowed' : 'pointer',
-            opacity: (isEmpty || (appState === 'drafting' && !hasContent)) ? 0.4 : 1,
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+            opacity: isDisabled ? 0.4 : 1,
             transition: 'all var(--t)',
           }}
         >
