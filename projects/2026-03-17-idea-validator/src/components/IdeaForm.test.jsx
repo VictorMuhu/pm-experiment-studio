@@ -38,6 +38,13 @@ describe('IdeaForm', () => {
     expect(onRun).toHaveBeenCalled();
   });
 
+  it('calls onStop when Stop is clicked in streaming state', () => {
+    const onStop = vi.fn();
+    render(<IdeaForm draft={emptyDraft} onChange={() => {}} onRun={() => {}} onStop={onStop} appState="streaming" activeSentenceId={null} onSentenceClick={() => {}} />);
+    fireEvent.click(screen.getByRole('button', { name: /stop/i }));
+    expect(onStop).toHaveBeenCalled();
+  });
+
   it('calls onChange when a field is edited', () => {
     const onChange = vi.fn();
     render(<IdeaForm draft={emptyDraft} onChange={onChange} onRun={() => {}} onStop={() => {}} appState="empty" activeSentenceId={null} onSentenceClick={() => {}} />);
@@ -49,5 +56,13 @@ describe('IdeaForm', () => {
     const draft = { ...emptyDraft, problem: 'Users lose time. They get frustrated.' };
     render(<IdeaForm draft={draft} onChange={() => {}} onRun={() => {}} onStop={() => {}} appState="done" activeSentenceId={null} onSentenceClick={() => {}} />);
     expect(screen.getByRole('button', { name: /users lose time/i })).toBeInTheDocument();
+  });
+
+  it('chip toggle-off calls onSentenceClick with (null, null)', () => {
+    const onSentenceClick = vi.fn();
+    const draft = { ...emptyDraft, problem: 'Users lose time. They get frustrated.' };
+    render(<IdeaForm draft={draft} onChange={() => {}} onRun={() => {}} onStop={() => {}} appState="done" activeSentenceId="s0" onSentenceClick={onSentenceClick} />);
+    fireEvent.click(screen.getByRole('button', { name: /users lose time/i }));
+    expect(onSentenceClick).toHaveBeenCalledWith(null, null);
   });
 });

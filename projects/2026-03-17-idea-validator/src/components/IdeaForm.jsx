@@ -40,7 +40,10 @@ function SentenceChips({ text, activeSentenceId, onSentenceClick }) {
         <button
           key={s.id}
           type="button"
-          onClick={() => onSentenceClick(activeSentenceId === s.id ? null : s.id, s.text)}
+          onClick={() => onSentenceClick(
+            activeSentenceId === s.id ? null : s.id,
+            activeSentenceId === s.id ? null : s.text
+          )}
           style={{
             fontFamily: 'var(--sans)', fontSize: '12px',
             padding: '3px 8px', border: '1px solid',
@@ -129,7 +132,7 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
         <button
           type="button"
           onClick={handleCTA}
-          disabled={isEmpty || (!isStreaming && !hasContent)}
+          disabled={isEmpty || (appState === 'drafting' && !hasContent)}
           style={{
             fontFamily: 'var(--mono)', fontSize: '11px', fontWeight: 500,
             letterSpacing: '0.1em', textTransform: 'uppercase',
@@ -138,8 +141,8 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
             borderRadius: 'var(--radius)',
             background: isStreaming ? 'oklch(0.58 0.15 30 / 0.08)' : 'oklch(0.55 0.15 250 / 0.08)',
             color: isStreaming ? 'var(--concern)' : 'var(--accent)',
-            cursor: (isEmpty || (!isStreaming && !hasContent)) ? 'not-allowed' : 'pointer',
-            opacity: (isEmpty || (!isStreaming && !hasContent)) ? 0.4 : 1,
+            cursor: (isEmpty || (appState === 'drafting' && !hasContent)) ? 'not-allowed' : 'pointer',
+            opacity: (isEmpty || (appState === 'drafting' && !hasContent)) ? 0.4 : 1,
             transition: 'all var(--t)',
           }}
         >
