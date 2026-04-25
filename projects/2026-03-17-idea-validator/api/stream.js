@@ -1,5 +1,7 @@
 import OpenAI from 'openai';
 
+const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? '', dangerouslyAllowBrowser: true });
+
 const LENS_PERSONAS = {
   skeptic:    "A devil's advocate who hunts for unvalidated assumptions, logical gaps, and claims that sound good but aren't falsifiable. You are not trying to kill the idea — you are trying to surface what must be true for it to work.",
   builder:    "A staff engineer evaluating what it would actually take to ship this. You flag hidden technical complexity, integration risks, data dependencies, and the gap between 'solution sketch' and working software.",
@@ -62,10 +64,10 @@ async function handler(req, res) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.flushHeaders();
+  res.flushHeaders?.();
 
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   let buffer = '';
+  let ended = false;
 
   try {
     const stream = await client.chat.completions.create({
@@ -104,11 +106,12 @@ async function handler(req, res) {
       } catch {}
     }
   } catch (err) {
-    if (!res.writableEnded) {
+    if (!ended) {
       res.write(`data: ${JSON.stringify({ type: 'error', message: 'Stream interrupted' })}\n\n`);
     }
   } finally {
-    if (!res.writableEnded) {
+    if (!ended) {
+      ended = true;
       res.write('data: [DONE]\n\n');
       res.end();
     }
