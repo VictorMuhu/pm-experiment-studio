@@ -10,7 +10,14 @@ export function useStream() {
     return () => { if (abortRef.current) abortRef.current.abort(); };
   }, []);
 
-  async function startStream(draft, lens) {
+  function reset() {
+    if (abortRef.current) abortRef.current.abort();
+    setThoughts([]);
+    setVerdict(null);
+    setStatus('idle');
+  }
+
+  async function startStream(ideaText, lens) {
     if (abortRef.current) abortRef.current.abort();
 
     setThoughts([]);
@@ -24,7 +31,7 @@ export function useStream() {
       const res = await fetch('/api/stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ draft, lens }),
+        body: JSON.stringify({ ideaText, lens }),
         signal: controller.signal,
       });
 
@@ -84,5 +91,5 @@ export function useStream() {
     setStatus('done');
   }
 
-  return { thoughts, verdict, status, startStream, stop };
+  return { thoughts, verdict, status, startStream, stop, reset };
 }

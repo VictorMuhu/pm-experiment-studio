@@ -38,7 +38,7 @@ describe('useStream', () => {
     ]);
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Test Idea' }, 'skeptic');
+      await result.current.startStream('Test Idea', 'skeptic');
     });
     expect(result.current.thoughts).toHaveLength(1);
     expect(result.current.thoughts[0].category).toBe('concern');
@@ -52,7 +52,7 @@ describe('useStream', () => {
     mockFetch(['data: {"type":"nothing"}']);
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Vague idea' }, 'skeptic');
+      await result.current.startStream('Vague idea', 'skeptic');
     });
     expect(result.current.status).toBe('nothing');
     expect(result.current.thoughts).toHaveLength(0);
@@ -62,7 +62,7 @@ describe('useStream', () => {
     mockFetch(['data: {"type":"error","message":"Stream interrupted"}']);
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Test' }, 'skeptic');
+      await result.current.startStream('Test', 'skeptic');
     });
     expect(result.current.status).toBe('error');
   });
@@ -75,7 +75,7 @@ describe('useStream', () => {
     ]);
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Test' }, 'skeptic');
+      await result.current.startStream('Test', 'skeptic');
     });
     expect(result.current.thoughts).toHaveLength(1);
   });
@@ -86,7 +86,7 @@ describe('useStream', () => {
     global.fetch = vi.fn().mockResolvedValue({ body: stream, ok: true });
 
     const { result } = renderHook(() => useStream());
-    act(() => { result.current.startStream({ ideaTitle: 'Test' }, 'skeptic'); });
+    act(() => { result.current.startStream('Test', 'skeptic'); });
 
     await act(async () => { result.current.stop(); });
     expect(result.current.status).toBe('done');
@@ -96,7 +96,7 @@ describe('useStream', () => {
     global.fetch = vi.fn().mockResolvedValue({ ok: false, body: null });
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Test' }, 'skeptic');
+      await result.current.startStream('Test', 'skeptic');
     });
     expect(result.current.status).toBe('error');
   });
@@ -108,13 +108,13 @@ describe('useStream', () => {
     ]);
     const { result } = renderHook(() => useStream());
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Run 1' }, 'skeptic');
+      await result.current.startStream('Run 1', 'skeptic');
     });
     expect(result.current.thoughts).toHaveLength(1);
 
     mockFetch(['data: {"type":"nothing"}']);
     await act(async () => {
-      await result.current.startStream({ ideaTitle: 'Run 2' }, 'buyer');
+      await result.current.startStream('Run 2', 'buyer');
     });
     expect(result.current.thoughts).toHaveLength(0);
     expect(result.current.verdict).toBeNull();

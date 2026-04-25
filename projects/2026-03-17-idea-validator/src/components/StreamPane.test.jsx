@@ -7,29 +7,30 @@ const thoughts = [
 ];
 const verdict = { label: 'Refine', score: 60, reason: 'Good problem, weak moat.' };
 
-it('shows EmptyState when appState is empty', () => {
-  render(<StreamPane thoughts={[]} verdict={null} appState="empty" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
-  expect(screen.getByText(/pick a lens/i)).toBeInTheDocument();
+it('shows idle header when appState is empty', () => {
+  render(<StreamPane thoughts={[]} verdict={null} appState="empty" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
+  expect(screen.getByText(/thinking out loud/i)).toBeInTheDocument();
+  expect(screen.getByText(/idle/i)).toBeInTheDocument();
 });
 
 it('renders all thoughts', () => {
-  render(<StreamPane thoughts={thoughts} verdict={null} appState="streaming" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
+  render(<StreamPane thoughts={thoughts} verdict={null} appState="streaming" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
   expect(screen.getByText('Weak moat')).toBeInTheDocument();
   expect(screen.getByText('Clear problem')).toBeInTheDocument();
 });
 
 it('shows pulsing indicator during streaming', () => {
-  const { container } = render(<StreamPane thoughts={[]} verdict={null} appState="streaming" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
+  const { container } = render(<StreamPane thoughts={[]} verdict={null} appState="streaming" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
   expect(container.querySelector('[data-testid="streaming-dot"]')).toBeInTheDocument();
 });
 
 it('does not show pulsing indicator when done', () => {
-  const { container } = render(<StreamPane thoughts={thoughts} verdict={verdict} appState="done" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
+  const { container } = render(<StreamPane thoughts={thoughts} verdict={verdict} appState="done" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
   expect(container.querySelector('[data-testid="streaming-dot"]')).not.toBeInTheDocument();
 });
 
 it('renders Verdict in done state', () => {
-  render(<StreamPane thoughts={thoughts} verdict={verdict} appState="done" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
+  render(<StreamPane thoughts={thoughts} verdict={verdict} appState="done" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
   expect(screen.getByText('Refine')).toBeInTheDocument();
   expect(screen.getByText('60')).toBeInTheDocument();
 });
@@ -47,6 +48,7 @@ it('dims thoughts that do not match activeSentenceText', () => {
       activeSentenceId="s0"
       activeSentenceText="users abandon checkout on mobile"
       stopped={false}
+      activeLens="skeptic"
     />
   );
   const wrapperA = screen.getByText('Thought A').closest('[data-testid="thought-wrapper"]');
@@ -56,6 +58,6 @@ it('dims thoughts that do not match activeSentenceText', () => {
 });
 
 it('shows specificity gap message in nothing state', () => {
-  render(<StreamPane thoughts={[]} verdict={null} appState="nothing" activeSentenceId={null} activeSentenceText={null} stopped={false} />);
-  expect(screen.getByText(/specificity gap/i)).toBeInTheDocument();
+  render(<StreamPane thoughts={[]} verdict={null} appState="nothing" activeSentenceId={null} activeSentenceText={null} stopped={false} activeLens="skeptic" />);
+  expect(screen.getAllByText(/specificity gap/i).length).toBeGreaterThan(0);
 });

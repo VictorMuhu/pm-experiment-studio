@@ -1,7 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import EmptyState from './EmptyState';
 
-it('renders invitation copy', () => {
+it('renders the idle illustration placeholder', () => {
   render(<EmptyState />);
-  expect(screen.getByText(/pick a lens/i)).toBeInTheDocument();
+  expect(screen.getByText('?')).toBeInTheDocument();
+});
+
+it('renders the invitation copy', () => {
+  render(<EmptyState />);
+  expect(screen.getByText(/thoughts, questions, and concerns/i)).toBeInTheDocument();
 });

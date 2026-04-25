@@ -13,14 +13,6 @@ const LENS_PERSONAS = {
   competitor: "A product lead at the closest substitute. You evaluate why your users wouldn't switch, where the new product's differentiation is weak, and what the incumbent response would be.",
 };
 
-const STAGE_CONTEXT = {
-  seed:        'early-stage startup validating problem-market fit',
-  'series-a':  'growth-stage company with initial traction seeking scale',
-  'scale-up':  'scaling company optimizing a proven business model',
-  enterprise:  'enterprise organization with an established customer base',
-};
-
-const cap = (s, n = 500) => (s && s.length > n) ? s.slice(0, n) + '…' : (s || '(none)');
 
 export function buildSystemPrompt(lens) {
   const persona = LENS_PERSONAS[lens] || LENS_PERSONAS.skeptic;
@@ -41,18 +33,8 @@ After all thoughts, output one final object:
 Output nothing else. No markdown. No wrapper object. One JSON object per line.`;
 }
 
-export function buildUserPrompt(draft) {
-  return `Company stage: ${STAGE_CONTEXT[draft.ideaStage] || 'unknown'}
-Title: ${cap(draft.ideaTitle, 120)}
-Problem: ${cap(draft.problem)}
-Target user: ${cap(draft.target)}
-Value proposition: ${cap(draft.valueProp)}
-Solution sketch: ${cap(draft.solution)}
-Differentiation: ${cap(draft.differentiation)}
-Known competitors: ${cap(draft.competitors, 200)}
-Distribution channel: ${cap(draft.channels)}
-Success metric: ${cap(draft.successMetric)}
-Constraints: ${cap(draft.constraints)}`;
+export function buildUserPrompt(ideaText) {
+  return `Product idea:\n${(ideaText || '').slice(0, 2000)}`;
 }
 
 async function handler(req, res) {
@@ -60,9 +42,9 @@ async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { draft, lens } = req.body || {};
-  if (!draft || !draft.ideaTitle) {
-    return res.status(400).json({ error: 'draft with ideaTitle required' });
+  const { ideaText, lens } = req.body || {};
+  if (!ideaText || !ideaText.trim()) {
+    return res.status(400).json({ error: 'ideaText is required' });
   }
 
   res.setHeader('Content-Type', 'text/event-stream');

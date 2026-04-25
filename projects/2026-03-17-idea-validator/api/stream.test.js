@@ -33,14 +33,14 @@ describe('buildSystemPrompt', () => {
 });
 
 describe('buildUserPrompt', () => {
-  it('includes the idea title', () => {
-    const prompt = buildUserPrompt({ ideaTitle: 'My AI tool', ideaStage: 'seed', problem: '', target: '', valueProp: '', solution: '', differentiation: '', competitors: '', channels: '', successMetric: '', constraints: '' });
-    expect(prompt).toContain('My AI tool');
+  it('includes the idea text', () => {
+    const prompt = buildUserPrompt('My AI tool for clinics');
+    expect(prompt).toContain('My AI tool for clinics');
   });
 
-  it('truncates very long problem text', () => {
-    const longText = 'x'.repeat(600);
-    const prompt = buildUserPrompt({ ideaTitle: 'T', ideaStage: 'seed', problem: longText, target: '', valueProp: '', solution: '', differentiation: '', competitors: '', channels: '', successMetric: '', constraints: '' });
-    expect(prompt.length).toBeLessThan(3000);
+  it('truncates very long idea text to 2000 chars', () => {
+    const longText = 'x'.repeat(3000);
+    const prompt = buildUserPrompt(longText);
+    expect(prompt.length).toBeLessThan(2100);
   });
 });

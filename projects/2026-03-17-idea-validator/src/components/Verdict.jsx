@@ -1,8 +1,22 @@
 export default function Verdict({ verdict, stopped }) {
   if (stopped && !verdict) {
     return (
-      <div style={{ borderTop: '1px solid var(--rule)', paddingTop: 'var(--sp-4)', marginTop: 'var(--sp-4)' }}>
-        <p style={{ fontFamily: 'var(--mono)', fontSize: '11px', color: 'var(--ink-mute)', textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+      <div style={{
+        margin: '6px 0',
+        padding: '14px 18px',
+        border: '1px solid var(--rule)',
+        borderRadius: 6,
+        background: 'var(--paper-warm)',
+        animation: 'v3fade 400ms ease both',
+      }}>
+        <p style={{
+          fontFamily: 'var(--mono)',
+          fontSize: '11px',
+          color: 'var(--ink-mute)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          margin: 0,
+        }}>
           Stopped — run again for a full verdict.
         </p>
       </div>
@@ -13,25 +27,31 @@ export default function Verdict({ verdict, stopped }) {
 
   return (
     <div style={{
-      borderTop: '2px solid var(--accent)',
-      paddingTop: 'var(--sp-4)',
-      marginTop: 'var(--sp-4)',
+      margin: '6px 0',
+      padding: '16px 18px',
+      border: '1px solid var(--rule)',
+      borderRadius: 6,
+      background: 'var(--paper-warm)',
       animation: 'v3fade 400ms ease both',
     }}>
-      <p style={{ fontFamily: 'var(--mono)', fontSize: '10px', color: 'var(--ink-mute)', textTransform: 'uppercase', letterSpacing: '0.12em', margin: '0 0 var(--sp-2)' }}>
-        Verdict
-      </p>
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--sp-4)', marginBottom: 'var(--sp-3)' }}>
-        <span style={{ fontFamily: 'var(--serif)', fontSize: '54px', lineHeight: 1, color: 'var(--ink)' }}>
-          {verdict.score}
-        </span>
-        <span style={{ fontFamily: 'var(--serif)', fontSize: '28px', lineHeight: 1.2, color: 'var(--ink)' }}>
-          {verdict.label}
-        </span>
+      <div style={{
+        fontFamily: 'var(--mono)',
+        fontSize: '11px',
+        textTransform: 'uppercase',
+        letterSpacing: '0.02em',
+        color: 'var(--ink-mute)',
+        marginBottom: 8,
+      }}>
+        Verdict · <span>{verdict.label}</span> · <span>{verdict.score}</span>
       </div>
-      <p style={{ fontFamily: 'var(--sans)', fontSize: '15px', color: 'var(--ink-soft)', margin: 0, lineHeight: 1.6 }}>
+      <div style={{
+        fontFamily: 'var(--serif)',
+        fontSize: '15px',
+        lineHeight: 1.5,
+        color: 'var(--ink)',
+      }}>
         {verdict.reason}
-      </p>
+      </div>
     </div>
   );
 }

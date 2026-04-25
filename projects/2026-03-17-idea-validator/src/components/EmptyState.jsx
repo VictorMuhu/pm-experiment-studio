@@ -1,23 +1,22 @@
 export default function EmptyState() {
   return (
-    <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100%',
-      padding: 'var(--sp-6)',
-      textAlign: 'center',
-    }}>
-      <p style={{
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
+      <div style={{
+        width: 64, height: 64,
+        border: '1px dashed var(--ink-faint)',
+        borderRadius: 12,
+        marginBottom: 14,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'var(--ink-faint)',
         fontFamily: 'var(--serif)',
-        fontSize: '18px',
-        color: 'var(--ink-mute)',
-        maxWidth: '36ch',
-        lineHeight: 1.5,
-        margin: 0,
+        fontSize: 28,
+        fontStyle: 'italic',
       }}>
-        Pick a lens and describe your idea. Run a check to see what's driving the result.
-      </p>
+        ?
+      </div>
+      <div style={{ fontFamily: 'var(--serif)', fontSize: 15, color: 'var(--ink-soft)', maxWidth: 280, lineHeight: 1.5 }}>
+        Thoughts, questions, and concerns will appear here. Each one cites the sentence that triggered it.
+      </div>
     </div>
   );
 }

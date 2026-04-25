@@ -1,4 +1,3 @@
-// src/App.test.jsx
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import App from './App';
@@ -20,12 +19,12 @@ describe('App', () => {
 
   it('renders in empty state on load', () => {
     render(<App />);
-    expect(screen.getByText(/pick a lens/i)).toBeInTheDocument();
+    expect(screen.getByText(/What idea do you want/i)).toBeInTheDocument();
   });
 
-  it('transitions to drafting when a field is filled', () => {
+  it('transitions to drafting when idea text is entered', () => {
     render(<App />);
-    fireEvent.change(screen.getByLabelText(/idea title/i), { target: { value: 'My idea' } });
+    fireEvent.change(screen.getByLabelText(/your idea/i), { target: { value: 'My idea' } });
     expect(screen.getByRole('button', { name: /pressure-test/i })).not.toBeDisabled();
   });
 
@@ -35,7 +34,7 @@ describe('App', () => {
       { type: 'verdict', label: 'Refine', score: 60, reason: 'Solid problem, weak moat.' },
     ]);
     render(<App />);
-    fireEvent.change(screen.getByLabelText(/idea title/i), { target: { value: 'Test idea' } });
+    fireEvent.change(screen.getByLabelText(/your idea/i), { target: { value: 'Test idea' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /pressure-test/i }));
     });
@@ -48,7 +47,7 @@ describe('App', () => {
       { type: 'verdict', label: 'Pursue', score: 80, reason: 'Strong signals.' },
     ]);
     render(<App />);
-    fireEvent.change(screen.getByLabelText(/idea title/i), { target: { value: 'Test idea' } });
+    fireEvent.change(screen.getByLabelText(/your idea/i), { target: { value: 'Test idea' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /pressure-test/i }));
     });
@@ -58,7 +57,7 @@ describe('App', () => {
       { type: 'verdict', label: 'Pass', score: 35, reason: 'Too costly.' },
     ]);
     await act(async () => {
-      fireEvent.click(screen.getByText(/buyer/i));
+      fireEvent.click(screen.getByRole('button', { name: /buyer/i }));
     });
     expect(screen.getByText('Pass')).toBeInTheDocument();
   });
