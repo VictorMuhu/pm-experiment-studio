@@ -58,3 +58,39 @@ body {
   0%, 100% { box-shadow: 0 0 0 0 oklch(0.55 0.15 250 / 0.4); }
   50%       { box-shadow: 0 0 0 6px oklch(0.55 0.15 250 / 0); }
 }
+
+/* ── Idea card header row ───────────────────────────────────── */
+
+.v3-idea-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.v3-clear {
+  background: transparent;
+  border: 1px solid transparent;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-mute);
+  padding: 3px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.v3-clear:hover {
+  color: var(--ink);
+  background: var(--paper);
+  border-color: var(--rule);
+}
+
+.v3-clear.confirming {
+  color: oklch(0.55 0.16 30);
+  background: oklch(0.98 0.03 30);
+  border-color: oklch(0.85 0.09 30);
+}

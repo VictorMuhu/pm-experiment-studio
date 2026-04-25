@@ -140,6 +140,48 @@ describe('IdeaForm — error state', () => {
   });
 });
 
+describe('IdeaForm — clear button', () => {
+  it('clear button is absent in empty state (no content)', () => {
+    render(<IdeaForm {...defaultProps} appState="empty" ideaText="" />);
+    expect(screen.queryByLabelText(/clear idea/i)).not.toBeInTheDocument();
+  });
+
+  it('clear button is absent in drafting state when textarea is empty', () => {
+    render(<IdeaForm {...defaultProps} appState="drafting" ideaText="" />);
+    expect(screen.queryByLabelText(/clear idea/i)).not.toBeInTheDocument();
+  });
+
+  it('clear button is visible in drafting state when text exists', () => {
+    render(<IdeaForm {...defaultProps} appState="drafting" ideaText="My idea." onClear={() => {}} />);
+    expect(screen.getByLabelText(/clear idea/i)).toBeInTheDocument();
+  });
+
+  it('clear button is visible in done state', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." onClear={() => {}} />);
+    expect(screen.getByLabelText(/clear idea/i)).toBeInTheDocument();
+  });
+
+  it('clear button is absent during streaming', () => {
+    render(<IdeaForm {...defaultProps} appState="streaming" ideaText="My idea." onClear={() => {}} />);
+    expect(screen.queryByLabelText(/clear idea/i)).not.toBeInTheDocument();
+  });
+
+  it('first click enters confirming state (shows sure? text)', () => {
+    render(<IdeaForm {...defaultProps} appState="drafting" ideaText="My idea." onClear={() => {}} />);
+    fireEvent.click(screen.getByLabelText(/clear idea/i));
+    expect(screen.getByLabelText(/confirm clear/i)).toBeInTheDocument();
+    expect(screen.getByText(/sure\?/i)).toBeInTheDocument();
+  });
+
+  it('second click calls onClear', () => {
+    const onClear = vi.fn();
+    render(<IdeaForm {...defaultProps} appState="drafting" ideaText="My idea." onClear={onClear} />);
+    fireEvent.click(screen.getByLabelText(/clear idea/i));
+    fireEvent.click(screen.getByLabelText(/confirm clear/i));
+    expect(onClear).toHaveBeenCalledOnce();
+  });
+});
+
 describe('IdeaForm — nothing state', () => {
   it('shows nothing heading', () => {
     render(<IdeaForm {...defaultProps} appState="nothing" ideaText="My idea." />);

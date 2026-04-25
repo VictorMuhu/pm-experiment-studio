@@ -1,3 +1,19 @@
+import { useClearConfirm } from '../hooks/useClearConfirm';
+
+function ClearBtn({ onClear }) {
+  const { confirming, handle } = useClearConfirm(onClear);
+  return (
+    <button
+      type="button"
+      onClick={handle}
+      className={`v3-clear${confirming ? ' confirming' : ''}`}
+      aria-label={confirming ? 'Confirm clear' : 'Clear idea'}
+    >
+      {confirming ? '↺ Clear — sure?' : '✕ Clear'}
+    </button>
+  );
+}
+
 function tagSentences(text) {
   if (!text) return [];
   const parts = [];
@@ -122,7 +138,7 @@ function LensPills({ lenses, activeLens, onLensChange, disabled }) {
 }
 
 export default function IdeaForm({
-  ideaText, onChange, onReset,
+  ideaText, onChange, onReset, onClear,
   activeLens, onLensChange, onRun, onStop,
   appState, activeSentenceId, onSentenceClick,
   concernCount, lenses,
@@ -176,9 +192,14 @@ export default function IdeaForm({
           border: `1px ${isEmpty ? 'dashed' : 'solid'} ${isBorderAccent ? 'var(--accent)' : 'var(--ink-faint)'}`,
           background: isEmpty ? 'transparent' : 'var(--paper-warm)',
         }}>
-          <span style={monoLabelStyle}>
-            {isDrafting ? `Your idea · ${sentences.length} sentences` : 'Your idea'}
-          </span>
+          <div className="v3-idea-head">
+            <span style={{ ...monoLabelStyle, marginBottom: 0 }}>
+              {isDrafting ? `Your idea · ${sentences.length} sentences` : 'Your idea'}
+            </span>
+            {isDrafting && ideaText.trim() && onClear && (
+              <ClearBtn onClear={onClear} />
+            )}
+          </div>
           <textarea
             aria-label="Your idea"
             style={{
@@ -271,7 +292,14 @@ export default function IdeaForm({
       </h2>
 
       <div style={{ ...cardBase, border: '1px solid var(--rule)' }}>
-        <span style={monoLabelStyle}>Your idea · {sentences.length} sentences</span>
+        <div className="v3-idea-head">
+          <span style={{ ...monoLabelStyle, marginBottom: 0 }}>
+            Your idea · {sentences.length} sentences
+          </span>
+          {!isStreaming && onClear && (
+            <ClearBtn onClear={onClear} />
+          )}
+        </div>
         <div style={{ fontFamily: 'var(--serif)', fontSize: 15.5, lineHeight: 1.7 }}>
           {sentences.map((s, i) => {
             const isActive = activeSentenceId === s.id;
@@ -298,29 +326,6 @@ export default function IdeaForm({
             );
           })}
         </div>
-        {!isStreaming && onReset && (
-          <button
-            type="button"
-            onClick={onReset}
-            style={{
-              position: 'absolute',
-              top: 12,
-              right: 12,
-              background: 'transparent',
-              border: '1px solid var(--rule)',
-              fontFamily: 'var(--mono)',
-              fontSize: 10,
-              color: 'var(--ink-mute)',
-              cursor: 'pointer',
-              padding: '2px 8px',
-              borderRadius: 3,
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-            }}
-          >
-            Edit
-          </button>
-        )}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6 }}>

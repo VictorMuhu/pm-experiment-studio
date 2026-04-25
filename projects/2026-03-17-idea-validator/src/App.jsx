@@ -74,6 +74,13 @@ export default function App() {
     setActiveSentenceText(null);
   }
 
+  function handleClear() {
+    reset();
+    setIdeaText('');
+    setActiveSentenceId(null);
+    setActiveSentenceText(null);
+  }
+
   function handleLensChange(lens) {
     setActiveLens(lens);
     if (['done', 'error', 'nothing'].includes(appState)) {
@@ -97,6 +104,7 @@ export default function App() {
           ideaText={ideaText}
           onChange={setIdeaText}
           onReset={handleReset}
+          onClear={handleClear}
           activeLens={activeLens}
           onLensChange={handleLensChange}
           onRun={handleRun}
