@@ -1,4 +1,4 @@
-export default function ThoughtItem({ thought, dimmed }) {
+export default function ThoughtItem({ thought, dimmed, sentenceIndex }) {
   const isConcern = thought.category === 'concern';
   const isStrength = thought.category === 'strength';
   const borderColor = isConcern ? 'var(--concern)' : isStrength ? 'var(--strength)' : 'var(--rule)';
@@ -30,17 +30,20 @@ export default function ThoughtItem({ thought, dimmed }) {
         {thought.text}
       </p>
       {thought.quote && (
-        <span style={{
-          fontFamily: 'var(--mono)',
-          fontSize: '10px',
-          color: borderColor === 'var(--rule)' ? 'var(--ink-mute)' : borderColor,
-          fontStyle: 'italic',
-          display: 'block',
-          background: isConcern ? 'oklch(0.93 0.04 30)' : isStrength ? 'oklch(0.93 0.04 145)' : 'transparent',
-          padding: isConcern || isStrength ? '1px 5px' : 0,
-          borderRadius: 3,
-          width: 'fit-content',
-        }}>
+        <span
+          {...(sentenceIndex !== null && sentenceIndex !== undefined ? { 'data-ref': sentenceIndex } : {})}
+          style={{
+            fontFamily: 'var(--mono)',
+            fontSize: '10px',
+            color: borderColor === 'var(--rule)' ? 'var(--ink-mute)' : borderColor,
+            fontStyle: 'italic',
+            display: 'block',
+            background: isConcern ? 'oklch(0.93 0.04 30)' : isStrength ? 'oklch(0.93 0.04 145)' : 'transparent',
+            padding: isConcern || isStrength ? '1px 5px' : 0,
+            borderRadius: 3,
+            width: 'fit-content',
+          }}
+        >
           "{thought.quote}"
         </span>
       )}

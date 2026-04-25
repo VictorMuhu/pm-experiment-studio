@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useClearConfirm } from '../hooks/useClearConfirm';
 
 function ClearBtn({ onClear }) {
@@ -142,13 +143,20 @@ export default function IdeaForm({
   activeLens, onLensChange, onRun, onStop,
   appState, activeSentenceId, onSentenceClick,
   concernCount, lenses,
+  showCoachmark, onDismissCoachmark,
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+
   const isStreaming = appState === 'streaming';
   const isDone = appState === 'done';
   const isError = appState === 'error';
   const isNothing = appState === 'nothing';
   const isEmpty = appState === 'empty';
   const isDrafting = appState === 'drafting';
+
+  useEffect(() => {
+    if (isStreaming) setIsEditing(false);
+  }, [isStreaming]);
 
   const sentences = tagSentences(ideaText);
   const wordCount = ideaText.trim() ? ideaText.trim().split(/\s+/).length : 0;
@@ -157,6 +165,8 @@ export default function IdeaForm({
     concernCount === 0 ? 'No load-bearing concerns.' :
     concernCount === 1 ? 'One concern is load-bearing.' :
     `${numToWord(concernCount)} concerns are load-bearing.`;
+
+  const showEditMode = isEditing && !isStreaming;
 
   // ── Empty + Drafting: textarea input view ───────────────────
   if (isEmpty || isDrafting) {
@@ -291,41 +301,72 @@ export default function IdeaForm({
         {isNothing && <>The critic <em style={{ fontStyle: 'italic' }}>can't find a concern</em>.</>}
       </h2>
 
-      <div style={{ ...cardBase, border: '1px solid var(--rule)' }}>
+      <div style={{ ...cardBase, border: `1px solid ${showEditMode ? 'var(--accent)' : 'var(--rule)'}` }}>
         <div className="v3-idea-head">
           <span style={{ ...monoLabelStyle, marginBottom: 0 }}>
             Your idea · {sentences.length} sentences
           </span>
-          {!isStreaming && onClear && (
-            <ClearBtn onClear={onClear} />
+          {showEditMode ? (
+            <div style={{ display: 'flex', gap: 4 }}>
+              <ClearBtn onClear={() => onChange('')} />
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="v3-edit-btn done"
+              >
+                ✓ Done
+              </button>
+            </div>
+          ) : (
+            !isStreaming && (
+              <button
+                type="button"
+                onClick={() => setIsEditing(true)}
+                className="v3-edit-btn"
+              >
+                ✏ Edit
+              </button>
+            )
           )}
         </div>
-        <div style={{ fontFamily: 'var(--serif)', fontSize: 15.5, lineHeight: 1.7 }}>
-          {sentences.map((s, i) => {
-            const isActive = activeSentenceId === s.id;
-            const canClick = isDone || isNothing;
-            return (
-              <span
-                key={s.id}
-                onClick={() => canClick && onSentenceClick(
-                  isActive ? null : s.id,
-                  isActive ? null : s.text,
-                )}
-                style={{
-                  borderBottom: `1.5px solid ${isActive ? 'var(--accent)' : 'transparent'}`,
-                  background: isActive ? 'oklch(0.92 0.06 260)' : 'transparent',
-                  padding: '1px 2px',
-                  borderRadius: 2,
-                  cursor: canClick ? 'pointer' : 'default',
-                  transition: 'background 0.2s, border-color 0.2s',
-                  display: 'inline',
-                }}
-              >
-                {s.text}{i < sentences.length - 1 ? ' ' : ''}
-              </span>
-            );
-          })}
-        </div>
+
+        {showEditMode ? (
+          <textarea
+            aria-label="Your idea"
+            style={taStyle}
+            value={ideaText}
+            onChange={e => onChange(e.target.value)}
+          />
+        ) : (
+          <div className="v3-idea-body" style={{ fontFamily: 'var(--serif)', fontSize: 15.5, lineHeight: 1.7 }}>
+            {sentences.map((s, i) => {
+              const isActive = activeSentenceId === s.id;
+              const canClick = isDone || isNothing;
+              return (
+                <span
+                  key={s.id}
+                  className={canClick ? 'sent clickable' : 'sent'}
+                  data-sent-ref={i}
+                  onClick={() => canClick && onSentenceClick(
+                    isActive ? null : s.id,
+                    isActive ? null : s.text,
+                  )}
+                  style={{
+                    borderBottom: isActive ? '1.5px solid var(--accent)' : undefined,
+                    background: isActive ? 'oklch(0.92 0.06 260)' : 'transparent',
+                    padding: '1px 2px',
+                    borderRadius: 2,
+                    cursor: canClick ? 'pointer' : 'default',
+                    transition: 'background 0.2s, border-color 0.2s',
+                    display: 'inline',
+                  }}
+                >
+                  {s.text}{i < sentences.length - 1 ? ' ' : ''}
+                </span>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 6 }}>
@@ -342,6 +383,20 @@ export default function IdeaForm({
           {getCTALabel()}
         </button>
       </div>
+
+      {isDone && showCoachmark && onDismissCoachmark && (
+        <div className="v3-coachmark">
+          <span>Tip — Click any sentence to focus the thoughts that cite it.</span>
+          <button
+            type="button"
+            className="v3-coachmark-dismiss"
+            aria-label="Dismiss tip"
+            onClick={onDismissCoachmark}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {isDone && (
         <div style={tipBoxStyle}>

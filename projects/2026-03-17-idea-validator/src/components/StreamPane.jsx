@@ -9,6 +9,33 @@ function thoughtMatchesSentence(thought, activeSentenceText) {
   return words.some(word => sentence.includes(word));
 }
 
+function tagSentences(text) {
+  if (!text) return [];
+  const parts = [];
+  const regex = /[^.!?]*[.!?]+(?:\s|$)|[^.!?]+$/g;
+  let id = 0;
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    const sentence = match[0].trim();
+    if (sentence) parts.push({ id: `s${id++}`, text: sentence });
+  }
+  return parts;
+}
+
+function findSentenceIndex(thought, sentences) {
+  if (!thought.quote || !sentences.length) return null;
+  const quoteWords = thought.quote.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  if (!quoteWords.length) return null;
+  let bestIdx = null;
+  let bestScore = 0;
+  sentences.forEach((s, i) => {
+    const sentText = s.text.toLowerCase();
+    const score = quoteWords.filter(w => sentText.includes(w)).length;
+    if (score > bestScore) { bestScore = score; bestIdx = i; }
+  });
+  return bestScore > 0 ? bestIdx : null;
+}
+
 function getStatusInfo(appState, thoughtCount, stopped) {
   switch (appState) {
     case 'streaming': return [null, `Streaming · ${thoughtCount}`];
@@ -58,8 +85,9 @@ function PanelHeader({ appState, thoughtCount, stopped, activeLens }) {
   );
 }
 
-export default function StreamPane({ thoughts, verdict, appState, activeSentenceId, activeSentenceText, onClearFocus, stopped, activeLens }) {
+export default function StreamPane({ thoughts, verdict, appState, activeSentenceId, activeSentenceText, onClearFocus, stopped, activeLens, ideaText = '' }) {
   const isFiltering = !!activeSentenceId;
+  const sentences = tagSentences(ideaText);
   const concernCount = thoughts.filter(t => t.category === 'concern').length;
 
   const showEmpty = appState === 'empty';
@@ -123,9 +151,10 @@ export default function StreamPane({ thoughts, verdict, appState, activeSentence
           {/* Thoughts */}
           {thoughts.map((thought, i) => {
             const matches = isFiltering ? thoughtMatchesSentence(thought, activeSentenceText) : true;
+            const sentenceIndex = findSentenceIndex(thought, sentences);
             return (
               <div key={i} data-testid="thought-wrapper" style={{ opacity: !isFiltering || matches ? 1 : 0.2, transition: 'opacity 160ms ease' }}>
-                <ThoughtItem thought={thought} dimmed={false} />
+                <ThoughtItem thought={thought} dimmed={false} sentenceIndex={sentenceIndex} />
               </div>
             );
           })}

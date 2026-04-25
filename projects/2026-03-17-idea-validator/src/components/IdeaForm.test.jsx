@@ -156,9 +156,9 @@ describe('IdeaForm — clear button', () => {
     expect(screen.getByLabelText(/clear idea/i)).toBeInTheDocument();
   });
 
-  it('clear button is visible in done state', () => {
+  it('clear button is absent in done read state (only accessible via Edit)', () => {
     render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." onClear={() => {}} />);
-    expect(screen.getByLabelText(/clear idea/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/clear idea/i)).not.toBeInTheDocument();
   });
 
   it('clear button is absent during streaming', () => {
@@ -179,6 +179,75 @@ describe('IdeaForm — clear button', () => {
     fireEvent.click(screen.getByLabelText(/clear idea/i));
     fireEvent.click(screen.getByLabelText(/confirm clear/i));
     expect(onClear).toHaveBeenCalledOnce();
+  });
+});
+
+describe('IdeaForm — edit / done buttons (post-run card)', () => {
+  it('shows Edit button in done state', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." />);
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+  });
+
+  it('shows Edit button in error state', () => {
+    render(<IdeaForm {...defaultProps} appState="error" ideaText="My idea." />);
+    expect(screen.getByRole('button', { name: /edit/i })).toBeInTheDocument();
+  });
+
+  it('does not show Edit button during streaming', () => {
+    render(<IdeaForm {...defaultProps} appState="streaming" ideaText="My idea." />);
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
+  });
+
+  it('clicking Edit shows textarea', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." />);
+    fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByLabelText(/your idea/i)).toBeInTheDocument();
+  });
+
+  it('edit mode shows Done button', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." />);
+    fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+    expect(screen.getByRole('button', { name: /done/i })).toBeInTheDocument();
+  });
+
+  it('clicking Done returns to read state (no textarea)', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." />);
+    fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+    fireEvent.click(screen.getByRole('button', { name: /done/i }));
+    expect(screen.queryByLabelText(/your idea/i)).not.toBeInTheDocument();
+  });
+
+  it('Clear in edit mode calls onChange with empty string', () => {
+    const onChange = vi.fn();
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." onChange={onChange} />);
+    fireEvent.click(screen.getByRole('button', { name: /edit/i }));
+    fireEvent.click(screen.getByLabelText(/clear idea/i));
+    fireEvent.click(screen.getByLabelText(/confirm clear/i));
+    expect(onChange).toHaveBeenCalledWith('');
+  });
+});
+
+describe('IdeaForm — coachmark', () => {
+  it('shows coachmark when showCoachmark=true in done state', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." showCoachmark={true} onDismissCoachmark={() => {}} />);
+    expect(screen.getByText(/click any sentence/i)).toBeInTheDocument();
+  });
+
+  it('does not show coachmark when showCoachmark=false', () => {
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." showCoachmark={false} onDismissCoachmark={() => {}} />);
+    expect(screen.queryByText(/click any sentence/i)).not.toBeInTheDocument();
+  });
+
+  it('does not show coachmark in non-done states', () => {
+    render(<IdeaForm {...defaultProps} appState="error" ideaText="My idea." showCoachmark={true} onDismissCoachmark={() => {}} />);
+    expect(screen.queryByText(/click any sentence/i)).not.toBeInTheDocument();
+  });
+
+  it('clicking dismiss calls onDismissCoachmark', () => {
+    const onDismissCoachmark = vi.fn();
+    render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." showCoachmark={true} onDismissCoachmark={onDismissCoachmark} />);
+    fireEvent.click(screen.getByRole('button', { name: /dismiss/i }));
+    expect(onDismissCoachmark).toHaveBeenCalledOnce();
   });
 });
 

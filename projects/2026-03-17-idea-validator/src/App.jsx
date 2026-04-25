@@ -45,12 +45,17 @@ function TopChrome({ ideaText }) {
   );
 }
 
+const COACHMARK_KEY = 'iv3-coachmark-dismissed';
+
 export default function App() {
   const [ideaText, setIdeaText] = useState('');
   const [activeLens, setActiveLens] = useState('skeptic');
   const [activeSentenceId, setActiveSentenceId] = useState(null);
   const [activeSentenceText, setActiveSentenceText] = useState(null);
   const [stopped, setStopped] = useState(false);
+  const [showCoachmark, setShowCoachmark] = useState(
+    () => !localStorage.getItem(COACHMARK_KEY)
+  );
   const { thoughts, verdict, status, startStream, stop, reset } = useStream();
 
   const appState = deriveAppState(status, ideaText);
@@ -96,6 +101,11 @@ export default function App() {
     setActiveSentenceText(id === null ? null : (text ?? null));
   }
 
+  function handleDismissCoachmark() {
+    localStorage.setItem(COACHMARK_KEY, '1');
+    setShowCoachmark(false);
+  }
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', background: 'var(--paper)' }}>
       <TopChrome ideaText={ideaText} />
@@ -114,6 +124,8 @@ export default function App() {
           onSentenceClick={handleSentenceClick}
           concernCount={concernCount}
           lenses={LENSES}
+          showCoachmark={showCoachmark}
+          onDismissCoachmark={handleDismissCoachmark}
         />
         <StreamPane
           thoughts={thoughts}
@@ -124,6 +136,7 @@ export default function App() {
           onClearFocus={() => handleSentenceClick(null, null)}
           stopped={stopped}
           activeLens={activeLens}
+          ideaText={ideaText}
         />
       </div>
     </div>
