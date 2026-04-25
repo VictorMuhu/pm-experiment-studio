@@ -59,7 +59,7 @@ export default function App() {
 
   function handleSentenceClick(id, text) {
     setActiveSentenceId(id);
-    setActiveSentenceText(text || null);
+    setActiveSentenceText(id === null ? null : (text ?? null));
   }
 
   return (
