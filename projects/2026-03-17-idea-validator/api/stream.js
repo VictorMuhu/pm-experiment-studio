@@ -1,6 +1,10 @@
 import OpenAI from 'openai';
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY ?? '', dangerouslyAllowBrowser: true });
+let _client;
+function getClient() {
+  if (!_client) _client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  return _client;
+}
 
 const LENS_PERSONAS = {
   skeptic:    "A devil's advocate who hunts for unvalidated assumptions, logical gaps, and claims that sound good but aren't falsifiable. You are not trying to kill the idea — you are trying to surface what must be true for it to work.",
@@ -70,7 +74,7 @@ async function handler(req, res) {
   let ended = false;
 
   try {
-    const stream = await client.chat.completions.create({
+    const stream = await getClient().chat.completions.create({
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: buildSystemPrompt(lens) },
