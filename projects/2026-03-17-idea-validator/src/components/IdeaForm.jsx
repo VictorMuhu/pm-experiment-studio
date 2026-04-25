@@ -98,10 +98,22 @@ const tipBoxStyle = {
 };
 
 const EXAMPLES = [
-  "A Slack bot that turns meeting transcripts into 'decision receipts' — one-line records of who agreed to what, by when, and under what assumptions. Auto-posted in the relevant channel within 60 seconds of meeting end. Free forever for teams under 10; $9/seat above that.",
-  "An AI that reads your team's GitHub commits, Jira tickets, and Slack messages overnight and writes a one-paragraph standup for each engineer — ready before the 9am call so the meeting confirms rather than reports. $12/seat/month, unlimited integrations.",
-  "A lightweight analytics layer that shows indie SaaS founders exactly which in-app moments predict a free-to-paid upgrade — ranked by conversion lift, not pageviews. One script-tag install, no backend changes. $49/month flat up to 25K MAU.",
-  "A mobile-first notes app where you speak a rough idea for 20–60 seconds and get back a structured note: a title, three bullet points, and flagged action items — synced to a shared team space instantly. $7/month per user; teams of 20+ get bulk pricing.",
+  {
+    label: 'Slack bot for meeting decisions',
+    text: "A Slack bot that turns meeting transcripts into 'decision receipts' — one-line records of who agreed to what, by when, and under what assumptions. Auto-posted in the relevant channel within 60 seconds of meeting end. Free forever for teams under 10; $9/seat above that.",
+  },
+  {
+    label: 'AI-powered daily standup summary',
+    text: "An AI that reads your team's GitHub commits, Jira tickets, and Slack messages overnight and writes a one-paragraph standup for each engineer — ready before the 9am call so the meeting confirms rather than reports. $12/seat/month, unlimited integrations.",
+  },
+  {
+    label: 'Paywall analytics for indie SaaS',
+    text: "A lightweight analytics layer that shows indie SaaS founders exactly which in-app moments predict a free-to-paid upgrade — ranked by conversion lift, not pageviews. One script-tag install, no backend changes. $49/month flat up to 25K MAU.",
+  },
+  {
+    label: 'Replace Notion with voice notes',
+    text: "A mobile-first notes app where you speak a rough idea for 20–60 seconds and get back a structured note: a title, three bullet points, and flagged action items — synced to a shared team space instantly. $7/month per user; teams of 20+ get bulk pricing.",
+  },
 ];
 
 function numToWord(n) {
@@ -229,25 +241,22 @@ export default function IdeaForm({
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {EXAMPLES.map(e => (
                 <button
-                  key={e}
+                  key={e.label}
                   type="button"
-                  onClick={() => onChange(e)}
+                  onClick={() => onChange(e.text)}
                   style={{
                     background: 'var(--paper)',
                     border: '1px solid var(--rule)',
-                    padding: '10px 14px',
-                    borderRadius: 6,
+                    padding: '6px 11px',
+                    borderRadius: 20,
                     fontSize: 12,
-                    lineHeight: 1.55,
                     color: 'var(--ink-soft)',
                     cursor: 'pointer',
                     fontFamily: 'var(--sans)',
-                    textAlign: 'left',
                     transition: 'all 0.15s',
-                    width: '100%',
                   }}
                 >
-                  {e}
+                  {e.label}
                 </button>
               ))}
             </div>

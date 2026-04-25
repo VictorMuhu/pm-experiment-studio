@@ -30,7 +30,7 @@ describe('IdeaForm — empty state', () => {
 
   it('renders example chips', () => {
     render(<IdeaForm {...defaultProps} />);
-    expect(screen.getByText(/decision receipts/i)).toBeInTheDocument();
+    expect(screen.getByText(/Slack bot for meeting decisions/i)).toBeInTheDocument();
   });
 
   it('CTA is disabled in empty state', () => {
@@ -38,10 +38,10 @@ describe('IdeaForm — empty state', () => {
     expect(screen.getByRole('button', { name: /pressure-test/i })).toBeDisabled();
   });
 
-  it('clicking an example chip calls onChange with that text', () => {
+  it('clicking an example chip calls onChange with the full expanded text', () => {
     const onChange = vi.fn();
     render(<IdeaForm {...defaultProps} onChange={onChange} />);
-    fireEvent.click(screen.getByText(/decision receipts/i));
+    fireEvent.click(screen.getByText(/Slack bot for meeting decisions/i));
     expect(onChange).toHaveBeenCalledWith(expect.stringContaining('decision receipts'));
   });
 
