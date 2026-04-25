@@ -86,7 +86,7 @@ export default function IdeaForm({ draft, onChange, onRun, onStop, appState, act
       </Field>
 
       <Field label="Problem (who, when, what breaks)" htmlFor="problem">
-        <textarea id="problem" style={textareaStyle} value={isDone ? '' : draft.problem} onChange={e => onChange('problem', e.target.value)} placeholder="Describe the moment and consequence." rows={3} readOnly={isDone} />
+        <textarea id="problem" style={textareaStyle} value={draft.problem} onChange={e => onChange('problem', e.target.value)} placeholder="Describe the moment and consequence." rows={3} />
         {isDone && <SentenceChips text={draft.problem} activeSentenceId={activeSentenceId} onSentenceClick={onSentenceClick} />}
       </Field>
 

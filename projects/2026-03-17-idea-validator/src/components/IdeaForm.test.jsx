@@ -48,6 +48,6 @@ describe('IdeaForm', () => {
   it('shows sentence chips in done state', () => {
     const draft = { ...emptyDraft, problem: 'Users lose time. They get frustrated.' };
     render(<IdeaForm draft={draft} onChange={() => {}} onRun={() => {}} onStop={() => {}} appState="done" activeSentenceId={null} onSentenceClick={() => {}} />);
-    expect(screen.getByText(/users lose time/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /users lose time/i })).toBeInTheDocument();
   });
 });
