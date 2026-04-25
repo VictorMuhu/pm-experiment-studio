@@ -60,7 +60,7 @@ async function handler(req, res) {
       model: 'gpt-4o',
       messages: [
         { role: 'system', content: buildSystemPrompt(lens) },
-        { role: 'user', content: buildUserPrompt(draft) },
+        { role: 'user', content: buildUserPrompt(ideaText) },
       ],
       stream: true,
       temperature: 0.4,
