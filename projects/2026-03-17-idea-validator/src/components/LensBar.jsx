@@ -1,4 +1,4 @@
-export default function LensBar({ lenses, activeLens, onChange, appState }) {
+export default function LensBar({ lenses = ['skeptic', 'builder', 'buyer', 'competitor'], activeLens, onChange, appState }) {
   const disabled = appState === 'streaming';
 
   return (

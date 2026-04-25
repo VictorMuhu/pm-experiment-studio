@@ -1,11 +1,13 @@
 export default function ThoughtItem({ thought, dimmed }) {
-  const borderColor = thought.category === 'concern' ? 'var(--concern)' : 'var(--strength)';
+  const borderColor =
+    thought.category === 'concern'  ? 'var(--concern)'  :
+    thought.category === 'strength' ? 'var(--strength)' :
+    'var(--rule)';
 
   return (
     <div
       style={{
         borderLeft: `3px solid ${borderColor}`,
-        borderLeftColor: borderColor,
         paddingLeft: 'var(--sp-3)',
         marginBottom: 'var(--sp-4)',
         opacity: dimmed ? 0.2 : 1,

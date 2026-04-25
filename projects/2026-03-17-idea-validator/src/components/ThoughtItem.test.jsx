@@ -35,11 +35,11 @@ describe('ThoughtItem', () => {
 
   it('uses concern border color for concern category', () => {
     const { container } = render(<ThoughtItem thought={concern} dimmed={false} />);
-    expect(container.firstChild).toHaveStyle({ borderLeftColor: 'var(--concern)' });
+    expect(container.firstChild).toHaveStyle({ borderLeft: '3px solid var(--concern)' });
   });
 
   it('uses strength border color for strength category', () => {
     const { container } = render(<ThoughtItem thought={strength} dimmed={false} />);
-    expect(container.firstChild).toHaveStyle({ borderLeftColor: 'var(--strength)' });
+    expect(container.firstChild).toHaveStyle({ borderLeft: '3px solid var(--strength)' });
   });
 });
