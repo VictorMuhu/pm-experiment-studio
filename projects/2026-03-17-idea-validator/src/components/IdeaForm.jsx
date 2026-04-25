@@ -162,9 +162,9 @@ export default function IdeaForm({
   const wordCount = ideaText.trim() ? ideaText.trim().split(/\s+/).length : 0;
 
   const doneHeading =
-    concernCount === 0 ? 'No load-bearing concerns.' :
-    concernCount === 1 ? 'One concern is load-bearing.' :
-    `${numToWord(concernCount)} concerns are load-bearing.`;
+    concernCount === 0 ? 'No critical concerns found.' :
+    concernCount === 1 ? '1 critical concern weakens this idea.' :
+    `${concernCount} critical concerns weaken this idea.`;
 
   const showEditMode = isEditing && !isStreaming;
 

@@ -106,7 +106,7 @@ describe('IdeaForm — streaming state', () => {
 describe('IdeaForm — done state', () => {
   it('shows concern count heading', () => {
     render(<IdeaForm {...defaultProps} appState="done" ideaText="My idea." concernCount={2} />);
-    expect(screen.getByText(/two concerns are load-bearing/i)).toBeInTheDocument();
+    expect(screen.getByText(/2 critical concerns weaken this idea/i)).toBeInTheDocument();
   });
 
   it('CTA button reads "Re-run"', () => {
